@@ -1,0 +1,53 @@
+name: Beta Release
+
+on:
+  pull_request:
+    branches: ['release/**']
+    types: [closed]
+
+jobs:
+  beta-release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [26.x]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set exact beta package version
+        id: version
+        run: |
+          BASE_VERSION=$(node -p "require('./package.json').version")
+          SHORT_SHA=$(git rev-parse --short=7 HEAD)
+          BETA_VERSION="${BASE_VERSION}-beta.sha${SHORT_SHA}"
+          npm version "$BETA_VERSION" --no-git-tag-version
+          echo "beta_version=$BETA_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Publish beta version
+        run: |
+          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
+          npm publish --tag beta
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Write published version artifact
+        run: echo "${{ steps.version.outputs.beta_version }}" > beta-version.txt
+
+      - name: Upload version artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: beta-version
+          path: beta-version.txt

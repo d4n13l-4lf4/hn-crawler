@@ -1,0 +1,61 @@
+{
+  "name": "@d4n13l-4lf4/hn-crawler",
+  "version": "1.0.0",
+  "description": "A CLI tool to scrape and analyze Hacker News entries",
+  "main": "dist/presentation/main.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "hn-crawler": "dist/presentation/main.js"
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test:unit": "vitest run tests/unit",
+    "test:coverage": "vitest run tests/unit --coverage",
+    "test:acceptance": "cucumber-js tests/acceptance",
+    "test:acceptance:local": "npm run build && npm install -g . && (npm run test:acceptance; EXIT_CODE=$?; npm uninstall -g hn-crawler; exit $EXIT_CODE)",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint src tests",
+    "typecheck": "tsc --noEmit",
+    "quality": "npm run format && npm run format:check && npm run lint && npm run typecheck && npm run test:coverage",
+    "prepare": "husky install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/d4n13l-4lf4/hn-crawler.git"
+  },
+  "keywords": [
+    "hacker-news",
+    "crawler",
+    "cli"
+  ],
+  "author": "Daniel Alfonso",
+  "license": "MIT",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/d4n13l-4lf4/hn-crawler/issues"
+  },
+  "homepage": "https://github.com/d4n13l-4lf4/hn-crawler#readme",
+  "dependencies": {
+    "cheerio": "1.0.0",
+    "commander": "12.1.0"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "10.8.0",
+    "@types/node": "^26.6.6",
+    "@typescript-eslint/eslint-plugin": "8.73.0",
+    "@typescript-eslint/parser": "8.73.0",
+    "@vitest/coverage-v8": "^5.1.0",
+    "eslint": "9.19.0",
+    "husky": "9.1.7",
+    "prettier": "3.5.3",
+    "tsx": "^4.23.15",
+    "typescript": "5.7.3",
+    "vitest": "^5.1.0"
+  }
+}

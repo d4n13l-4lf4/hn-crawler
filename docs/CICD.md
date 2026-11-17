@@ -4,10 +4,10 @@
 
 ## Branching (gitflow)
 
-| Branch | Purpose |
-| --- | --- |
-| `main` | Production. |
-| `release/**` | An epic. Accumulates features and publishes betas. |
+| Branch       | Purpose                                                                  |
+| ------------ | ------------------------------------------------------------------------ |
+| `main`       | Production.                                                              |
+| `release/**` | An epic. Accumulates features and publishes betas.                       |
 | `feature/**` | Incremental user-story changes, merged into a `release/**` branch by PR. |
 
 Flow: `feature/**` → PR → `release/**` → PR → `main`.
@@ -27,12 +27,12 @@ Flow: `feature/**` → PR → `release/**` → PR → `main`.
 
 All workflows use the Node version from `.nvmrc`.
 
-| Workflow | Trigger | Condition | Jobs |
-| --- | --- | --- | --- |
-| `ci` | PR opened or updated against `release/**` or `main` | none | Run the quality gates from `QA.md`. This validates `feature/**` and `release/**` branches. |
-| `beta-release` | PR opened or updated against `release/**` | `ci` passed for the `feature/**` branch | Build, derive the beta version, publish to npm under `beta`, upload an artifact with the version. |
-| `acceptance-tests` | `beta-release` completed | `beta-release` succeeded | Download the artifact, install that published beta, run the acceptance tests from `QA.md` against it. |
-| `release` | PR merged into `main` | `ci`, `beta-release` and `acceptance-tests` succeeded for the merged `release/**` branch | Build, publish the `package.json` version to npm as public. |
+| Workflow           | Trigger                                             | Condition                | Jobs                                                                                                    |
+| ------------------ | --------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------- |
+| `ci`               | PR opened or updated against `release/**` or `main` | none                     | Run the quality gates from `QA.md`. This validates `feature/**` and `release/**` branches.              |
+| `beta-release`     | PR closed against `release/**`                      | PR was merged            | Build, derive the beta version, publish to npm under `beta`, upload an artifact with the exact version. |
+| `acceptance-tests` | `beta-release` completed                            | `beta-release` succeeded | Download the artifact, install that exact published beta, run the acceptance tests from `QA.md`.        |
+| `release`          | PR merged into `main`                               | PR was merged            | Build, publish the `package.json` version to npm as public under `latest`.                              |
 
 ## Tools
 
