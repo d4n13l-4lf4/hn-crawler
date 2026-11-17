@@ -4,7 +4,7 @@ A CLI tool to scrape and analyze the top Hacker News entries.
 
 ## Features
 
-This is the **MVP (Minimum Viable Product)** version with the following capabilities:
+This is the **MVP** version with the following capabilities:
 
 - Default "Hello World" command to validate toolchain works end-to-end
 - Full hexagonal architecture scaffolding
