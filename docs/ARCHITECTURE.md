@@ -81,23 +81,22 @@ Root-level configuration files for the tools in the stack (linter, formatter, te
 
 ### Folder responsibilities
 
-| Folder | Responsibility |
-| --- | --- |
-| `src/domain` | Pure core: entities and value objects (`HNEntry`, `FilterType`, `UsageRecord`) and stateless text utilities (`countWords`, `extractNumber`). No external dependencies; unaware of streams, HTTP, databases or the CLI. |
-| `src/application` | The main use case (`crawl-hn`): reads entries from a port, applies a pipeline, records usage. |
-| `src/application/ports` | Driven interfaces that decouple orchestration from I/O: the entry source (sync or async iterable of entries) and the usage repository. |
-| `src/application/pipeline` | Generic stream building blocks: `pipe`/`pipeAsync` and operators (`filter`, `map`, `take`, `eagerTopK`), plus their type declarations. |
-| `src/application/pipeline/steps` | Single-responsibility steps configured with domain rules: lazy filters (`filter-*`) and bounded eager windows (`top-by-*`). |
-| `src/application/pipeline/composed` | Pre-wired pipelines (`long-titles`, `short-titles`) combining steps into business flows. |
-| `src/infrastructure/web` | HTTP fetching, lazy HTML-to-entry parsing with Cheerio, and the adapter implementing the entry-source port. |
-| `src/infrastructure/persistence` | Usage repository implementation on SQLite. |
-| `src/presentation` | Driving adapter: `cli.ts` handles argument parsing and output formatting; `main.ts` is the composition root where concrete adapters are instantiated and injected into the use case. |
-| `tests/fixtures` | Static HTML snapshots shared by all test levels, so no test needs the live site. |
-| `tests/unit` | Mirrors `src`; see `QA.md`. |
-| `tests/integration` | Use case against an in-memory entry source and database; see `QA.md`. |
-| `tests/acceptance` | Gherkin `features` and `steps` exercising the CLI; see `QA.md`. |
-| `docs` | Project documentation. |
-| `.github/workflows`, `.husky` | CI/CD workflows and git hooks; see `CICD.md`. |
+| Folder                              | Responsibility                                                                                                                                                                                                         |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/domain`                        | Pure core: entities and value objects (`HNEntry`, `FilterType`, `UsageRecord`) and stateless text utilities (`countWords`, `extractNumber`). No external dependencies; unaware of streams, HTTP, databases or the CLI. |
+| `src/application`                   | The main use case (`crawl-hn`): reads entries from a port, applies a pipeline, records usage.                                                                                                                          |
+| `src/application/ports`             | Driven interfaces that decouple orchestration from I/O: the entry source (sync or async iterable of entries) and the usage repository.                                                                                 |
+| `src/application/pipeline`          | Generic stream building blocks: `pipe`/`pipeAsync` and operators (`filter`, `map`, `take`, `eagerTopK`), plus their type declarations.                                                                                 |
+| `src/application/pipeline/steps`    | Single-responsibility steps configured with domain rules: lazy filters (`filter-*`) and bounded eager windows (`top-by-*`).                                                                                            |
+| `src/application/pipeline/composed` | Pre-wired pipelines (`long-titles`, `short-titles`) combining steps into business flows.                                                                                                                               |
+| `src/infrastructure/web`            | HTTP fetching, lazy HTML-to-entry parsing with Cheerio, and the adapter implementing the entry-source port.                                                                                                            |
+| `src/infrastructure/persistence`    | Usage repository implementation on SQLite.                                                                                                                                                                             |
+| `src/presentation`                  | Driving adapter: `cli.ts` handles argument parsing and output formatting; `main.ts` is the composition root where concrete adapters are instantiated and injected into the use case.                                   |
+| `tests/fixtures`                    | Static HTML snapshots shared by all test levels, so no test needs the live site.                                                                                                                                       |
+| `tests/unit`                        | Mirrors `src`; see `QA.md`.                                                                                                                                                                                            |
+| `tests/acceptance`                  | Gherkin `features` and `steps` exercising the CLI; see `QA.md`.                                                                                                                                                        |
+| `docs`                              | Project documentation.                                                                                                                                                                                                 |
+| `.github/workflows`, `.husky`       | CI/CD workflows and git hooks; see `CICD.md`.                                                                                                                                                                          |
 
 ### Conventions
 
@@ -126,10 +125,10 @@ function take(limit: number): {
 
 Testing and delivery tooling is described in `QA.md` and `CICD.md`.
 
-| Technology | Role |
-| --- | --- |
-| TypeScript (strict) | Base language; compiled to JavaScript with `tsc`, no bundler |
-| Node 26 LTS + npm | Runtime and package manager; `.nvmrc` pins the version |
-| Commander | CLI framework |
-| Native `fetch` + Cheerio | HTTP requests and HTML parsing |
-| `node:sqlite` | Usage storage in a local file. Built into Node, so there is no native dependency to install. At the time of writing it is marked as a release candidate in Node 26, so it is the one API to re-check when upgrading Node. |
+| Technology               | Role                                                                                                                                                                                                                      |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TypeScript (strict)      | Base language; compiled to JavaScript with `tsc`, no bundler                                                                                                                                                              |
+| Node 26 LTS + npm        | Runtime and package manager; `.nvmrc` pins the version                                                                                                                                                                    |
+| Commander                | CLI framework                                                                                                                                                                                                             |
+| Native `fetch` + Cheerio | HTTP requests and HTML parsing                                                                                                                                                                                            |
+| `node:sqlite`            | Usage storage in a local file. Built into Node, so there is no native dependency to install. At the time of writing it is marked as a release candidate in Node 26, so it is the one API to re-check when upgrading Node. |
