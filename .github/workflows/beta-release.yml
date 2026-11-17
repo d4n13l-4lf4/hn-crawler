@@ -32,7 +32,9 @@ jobs:
         run: |
           BASE_VERSION=$(node -p "require('./package.json').version")
           SHORT_SHA=$(git rev-parse --short=7 HEAD)
-          BETA_VERSION="${BASE_VERSION}-beta.sha${SHORT_SHA}"
+          RUN_NUMBER="${GITHUB_RUN_NUMBER}"
+          RUN_ATTEMPT="${GITHUB_RUN_ATTEMPT}"
+          BETA_VERSION="${BASE_VERSION}-beta.${RUN_NUMBER}-${RUN_ATTEMPT}-sha${SHORT_SHA}"
           npm version "$BETA_VERSION" --no-git-tag-version
           echo "beta_version=$BETA_VERSION" >> "$GITHUB_OUTPUT"
 
