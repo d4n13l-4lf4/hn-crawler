@@ -40,7 +40,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install exact published beta version
-        run: npm install --global "hn-crawler@$(cat .beta-version/beta-version.txt)"
+        run: npm install --global "@d4n13l-4lf4/hn-crawler@$(cat .beta-version/beta-version.txt)"
 
       - name: Run acceptance tests
         run: npm run test:acceptance

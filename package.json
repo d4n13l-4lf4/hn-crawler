@@ -1,6 +1,6 @@
 {
   "name": "@d4n13l-4lf4/hn-crawler",
-  "version": "0.0.1-beta.1",
+  "version": "1.0.0",
   "description": "A CLI tool to scrape and analyze Hacker News entries",
   "main": "dist/presentation/main.js",
   "publishConfig": {
@@ -18,10 +18,11 @@
     "test:coverage": "vitest run tests/unit --coverage",
     "test:acceptance": "cucumber-js tests/acceptance",
     "test:acceptance:local": "npm run build && npm install -g . && (npm run test:acceptance; EXIT_CODE=$?; npm uninstall -g hn-crawler; exit $EXIT_CODE)",
+    "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint src tests",
     "typecheck": "tsc --noEmit",
-    "quality": "npm run format:check && npm run lint && npm run typecheck && npm run test:coverage",
+    "quality": "npm run format && npm run format:check && npm run lint && npm run typecheck && npm run test:coverage",
     "prepare": "husky install"
   },
   "repository": {
