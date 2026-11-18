@@ -133,6 +133,7 @@ function testDbEnvironment(world: UsageWorld): Record<string, string> {
   return {
     HN_CRAWLER_DB_PATH: world.usageDbPath,
     HN_CRAWLER_USAGE_LIMIT: process.env.HN_CRAWLER_USAGE_LIMIT ?? '100',
+    TZ: 'UTC',
   };
 }
 

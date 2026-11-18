@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { UsageQueryPort } from '@/application/ports/in/usage-query.port';
 import { AppliedFilters } from '@/domain/vo/applied-filters.vo';
 import { Usage } from '@/domain/entities/usage.entity';
@@ -11,6 +11,10 @@ const FILTERS = AppliedFilters.builder()
   .build();
 
 const ORIGINAL_TIME_ZONE = process.env.TZ;
+
+beforeEach(() => {
+  process.env.TZ = 'UTC';
+});
 
 afterEach(() => {
   if (ORIGINAL_TIME_ZONE === undefined) {
@@ -56,8 +60,8 @@ describe('Usage command unit test', () => {
         'Usage data',
         'ID                                   | Request Date and Time     | Applied Filters                                    | Duration (ms)',
         '-------------------------------------|---------------------------|----------------------------------------------------|--------------',
-        `${UUID} | 1970-01-02 11:12:03 (CET) | sort:number_of_comments:desc,sort:title_words:gt:5 |           122`,
-        '018f0f4b-7b7c-7abc-8def-0123456789ac | 1970-01-02 11:12:03 (CET) | sort:number_of_points:desc                         |            10',
+        `${UUID} | 1970-01-02 10:12:03 (UTC) | sort:number_of_comments:desc,sort:title_words:gt:5 |           122`,
+        '018f0f4b-7b7c-7abc-8def-0123456789ac | 1970-01-02 10:12:03 (UTC) | sort:number_of_points:desc                         |            10',
       ].join('\n'),
     },
   ])(
