@@ -43,9 +43,9 @@
 
 ### Milestone B: In-memory repository
 
-- [ ] T013 [P] Implement `UsageRepositoryPort` using a process-local list in `src/infrastructure/persistence/in-memory/in-memory.repository.ts`; preserve insertion order and return a defensive list copy
-- [ ] T014 Add table-driven `it should when` tests for empty history, sequential saves, insertion order, and retrieval isolation in `tests/unit/infrastructure/persistence/in-memory/in-memory.repository.test.ts`
-- [ ] T015 Run focused repository unit tests and non-acceptance quality gates; pause for review
+- [x] T013 [P] Implement `UsageRepositoryPort` using a process-local list in `src/infrastructure/persistence/in-memory/in-memory.repository.ts`; preserve insertion order and return a defensive list copy
+- [x] T014 Add table-driven `it should when` tests for empty history, sequential saves, insertion order, and retrieval isolation in `tests/unit/infrastructure/persistence/in-memory/in-memory.repository.test.ts`
+- [x] T015 Run `npm run quality`; all non-acceptance gates pass with 100% unit coverage
 
 **Checkpoint**: Minimal process-local storage is reviewed and green.
 
