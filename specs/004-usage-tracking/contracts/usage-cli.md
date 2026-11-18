@@ -27,6 +27,8 @@ The `applied_filters` example uses sort-first ordering. If there is no title rul
 
 History is held in process-local memory. A newly started process has empty history; records do not persist between independent invocations or restarts.
 
+The standalone CLI starts a new process for each invocation. Therefore, a separate `hn-crawler usage` invocation prints `[]`; populated-history serialization and crawl tracking are verified with unit tests that exercise the shared repository and command components in one process.
+
 ## Errors
 
 Unsupported options or arguments are rejected using the standard CLI argument error and non-zero status. Usage read errors use the command's standard failure behavior. A tracking write failure is isolated and never changes the crawl result or original crawl error.

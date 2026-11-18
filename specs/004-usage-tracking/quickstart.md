@@ -20,6 +20,6 @@ Unit tests should exercise default filters, ranking-only requests, title-only re
 
 ## Acceptance scenarios
 
-The final approved acceptance run should verify `usage` output in a single process/test context where possible. Since process-local history is intentional for this feature, launching a separate executable process for each command starts with empty history. Persistence will be addressed in a future feature. No local acceptance execution is required before the final milestone.
+The standalone CLI launches a process for each command. Since history is process-local, each `usage` invocation in the acceptance suite starts empty. Populated-history serialization and tracking across crawl outcomes are verified through unit tests that exercise the wired components in one process. Persistence will be addressed in a future feature. No local acceptance execution is required before explicit approval at the final milestone.
 
 See [usage CLI contract](contracts/usage-cli.md) and [data model](data-model.md).

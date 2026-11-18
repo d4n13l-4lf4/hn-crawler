@@ -8,11 +8,10 @@ Feature: View crawler usage history
     Then the usage command exits with code 0
     And the usage output is an empty JSON array
 
-  Scenario: Show a JSON array with the usage record schema
+  Scenario: Show an empty JSON array because history is process local
     When I run "hn-crawler usage" as a standalone command
     Then the usage command exits with code 0
-    And the usage output is a JSON array
-    And the usage output contains the required public fields
+    And the usage output is an empty JSON array
 
   Scenario: Reject unsupported usage arguments
     When I run "hn-crawler usage --unknown" as a standalone command
@@ -21,3 +20,7 @@ Feature: View crawler usage history
   Scenario: Start with empty history after process restart
     When I run "hn-crawler usage" as a standalone command
     Then the usage output is an empty JSON array
+
+  Scenario: Register usage in the CLI help
+    When I run "hn-crawler --help" as a standalone command
+    Then the usage help includes the usage subcommand

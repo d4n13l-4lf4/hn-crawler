@@ -20,8 +20,8 @@
 
 - [x] T002 [P] [US1] Add acceptance scenarios for a crawl usage record on default, ranking-only, title-only, and combined filter/ranking requests in `tests/acceptance/features/usage.feature`
 - [x] T003 [P] [US1] Add acceptance scenarios for usage recording after crawl success/failure and for best-effort behavior preserving crawl results/errors in `tests/acceptance/features/usage.feature`
-- [x] T004 [P] [US2] Add acceptance scenarios for empty usage output, serialized record fields/order, unsupported args, and process-local history behavior in `tests/acceptance/features/usage.feature`
-- [x] T005 [US1] Add black-box process steps for usage command output and crawl usage scenarios in `tests/acceptance/steps/usage.steps.ts`, avoiding imports or references to source artifacts
+- [x] T004 [P] [US2] Add acceptance scenarios for empty process-local usage output, unsupported args, restart behavior, and usage CLI help registration in `tests/acceptance/features/usage.feature`
+- [x] T005 [US1] Add black-box process steps for usage output and help scenarios in `tests/acceptance/steps/usage.steps.ts`, avoiding imports or references to source artifacts
 - [x] T006 Run `npm run format:check`, `npm run lint`, and `npm run typecheck` only; do not execute acceptance tests; pause for review
 
 **Checkpoint**: Acceptance contract is reviewable and remains unrun.
@@ -99,7 +99,7 @@
 
 **Purpose**: Run the previously deferred black-box suite only after the user explicitly approves the final milestone.
 
-- [ ] T030 After explicit user approval, execute the acceptance tests for usage recording and retrieval using the configured deterministic environment and verify process-local lifetime behavior
+- [ ] T030 After explicit user approval, execute the black-box acceptance suite using the configured deterministic environment and verify CLI registration, argument behavior, and empty process-local usage history (populated tracking and serialization are covered by unit tests)
 - [ ] T031 Run `npm run format:check`, `npm run lint`, `npm run typecheck`, and `npm run test:coverage`; record results and pause for final review
 
 ## Dependencies & Execution Order

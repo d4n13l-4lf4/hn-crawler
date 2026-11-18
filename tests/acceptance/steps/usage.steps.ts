@@ -45,25 +45,10 @@ Then(
 );
 
 Then(
-  'the usage output is a JSON array',
+  'the usage help includes the usage subcommand',
   function (this: { result?: CommandResult }) {
-    assert.ok(Array.isArray(parseOutput(this.result)));
-  }
-);
-
-Then(
-  'the usage output contains the required public fields',
-  function (this: { result?: CommandResult }) {
-    const entries = parseOutput(this.result);
-    assert.ok(Array.isArray(entries));
-    for (const entry of entries) {
-      assert.deepEqual(Object.keys(entry).sort(), [
-        'applied_filters',
-        'duration_ms',
-        'request_id',
-        'request_timestamp',
-      ]);
-    }
+    assert.equal(this.result?.status, 0);
+    assert.ok(this.result?.stdout.includes('usage'));
   }
 );
 
