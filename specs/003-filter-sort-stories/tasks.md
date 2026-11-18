@@ -47,12 +47,12 @@
 
 ### Milestone B: Domain title policy and pipeline factory
 
-- [X] T015 [P] [US1] Add pure title-word predicates for `gt` and `le` using the established word-count rule in `src/domain/policies/entry-filter.policy.ts`
-- [X] T016 [P] [US1] Add table-driven policy tests for whitespace, punctuation-only tokens, internal punctuation, boundary counts, and empty titles in `tests/unit/domain/policies/entry-filter.policy.test.ts`
-- [X] T017 [US1] Define factory configuration (`comments | points`, optional title-word rule) and async pipeline factory in `src/application/pipeline/factory/factory.ts`
-- [X] T018 [US1] Add a configured title filter step in `src/application/pipeline/steps/filter-title-words.step.ts` using the domain policy
-- [X] T019 [US1] Add table-driven tests for configured filter and sort pipeline composition, defaults supplied by caller, all four combinations, stable ties, missing metrics, and no matches in `tests/unit/application/pipeline/factory/factory.test.ts` and `tests/unit/application/pipeline/steps/filter-title-words.step.test.ts`
-- [X] T020 [US1] Run `npm run test:unit -- tests/unit/domain/policies/entry-filter.policy.test.ts tests/unit/application/pipeline/factory/factory.test.ts` and the non-acceptance quality gates; pause for review before use-case changes
+- [x] T015 [P] [US1] Add pure title-word predicates for `gt` and `le` using the established word-count rule in `src/domain/policies/entry-filter.policy.ts`
+- [x] T016 [P] [US1] Add table-driven policy tests for whitespace, punctuation-only tokens, internal punctuation, boundary counts, and empty titles in `tests/unit/domain/policies/entry-filter.policy.test.ts`
+- [x] T017 [US1] Define factory configuration (`comments | points`, optional title-word rule) and async pipeline factory in `src/application/pipeline/factory/factory.ts`
+- [x] T018 [US1] Add a configured title filter step in `src/application/pipeline/steps/filter-title-words.step.ts` using the domain policy
+- [x] T019 [US1] Add table-driven tests for configured filter and sort pipeline composition, defaults supplied by caller, all four combinations, stable ties, missing metrics, and no matches in `tests/unit/application/pipeline/factory/factory.test.ts` and `tests/unit/application/pipeline/steps/filter-title-words.step.test.ts`
+- [x] T020 [US1] Run `npm run test:unit -- tests/unit/domain/policies/entry-filter.policy.test.ts tests/unit/application/pipeline/factory/factory.test.ts` and the non-acceptance quality gates; pause for review before use-case changes
 
 **Checkpoint**: Domain predicates and configured pipeline are independently tested and green.
 
