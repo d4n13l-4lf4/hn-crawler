@@ -27,7 +27,7 @@ describe('SqliteUsageRepository', () => {
       `018f0f4b-7b7c-7abc-8def-0123456789${suffix}`,
       timestamp,
       filters,
-      timestamp / 10
+      Math.floor(timestamp / 10)
     );
   const first = makeUsage('ab', 100);
   const second = makeUsage('ac', 100);
@@ -102,6 +102,17 @@ describe('SqliteUsageRepository', () => {
       expect(await repository.getAll()).toEqual(expected);
     }
   );
+
+  it('should retain the newest 100 records by default', () => {
+    const repository = createRepository();
+    const records = Array.from({ length: 101 }, (_, index) =>
+      makeUsage(index.toString(16).padStart(2, '0'), index + 1)
+    );
+
+    for (const record of records) repository.save(record);
+
+    expect(repository.getAll()).toEqual(records.slice(1));
+  });
 
   it('should roll back the inserted record when retention pruning fails', () => {
     const repository = createRepository(1);

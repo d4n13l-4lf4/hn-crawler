@@ -87,14 +87,14 @@
 
 ### Tests for User Story 3
 
-- [ ] T030 [P] [US3] Add repository tests proving the default limit is 100 and the newest 100 survive an over-limit write sequence in `tests/unit/infrastructure/persistence/sqlite/repositories/usage.repository.test.ts`
-- [ ] T031 [P] [US3] Add repository tests proving custom limit and configuration reduction prune oldest rows on the next save in `tests/unit/infrastructure/persistence/sqlite/repositories/usage.repository.test.ts`
+- [x] T030 [P] [US3] Add repository tests proving the default limit is 100 and the newest 100 survive an over-limit write sequence in `tests/unit/infrastructure/persistence/sqlite/repositories/usage.repository.test.ts`
+- [x] T031 [P] [US3] Add repository tests proving custom limit and configuration reduction prune oldest rows on the next save in `tests/unit/infrastructure/persistence/sqlite/repositories/usage.repository.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T032 [US3] Apply the configured retention limit atomically with each save and preserve newest-first selection/insertion-order retrieval in `src/infrastructure/persistence/sqlite/repositories/usage.repository.ts`
-- [ ] T033 [US3] Verify retention config validation and default wiring through the composition root in `src/config/config.ts` and `src/presentation/main.ts`
-- [ ] T034 [US3] Run focused retention tests, `npm run quality`, and `npm run build`; pause for review
+- [x] T032 [US3] Apply the configured retention limit atomically with each save and preserve newest-first selection/insertion-order retrieval in `src/infrastructure/persistence/sqlite/repositories/usage.repository.ts`
+- [x] T033 [US3] Verify retention config validation and default wiring through the composition root in `src/config/config.ts` and `src/presentation/main.ts`
+- [x] T034 [US3] Run focused retention tests, `npm run quality`, and `npm run build`; pause for review
 
 **Checkpoint**: The persisted history remains bounded by application configuration.
 
