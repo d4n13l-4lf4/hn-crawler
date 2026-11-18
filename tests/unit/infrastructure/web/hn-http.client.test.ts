@@ -51,14 +51,31 @@ describe('HN HTTP client unit test', () => {
     }
   );
 
-  it('should propagate the original network error', async () => {
-    const networkError = new TypeError('network unavailable');
-    const fetchMock = vi.fn().mockRejectedValue(networkError);
+  it.each([
+    {
+      should: 'retain the original network error as the cause',
+      error: new TypeError('network unavailable'),
+    },
+    {
+      should: 'retain a non-Error rejection as the cause',
+      error: 'connection refused',
+    },
+  ])('should $should when fetch rejects', async ({ error: cause }) => {
+    const fetchMock = vi.fn().mockRejectedValue(cause);
     vi.stubGlobal('fetch', fetchMock);
 
-    await expect(fetchPage('https://example.com/news')).rejects.toBe(
-      networkError
-    );
+    let caughtError: unknown;
+    try {
+      await fetchPage('https://example.com/news');
+    } catch (error) {
+      caughtError = error;
+    }
+
+    expect(caughtError).toBeInstanceOf(Error);
+    expect(caughtError).toMatchObject({
+      message: 'Failed to fetch page from https://example.com/news',
+      cause,
+    });
     expect(fetchMock).toHaveBeenCalledOnce();
     expect(fetchMock).toHaveBeenCalledWith('https://example.com/news');
   });

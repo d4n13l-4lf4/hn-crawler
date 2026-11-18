@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import { CrawlerPort } from '../../application/ports/in/crawler.port';
+import { config } from '../../config/config';
 
 const CRAWL_ERROR =
   'An error occurred while running the crawler. Please try again.';
@@ -18,7 +19,9 @@ export function createCrawlCommand(
 
   command.action(async (options: { url?: string }) => {
     try {
-      const entries = await crawler.execute(options.url);
+      const entries = await crawler.execute(
+        options.url ?? config.newsCombinatorUrl
+      );
       console.log(
         JSON.stringify(
           entries.map(({ rank, title, points, number_of_comments }) => ({

@@ -47,7 +47,7 @@ describe('CrawlerUseCase Unit Test', () => {
       const fetchEntries = vi.fn(() => entries(sourceEntries));
       const useCase = new CrawlerUseCase({ fetchEntries });
 
-      const result = await useCase.execute();
+      const result = await useCase.execute('https://example.com/news');
 
       expect(result).toHaveLength(expectedEntries);
       expect(result.map((entry) => entry.rank)).toEqual(
@@ -55,9 +55,7 @@ describe('CrawlerUseCase Unit Test', () => {
       );
       expect(result.at(-1)?.rank ?? 0).toBe(expectedLastRank);
       expect(fetchEntries).toHaveBeenCalledOnce();
-      expect(fetchEntries).toHaveBeenCalledWith(
-        'https://news.ycombinator.com/'
-      );
+      expect(fetchEntries).toHaveBeenCalledWith('https://example.com/news');
     }
   );
 
@@ -72,11 +70,23 @@ describe('CrawlerUseCase Unit Test', () => {
     expect(fetchEntries).toHaveBeenCalledWith('https://example.com/news');
   });
 
+  it('should pass the provided configured URL to the entry source unchanged', async () => {
+    const fetchEntries = vi.fn(() => entries(1));
+    const useCase = new CrawlerUseCase({ fetchEntries });
+
+    const configuredUrl = 'https://news.ycombinator.com/';
+    const result = await useCase.execute(configuredUrl);
+
+    expect(result).toEqual([new HNEntry(1, 'Story 1', 1, 2)]);
+    expect(fetchEntries).toHaveBeenCalledOnce();
+    expect(fetchEntries).toHaveBeenCalledWith(configuredUrl);
+  });
+
   it('should stop consuming the source after the 30th entry', async () => {
     const source = { fetchEntries: vi.fn(() => entries(31)) };
     const useCase = new CrawlerUseCase(source);
 
-    const result = await useCase.execute();
+    const result = await useCase.execute('https://news.ycombinator.com/');
 
     expect(result).toHaveLength(30);
     expect(result[0].rank).toBe(1);

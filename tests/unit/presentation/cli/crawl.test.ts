@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { CrawlerPort } from '../../../../src/application/ports/in/crawler.port';
 import { HNEntry } from '../../../../src/domain/entities/hn-entry.entity';
 import { createCrawlCommand } from '../../../../src/presentation/cli/crawl';
+import { config } from '../../../../src/config/config';
 
 type CrawlCommandTestCase = {
   should: string;
@@ -37,7 +38,7 @@ describe('Crawl command unit test', () => {
 
     expect(log).toHaveBeenCalledWith(expectedOutput);
     expect(crawler.execute).toHaveBeenCalledOnce();
-    expect(crawler.execute).toHaveBeenCalledWith(undefined);
+    expect(crawler.execute).toHaveBeenCalledWith(config.newsCombinatorUrl);
     log.mockRestore();
   });
 
@@ -59,7 +60,7 @@ describe('Crawl command unit test', () => {
     );
     expect(exit).toHaveBeenCalledWith(1);
     expect(crawler.execute).toHaveBeenCalledOnce();
-    expect(crawler.execute).toHaveBeenCalledWith(undefined);
+    expect(crawler.execute).toHaveBeenCalledWith(config.newsCombinatorUrl);
     error.mockRestore();
     exit.mockRestore();
   });
@@ -86,6 +87,20 @@ describe('Crawl command unit test', () => {
 
     expect(crawler.execute).toHaveBeenCalledOnce();
     expect(crawler.execute).toHaveBeenCalledWith('http://127.0.0.1:4321');
+    vi.restoreAllMocks();
+  });
+
+  it('should pass the configured URL when the beta URL option is omitted', async () => {
+    const crawler = createCrawler();
+    const command = createCrawlCommand(crawler, true);
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    await command.parseAsync(['node', 'hn-crawler', 'crawl'], {
+      from: 'user',
+    });
+
+    expect(crawler.execute).toHaveBeenCalledOnce();
+    expect(crawler.execute).toHaveBeenCalledWith(config.newsCombinatorUrl);
     vi.restoreAllMocks();
   });
 });
