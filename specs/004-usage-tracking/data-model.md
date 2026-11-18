@@ -4,12 +4,12 @@
 
 One entity represents a crawl attempt.
 
-| Field | Type | Required | Rule |
-| --- | --- | ---: | --- |
-| `request_id` | UUIDv7 string | Yes | Unique per tracked crawl attempt |
-| `request_timestamp` | Integer Unix milliseconds UTC | Yes | Captured at request start |
-| `applied_filters` | `AppliedFilters` value object | Yes | Stable sort tag plus optional title rule tag |
-| `duration_ms` | Non-negative integer | Yes | Monotonic elapsed time, rounded/floored to integer milliseconds |
+| Field               | Type                          | Required | Rule                                                            |
+| ------------------- | ----------------------------- | -------: | --------------------------------------------------------------- |
+| `request_id`        | UUIDv7 string                 |      Yes | Unique per tracked crawl attempt                                |
+| `request_timestamp` | Integer Unix milliseconds UTC |      Yes | Captured at request start                                       |
+| `applied_filters`   | `AppliedFilters` value object |      Yes | Stable sort tag plus optional title rule tag                    |
+| `duration_ms`       | Non-negative integer          |      Yes | Monotonic elapsed time, rounded/floored to integer milliseconds |
 
 The user-visible JSON contains these four fields. Storage-specific metadata is excluded from serialization.
 

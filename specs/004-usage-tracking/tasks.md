@@ -32,12 +32,12 @@
 
 ### Milestone A: Usage entity and applied-filters value object
 
-- [ ] T007 [P] Create `AppliedFilters` builder in `src/domain/value-objects/applied-filters.vo.ts`, exposing sort/title choices and deterministic sort-first serialization while hiding string tags
-- [ ] T008 [P] Add table-driven `it should when` tests for sort mappings, optional title mappings, combined tag order, and omitted title tag in `tests/unit/domain/value-objects/applied-filters.vo.test.ts`
-- [ ] T009 Create `Usage` entity in `src/domain/entities/usage.entity.ts` with UUIDv7 request ID, Unix-millisecond request timestamp, `AppliedFilters`, and validated non-negative integer duration
-- [ ] T010 Add table-driven `it should when` tests for valid fields, UUIDv7 shape, timestamp and duration rules in `tests/unit/domain/entities/usage.entity.test.ts`
-- [ ] T011 Define `UsageRepositoryPort` save and get-all operations in `src/application/ports/out/usage-repository.port.ts`
-- [ ] T012 Run focused domain tests and non-acceptance quality gates; pause for review
+- [x] T007 [P] Create `AppliedFilters` builder in `src/domain/vo/applied-filters.vo.ts`, exposing sort/title choices and deterministic sort-first serialization while hiding string tags
+- [x] T008 [P] Add table-driven `it should when` tests for sort mappings, optional title mappings, combined tag order, and omitted title tag in `tests/unit/domain/vo/applied-filters.vo.test.ts`
+- [x] T009 Create `Usage` entity in `src/domain/entities/usage.entity.ts` with UUIDv7 request ID, Unix-millisecond request timestamp, `AppliedFilters`, and validated non-negative integer duration
+- [x] T010 Add table-driven `it should when` tests for valid fields, UUIDv7 shape, timestamp and duration rules in `tests/unit/domain/entities/usage.entity.test.ts`
+- [x] T011 Define `UsageRepositoryPort` save and get-all operations in `src/application/ports/out/usage-repository.port.ts`
+- [x] T012 Run `npm run quality`; formatting, lint, typecheck, and 100% unit coverage pass
 
 **Checkpoint**: Domain record/filter types and repository contract are reviewed and green.
 
