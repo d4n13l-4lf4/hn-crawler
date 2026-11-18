@@ -18,11 +18,11 @@
 
 **Purpose**: Specify user-visible usage behavior as standalone CLI acceptance scenarios before implementation.
 
-- [ ] T002 [P] [US1] Add acceptance scenarios for a crawl usage record on default, ranking-only, title-only, and combined filter/ranking requests in `tests/acceptance/features/usage.feature`
-- [ ] T003 [P] [US1] Add acceptance scenarios for usage recording after crawl success/failure and for best-effort behavior preserving crawl results/errors in `tests/acceptance/features/usage.feature`
-- [ ] T004 [P] [US2] Add acceptance scenarios for empty usage output, serialized record fields/order, unsupported args, and process-local history behavior in `tests/acceptance/features/usage.feature`
-- [ ] T005 [US1] Add black-box process steps for usage command output and crawl usage scenarios in `tests/acceptance/steps/usage.steps.ts`, avoiding imports or references to source artifacts
-- [ ] T006 Run `npm run format:check`, `npm run lint`, and `npm run typecheck` only; do not execute acceptance tests; pause for review
+- [x] T002 [P] [US1] Add acceptance scenarios for a crawl usage record on default, ranking-only, title-only, and combined filter/ranking requests in `tests/acceptance/features/usage.feature`
+- [x] T003 [P] [US1] Add acceptance scenarios for usage recording after crawl success/failure and for best-effort behavior preserving crawl results/errors in `tests/acceptance/features/usage.feature`
+- [x] T004 [P] [US2] Add acceptance scenarios for empty usage output, serialized record fields/order, unsupported args, and process-local history behavior in `tests/acceptance/features/usage.feature`
+- [x] T005 [US1] Add black-box process steps for usage command output and crawl usage scenarios in `tests/acceptance/steps/usage.steps.ts`, avoiding imports or references to source artifacts
+- [x] T006 Run `npm run format:check`, `npm run lint`, and `npm run typecheck` only; do not execute acceptance tests; pause for review
 
 **Checkpoint**: Acceptance contract is reviewable and remains unrun.
 
