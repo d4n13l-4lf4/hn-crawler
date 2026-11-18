@@ -12,6 +12,10 @@
   "directories": {
     "doc": "docs"
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "test:unit": "vitest run tests/unit",
