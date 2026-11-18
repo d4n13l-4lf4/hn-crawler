@@ -39,4 +39,11 @@ module.exports = [
       'no-console': 'off',
     },
   },
+  {
+    files: ['src/presentation/cli/**/*.ts'],
+    rules: {
+      // Console output is the CLI's user-facing stdout/stderr interface.
+      'no-console': 'off',
+    },
+  },
 ];
