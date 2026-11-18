@@ -91,10 +91,11 @@ Then(
   function (this: UsageWorld) {
     const output = this.result?.stdout ?? '';
     assert.match(output, /Usage data/);
-    assert.match(output, /Request Timestamp/);
+    assert.match(output, /Request Date and Time/);
     assert.match(output, /Applied Filters/);
     assert.match(output, /Duration \(ms\)/);
     assert.match(output, /sort:number_of_comments:desc/);
+    assertLocalizedTimestamp(output);
   }
 );
 
@@ -113,7 +114,7 @@ Then(
   function (this: UsageWorld) {
     const lines = (this.result?.stdout ?? '').trimEnd().split('\n');
     assert.equal(lines[0], 'Usage data');
-    assert.match(lines[1] ?? '', /ID\s+\| Request Timestamp/);
+    assert.match(lines[1] ?? '', /ID\s+\| Request Date and Time/);
     assert.match(lines[1] ?? '', /Applied Filters/);
     assert.match(lines[1] ?? '', /Duration \(ms\)/);
     assert.equal(
@@ -166,4 +167,16 @@ function pipeBoundaries(line: string): number[] {
     if (line[index] === '|') positions.push(index);
   }
   return positions;
+}
+
+function assertLocalizedTimestamp(output: string): void {
+  const timestampRow = output
+    .split('\n')
+    .find((line) =>
+      /\| \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \([^)]+\)/.test(line)
+    );
+  assert.ok(
+    timestampRow,
+    'Expected a persisted usage row with a local timestamp and timezone label'
+  );
 }

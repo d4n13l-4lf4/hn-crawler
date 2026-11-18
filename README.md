@@ -173,18 +173,18 @@ The two filters are complementary: `gt:5` and `le:5` together cover every entry,
 
 ### Step 4: Check the usage data
 
-Finally, ask the tool what it did. Each request gets a unique **ID**, a **Request Timestamp** (Unix time in milliseconds), the **Applied Filters** and the **Duration** of the request.
+Finally, ask the tool what it did. Each request gets a unique **ID**, a **Request Date and Time** (shown in your local time zone), the **Applied Filters** and the **Duration** of the request.
 
 ```bash
 hn-crawler usage
 ```
 
 ```text
-ID                                   | Request Timestamp | Applied Filters                                        | Duration (ms)
--------------------------------------|-------------------|--------------------------------------------------------|--------------
-01a1efee-f1d6-7f30-b989-c03e4e02c6ec |     1795026776284 | sort:number_of_comments:desc,sort:title_words:le:10000 |           249
-01a1efee-f32f-75d6-92db-dcd225769067 |     1795026776804 | sort:number_of_comments:desc,sort:title_words:gt:5     |            74
-01a1efee-f5e6-75cb-ab5b-3a8fed5667d6 |     1795026777498 | sort:number_of_points:desc,sort:title_words:le:5       |            75
+ID                                   | Request Date and Time     | Applied Filters                                        | Duration (ms)
+-------------------------------------|---------------------------|--------------------------------------------------------|--------------
+01a1efee-f1d6-7f30-b989-c03e4e02c6ec | 2026-11-18 19:32:56 (CET) | sort:number_of_comments:desc,sort:title_words:le:10000 |           249
+01a1efee-f32f-75d6-92db-dcd225769067 | 2026-11-18 19:32:56 (CET) | sort:number_of_comments:desc,sort:title_words:gt:5     |            74
+01a1efee-f5e6-75cb-ab5b-3a8fed5667d6 | 2026-11-18 19:32:57 (CET) | sort:number_of_points:desc,sort:title_words:le:5       |            75
 ```
 
 Reading the table:
@@ -192,13 +192,6 @@ Reading the table:
 - **Row 1** is your plain `crawl`. No word filter was given, so the tool applied its defaults: sort by comments, and a title word limit of `le:10000`, which keeps everything.
 - **Row 2** is the `gt:5` + comments request from step 2.
 - **Row 3** is the `le:5` + points request from step 3.
-
-Want a human-readable date? Convert the timestamp with Node:
-
-```bash
-node -e "console.log(new Date(1795026776284).toISOString())"
-# 2026-11-18T18:32:56.284Z
-```
 
 That's the whole loop: **crawl, filter, rank, inspect.**
 
@@ -318,12 +311,12 @@ hn-crawler usage
 
 **Output columns**
 
-| Column              | Description                                                                      |
-| ------------------- | -------------------------------------------------------------------------------- |
-| `ID`                | Unique identifier of the request                                                 |
-| `Request Timestamp` | When the request was made, in Unix time (milliseconds)                           |
-| `Applied Filters`   | Comma-separated filters, e.g. `sort:number_of_points:desc,sort:title_words:le:5` |
-| `Duration (ms)`     | How long the request took                                                        |
+| Column                  | Description                                                                           |
+| ----------------------- | ------------------------------------------------------------------------------------- |
+| `ID`                    | Unique identifier of the request                                                      |
+| `Request Date and Time` | When the request was made, as a local date and time, e.g. `2026-11-18 19:32:56 (CET)` |
+| `Applied Filters`       | Comma-separated filters, e.g. `sort:number_of_points:desc,sort:title_words:le:5`      |
+| `Duration (ms)`         | How long the request took                                                             |
 
 ---
 
