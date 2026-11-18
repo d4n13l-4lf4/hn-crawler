@@ -1,10 +1,13 @@
 {
   "name": "@d4n13l-4lf4/hn-crawler",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A CLI tool to scrape and analyze Hacker News entries",
   "main": "dist/presentation/main.js",
   "publishConfig": {
     "access": "public"
+  },
+  "engines": {
+    "node": ">=26.0.0"
   },
   "bin": {
     "hn-crawler": "dist/presentation/main.js"
@@ -15,6 +18,7 @@
   "files": [
     "dist",
     "README.md",
+    "LICENSE",
     "drizzle/migrations",
     "!dist/**/*.map",
     "!dist/**/*.d.ts"

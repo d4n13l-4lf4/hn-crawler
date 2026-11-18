@@ -1,5 +1,5 @@
 import { filter } from '@/application/pipeline/operators/filter';
-import type { AsyncOperator } from '@/application/pipeline/pipeline.types';
+import type { AsyncOperator } from '@/application/pipeline/pipeline.type';
 import {
   createEntryFilter,
   TitleWordRule,
