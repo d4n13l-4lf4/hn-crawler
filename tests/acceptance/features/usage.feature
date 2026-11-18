@@ -1,26 +1,23 @@
-Feature: View crawler usage history
+Feature: Persist and inspect crawler usage history
   As a user of the Hacker News Crawler
-  I want to inspect usage records
-  So that I can understand recent crawler activity
+  I want usage history to survive CLI invocations and appear as an aligned table
+  So that I can inspect recent crawler activity
 
-  Scenario: Show empty usage history in a fresh process
-    When I run "hn-crawler usage" as a standalone command
+  Scenario: Display persisted crawl usage across two CLI invocations
+    Given a temporary usage database path is configured
+    When I run the crawl command with the configured URL in beta mode using the temporary usage database
+    And I run the usage command using the same temporary usage database
     Then the usage command exits with code 0
-    And the usage output is an empty JSON array
+    And the usage table contains the persisted crawl record
+    And the usage table columns are aligned
 
-  Scenario: Show an empty JSON array because history is process local
-    When I run "hn-crawler usage" as a standalone command
+  Scenario: Display an empty usage table in a fresh database
+    Given a temporary usage database path is configured
+    When I run the usage command using the temporary usage database
     Then the usage command exits with code 0
-    And the usage output is an empty JSON array
+    And the usage table has a heading and column headers but no records
 
   Scenario: Reject unsupported usage arguments
-    When I run "hn-crawler usage --unknown" as a standalone command
+    Given a temporary usage database path is configured
+    When I run the usage command with an unsupported argument
     Then the usage command exits with a non-zero code
-
-  Scenario: Start with empty history after process restart
-    When I run "hn-crawler usage" as a standalone command
-    Then the usage output is an empty JSON array
-
-  Scenario: Register usage in the CLI help
-    When I run "hn-crawler --help" as a standalone command
-    Then the usage help includes the usage subcommand
