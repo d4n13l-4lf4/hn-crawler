@@ -44,16 +44,16 @@
 
 ### Tests for User Story 1
 
-- [ ] T015 [P] [US1] Add table-driven tests for default env-path resolution, test-path override, and directory creation in `tests/unit/infrastructure/persistence/sqlite/sqlite-path.test.ts`
-- [ ] T016 [P] [US1] Add tests for successful startup migration, repeat startup, migration failure, and temporary DB cleanup in `tests/unit/infrastructure/persistence/sqlite/sqlite-migrator.test.ts`
+- [x] T015 [P] [US1] Add table-driven tests for default env-path resolution, test-path override, and directory creation in `tests/unit/infrastructure/persistence/sqlite/sqlite-path.test.ts`
+- [x] T016 [P] [US1] Add tests for successful startup migration, repeat startup, migration failure, and temporary DB cleanup in `tests/unit/infrastructure/persistence/sqlite/sqlite-migrator.test.ts`
 - [ ] T017 [P] [US1] Add table-driven repository tests for save/get mapping, insertion ordering, persistence after reopen, retention default/custom/reduction, and transactional failures in `tests/unit/infrastructure/persistence/sqlite/repositories/usage.repository.test.ts`
 - [ ] T018 [US1] Add tracked-crawler integration coverage proving SQLite save failures preserve successful results and original crawl errors in `tests/unit/application/usecases/decorators/tracked-crawler.sqlite.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T019 [US1] Implement `sqlite-path.ts` using `env-paths('hn-crawler')`, a database filename, safe test override, and recursive data-directory creation in `src/infrastructure/persistence/sqlite/sqlite-path.ts`
-- [ ] T020 [US1] Implement the SQLite connection/client using the selected Drizzle adapter and `node:sqlite` in `src/infrastructure/persistence/sqlite/sqlite.client.ts`
-- [ ] T021 [US1] Implement programmatic Drizzle migration loading from packaged `drizzle/migrations/` in `src/infrastructure/persistence/sqlite/sqlite-migrator.ts`
+- [x] T019 [US1] Implement `sqlite-path.ts` using `env-paths('hn-crawler')`, a database filename, safe test override, and recursive data-directory creation in `src/infrastructure/persistence/sqlite/sqlite-path.ts`
+- [x] T020 [US1] Implement the SQLite connection/client using the selected Drizzle adapter and `node:sqlite` in `src/infrastructure/persistence/sqlite/sqlite.client.ts`
+- [x] T021 [US1] Implement programmatic Drizzle migration loading from packaged `drizzle/migrations/` in `src/infrastructure/persistence/sqlite/sqlite-migrator.ts`
 - [ ] T022 [US1] Implement `UsageRepositoryPort` save/getAll operations and transactional insertion-sequence retention pruning in `src/infrastructure/persistence/sqlite/repositories/usage.repository.ts`
 - [ ] T023 [US1] Wire SQLite path, client, migrations, and repository in `src/presentation/main.ts` before command dispatch while preserving best-effort crawl tracking
 - [ ] T024 [US1] Run focused persistence tests, `npm run quality`, and `npm run build`; pause for review
