@@ -4,51 +4,50 @@ import { AppliedFilters } from '@/domain/vo/applied-filters.vo';
 import { Usage } from '@/domain/entities/usage.entity';
 import { createUsageCommand } from '@/presentation/cli/usage';
 
+const UUID = '018f0f4b-7b7c-7abc-8def-0123456789ab';
+const FILTERS = AppliedFilters.builder()
+  .sortBy('comments')
+  .titleWords({ operator: 'gt', value: 5 })
+  .build();
+
+function makeUsage(
+  requestId: string,
+  timestamp: number,
+  filters: AppliedFilters,
+  duration: number
+): Usage {
+  return new Usage(requestId, timestamp, filters, duration);
+}
+
 describe('Usage command unit test', () => {
   it.each([
     {
-      should: 'display an empty JSON array',
+      should: 'display the table headers and separator for empty history',
       records: [],
-      expectedOutput: '[]',
+      expectedOutput: [
+        'Usage data',
+        'ID | Request Timestamp | Applied Filters | Duration (ms)',
+        '---|-------------------|-----------------|--------------',
+      ].join('\n'),
     },
     {
-      should: 'display usage entries with only their public fields',
+      should: 'display aligned rows and retain the specified column order',
       records: [
-        new Usage(
-          '018f0f4b-7b7c-7abc-8def-0123456789ab',
-          123123123,
-          AppliedFilters.builder()
-            .sortBy('comments')
-            .titleWords({ operator: 'gt', value: 5 })
-            .build(),
-          122
-        ),
-        new Usage(
+        makeUsage(UUID, 123123123, FILTERS, 122),
+        makeUsage(
           '018f0f4b-7b7c-7abc-8def-0123456789ac',
           123123124,
           AppliedFilters.builder().sortBy('points').build(),
           10
         ),
       ],
-      expectedOutput: JSON.stringify(
-        [
-          {
-            request_id: '018f0f4b-7b7c-7abc-8def-0123456789ab',
-            request_timestamp: 123123123,
-            applied_filters:
-              'sort:number_of_comments:desc|sort:title_words:gt:5',
-            duration_ms: 122,
-          },
-          {
-            request_id: '018f0f4b-7b7c-7abc-8def-0123456789ac',
-            request_timestamp: 123123124,
-            applied_filters: 'sort:number_of_points:desc',
-            duration_ms: 10,
-          },
-        ],
-        null,
-        2
-      ),
+      expectedOutput: [
+        'Usage data',
+        'ID                                   | Request Timestamp | Applied Filters                                     | Duration (ms)',
+        '-------------------------------------|-------------------|-----------------------------------------------------|--------------',
+        `${UUID} |         123123123 | sort:number_of_comments:desc\\|sort:title_words:gt:5 |           122`,
+        '018f0f4b-7b7c-7abc-8def-0123456789ac |         123123124 | sort:number_of_points:desc                          |            10',
+      ].join('\n'),
     },
   ])(
     'should $should when the repository returns records',
@@ -65,9 +64,44 @@ describe('Usage command unit test', () => {
 
       expect(log).toHaveBeenCalledOnce();
       expect(log).toHaveBeenCalledWith(expectedOutput);
+      const output = log.mock.calls[0][0] as string;
+      const tableRows = output.split('\n').slice(1);
+      expect(new Set(tableRows.map((row) => row.length)).size).toBe(1);
       expect(getAll).toHaveBeenCalledOnce();
       expect(error).not.toHaveBeenCalled();
       vi.restoreAllMocks();
+    }
+  );
+
+  it.each([
+    {
+      should: 'escape embedded column delimiters',
+      filters: AppliedFilters.fromString('sort|points'),
+      expected: 'sort\\|points',
+    },
+    {
+      should: 'render line breaks visibly on a single row',
+      filters: AppliedFilters.fromString('sort\npoints\rnext'),
+      expected: 'sort\\npoints\\rnext',
+    },
+  ])(
+    'should $should when formatting filter values',
+    async ({ filters, expected }) => {
+      const record = makeUsage(UUID, 1, filters, 2);
+      const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const command = createUsageCommand({
+        save: vi.fn(),
+        getAll: () => [record],
+      });
+
+      await command.parseAsync(['node', 'hn-crawler', 'usage'], {
+        from: 'user',
+      });
+
+      expect(log).toHaveBeenCalledOnce();
+      expect(log.mock.calls[0][0]).toContain(expected);
+      expect(log.mock.calls[0][0]).not.toContain('\npoints');
+      log.mockRestore();
     }
   );
 

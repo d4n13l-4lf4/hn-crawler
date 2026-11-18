@@ -68,14 +68,14 @@
 
 ### Tests for User Story 2
 
-- [ ] T025 [P] [US2] Add table-driven formatter tests for widths, alignment, UUID ID, empty history, delimiters, and line breaks in `tests/unit/presentation/cli/usage.test.ts`
-- [ ] T026 [P] [US2] Add usage command tests for database retrieval output and clear non-zero read failures in `tests/unit/presentation/cli/usage.test.ts`
+- [x] T025 [P] [US2] Add table-driven formatter tests for widths, alignment, UUID ID, empty history, delimiters, and line breaks in `tests/unit/presentation/cli/usage.test.ts`
+- [x] T026 [P] [US2] Add usage command tests for database retrieval output and clear non-zero read failures in `tests/unit/presentation/cli/usage.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T027 [US2] Replace JSON serialization with `Usage data` ASCII table output using columns ID, Request Timestamp, Applied Filters, and Duration (ms) in `src/presentation/cli/usage.ts`
-- [ ] T028 [US2] Ensure table rendering sanitizes delimiter/newline characters without dropping field content or creating extra rows in `src/presentation/cli/usage.ts`
-- [ ] T029 [US2] Run usage CLI unit tests, `npm run quality`, and `npm run build`; pause for review
+- [x] T027 [US2] Replace JSON serialization with `Usage data` ASCII table output using columns ID, Request Timestamp, Applied Filters, and Duration (ms) in `src/presentation/cli/usage.ts`
+- [x] T028 [US2] Ensure table rendering sanitizes delimiter/newline characters without dropping field content or creating extra rows in `src/presentation/cli/usage.ts`
+- [x] T029 [US2] Run usage CLI unit tests, `npm run quality`, and `npm run build`; pause for review
 
 **Checkpoint**: The usage command presents persisted history in the documented readable table format.
 
