@@ -25,6 +25,10 @@ export class AppliedFilters {
     );
   }
 
+  static fromString(value: string): AppliedFilters {
+    return new AppliedFilters(value);
+  }
+
   toString(): string {
     return this.value;
   }

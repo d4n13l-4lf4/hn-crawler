@@ -54,6 +54,15 @@ describe('AppliedFilters value object unit test', () => {
     expect(filters.toString()).toBe(testCase.expected);
   });
 
+  it('should restore the persisted applied filter text', () => {
+    const persistedFilters =
+      'sort:number_of_comments:desc|sort:title_words:gt:5';
+
+    expect(AppliedFilters.fromString(persistedFilters).toString()).toBe(
+      persistedFilters
+    );
+  });
+
   it('should require a sort choice when building applied filters', () => {
     expect(() => AppliedFilters.builder().build()).toThrow(
       'An applied sort is required.'

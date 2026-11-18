@@ -5,17 +5,20 @@ import { hasMigrationFiles } from '@/infrastructure/persistence/sqlite/migration
 
 type SqliteClient = ReturnType<typeof createSqliteClient>;
 
-const MIGRATIONS_DIRECTORY = resolve(
-  __dirname,
-  '../../../../drizzle/migrations'
-);
+const MIGRATION_DIRECTORY_CANDIDATES = [
+  resolve(__dirname, '../../../../drizzle/migrations'),
+  resolve(__dirname, '../../../drizzle/migrations'),
+];
 
 export function migrateSqlite(client: SqliteClient): void {
-  if (!hasMigrationFiles(MIGRATIONS_DIRECTORY)) {
+  const migrationsDirectory =
+    MIGRATION_DIRECTORY_CANDIDATES.find(hasMigrationFiles);
+
+  if (!migrationsDirectory) {
     throw new Error(
-      `SQLite migration files not found in: ${MIGRATIONS_DIRECTORY}`
+      `SQLite migration files not found in: ${MIGRATION_DIRECTORY_CANDIDATES.join(', ')}`
     );
   }
 
-  migrate(client, { migrationsFolder: MIGRATIONS_DIRECTORY });
+  migrate(client, { migrationsFolder: migrationsDirectory });
 }

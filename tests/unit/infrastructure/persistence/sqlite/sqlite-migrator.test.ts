@@ -63,6 +63,11 @@ describe('migrateSqlite', () => {
     expect(migrateMock).toHaveBeenCalledWith(client, {
       migrationsFolder: expect.stringContaining('drizzle/migrations'),
     });
+    expect(hasMigrationFiles).toHaveBeenCalledWith(
+      expect.stringContaining('drizzle/migrations'),
+      0,
+      expect.any(Array)
+    );
     expect(client.$client).toBeInstanceOf(DatabaseSync);
   });
 
@@ -81,6 +86,7 @@ describe('migrateSqlite', () => {
     expect(migrateMock).toHaveBeenNthCalledWith(2, client, {
       migrationsFolder: expect.stringContaining('drizzle/migrations'),
     });
+    expect(hasMigrationFiles).toHaveBeenCalledTimes(2);
   });
 
   it('should fail with the expected path when migrations are missing', () => {
@@ -91,9 +97,7 @@ describe('migrateSqlite', () => {
     expect(() => migrateSqlite(client!)).toThrow(
       'SQLite migration files not found in:'
     );
-    expect(hasMigrationFiles).toHaveBeenCalledWith(
-      expect.stringContaining('drizzle/migrations')
-    );
+    expect(hasMigrationFiles).toHaveBeenCalledTimes(2);
     expect(migrateMock).not.toHaveBeenCalled();
   });
 });
