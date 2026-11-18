@@ -64,7 +64,7 @@ jobs:
             fi
 
             echo "Beta version not available yet. Attempt $i/6."
-            sleep 10
+            sleep 30
           done
 
           echo "Beta version $BETA_VERSION was not found."
@@ -88,6 +88,12 @@ jobs:
             echo "Repository Actions variable HN_CRAWLER_ACCEPTANCE_URL must be set to a deterministic crawl page URL."
             exit 1
           fi
+
+      - name: Configure temporary usage database path
+        run: |
+          DB_DIRECTORY="${RUNNER_TEMP}/hn-crawler-usage-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${RANDOM}"
+          mkdir -p "$DB_DIRECTORY"
+          echo "HN_CRAWLER_DB_PATH=${DB_DIRECTORY}/usage.sqlite" >> "$GITHUB_ENV"
 
       - name: Run acceptance tests
         run: npm run test:acceptance
