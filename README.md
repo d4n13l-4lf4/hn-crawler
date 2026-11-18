@@ -214,18 +214,18 @@ A CLI tool to scrape and analyze Hacker News entries
 
 ### Global options
 
-| Option          | Description                |
-| --------------- | -------------------------- |
-| `-V, --version` | Output the version number  |
-| `-h, --help`    | Display help for command   |
+| Option          | Description               |
+| --------------- | ------------------------- |
+| `-V, --version` | Output the version number |
+| `-h, --help`    | Display help for command  |
 
 ### Commands
 
-| Command            | Description                                     |
-| ------------------ | ----------------------------------------------- |
-| `crawl [options]`  | Crawl the top Hacker News stories               |
-| `usage`            | Display current process usage statistics        |
-| `help [command]`   | Display help for a command                      |
+| Command           | Description                              |
+| ----------------- | ---------------------------------------- |
+| `crawl [options]` | Crawl the top Hacker News stories        |
+| `usage`           | Display current process usage statistics |
+| `help [command]`  | Display help for a command               |
 
 ---
 
@@ -237,30 +237,30 @@ Crawl the top Hacker News stories, optionally filtering and sorting them. The re
 hn-crawler crawl [options]
 ```
 
-| Option                 | Description                                         |
-| ---------------------- | --------------------------------------------------- |
-| `--top-comments`       | Sort by number of comments, descending              |
-| `--top-points`         | Sort by points, descending                          |
-| `--title-words <rule>` | Filter by title word count: `gt:N` or `le:N`        |
-| `-h, --help`           | Display help for command                            |
+| Option                 | Description                                  |
+| ---------------------- | -------------------------------------------- |
+| `--top-comments`       | Sort by number of comments, descending       |
+| `--top-points`         | Sort by points, descending                   |
+| `--title-words <rule>` | Filter by title word count: `gt:N` or `le:N` |
+| `-h, --help`           | Display help for command                     |
 
 **Defaults:** with no flags, results are sorted by number of comments (descending) and no title filter is applied.
 
 **Title word rules**
 
-| Rule   | Keeps entries whose title has...  | Example                    |
-| ------ | --------------------------------- | -------------------------- |
-| `gt:N` | more than N words                 | `--title-words gt:5`       |
-| `le:N` | N words or fewer                  | `--title-words le:4`       |
+| Rule   | Keeps entries whose title has... | Example              |
+| ------ | -------------------------------- | -------------------- |
+| `gt:N` | more than N words                | `--title-words gt:5` |
+| `le:N` | N words or fewer                 | `--title-words le:4` |
 
 **Output fields**
 
-| Field                | Type   | Description                                |
-| -------------------- | ------ | ------------------------------------------ |
-| `rank`               | number | Position of the entry on the front page    |
-| `title`              | string | Entry title                                |
-| `points`             | number | Points (upvotes)                           |
-| `number_of_comments` | number | Number of comments                         |
+| Field                | Type   | Description                             |
+| -------------------- | ------ | --------------------------------------- |
+| `rank`               | number | Position of the entry on the front page |
+| `title`              | string | Entry title                             |
+| `points`             | number | Points (upvotes)                        |
+| `number_of_comments` | number | Number of comments                      |
 
 **Examples**
 
@@ -318,12 +318,12 @@ hn-crawler usage
 
 **Output columns**
 
-| Column              | Description                                                                 |
-| ------------------- | --------------------------------------------------------------------------- |
-| `ID`                | Unique identifier of the request                                            |
-| `Request Timestamp` | When the request was made, in Unix time (milliseconds)                      |
+| Column              | Description                                                                      |
+| ------------------- | -------------------------------------------------------------------------------- |
+| `ID`                | Unique identifier of the request                                                 |
+| `Request Timestamp` | When the request was made, in Unix time (milliseconds)                           |
 | `Applied Filters`   | Comma-separated filters, e.g. `sort:number_of_points:desc,sort:title_words:le:5` |
-| `Duration (ms)`     | How long the request took                                                   |
+| `Duration (ms)`     | How long the request took                                                        |
 
 ---
 
