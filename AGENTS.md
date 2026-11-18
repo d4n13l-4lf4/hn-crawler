@@ -4,11 +4,11 @@ A standalone TypeScript CLI that scrapes the first 30 Hacker News entries (numbe
 
 ## Read first
 
-| Document | Read it for |
-| --- | --- |
+| Document               | Read it for                                                                                              |
+| ---------------------- | -------------------------------------------------------------------------------------------------------- |
 | `docs/ARCHITECTURE.md` | Layers, dependency rule, folder layout, domain rules, naming conventions, design decisions, technologies |
-| `docs/QA.md` | TDD workflow, test levels and locations, coverage, quality gates, local commands |
-| `docs/CICD.md` | Branching, semver and beta versioning, workflows, pre-commit hook |
+| `docs/QA.md`           | TDD workflow, test levels and locations, coverage, quality gates, local commands                         |
+| `docs/CICD.md`         | Branching, semver and beta versioning, workflows, pre-commit hook                                        |
 
 These documents are the source of truth. If a task conflicts with them, stop and ask instead of working around them.
 
@@ -26,4 +26,4 @@ Run the quality gates, which must all pass (formatting, linting, type checking, 
 
 ## Git workflow
 
-Work on a `feature/**` branch, merged into a `release/**` branch by PR. Make small, incremental commits that each leave the gates green. Details are in `docs/CICD.md`.
+Work on a `feature/**` branch, merged into a `release/**` branch by PR. Make small, incremental changes that each leave the gates green. Details are in `docs/CICD.md`.

@@ -1,0 +1,102 @@
+name: Acceptance Tests
+
+on:
+  workflow_run:
+    workflows: ['Beta Release']
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  acceptance-tests:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [26.x]
+
+    steps:
+      - name: Checkout acceptance test files
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          sparse-checkout: |
+            package.json
+            package-lock.json
+            tests/acceptance
+            tsconfig.json
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Configure global npm PATH
+        run: |
+          NPM_GLOBAL_BIN="$(npm prefix -g)/bin"
+          echo "$NPM_GLOBAL_BIN" >> "$GITHUB_PATH"
+          echo "Global npm binaries: $NPM_GLOBAL_BIN"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download published beta version artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: beta-version
+          path: .beta-version
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Wait for beta version availability
+        run: |
+          BETA_VERSION="$(cat .beta-version/beta-version.txt)"
+
+          for i in {1..6}; do
+            if npm view "@d4n13l-4lf4/hn-crawler@$BETA_VERSION" version; then
+              echo "Beta version is available."
+              exit 0
+            fi
+
+            echo "Beta version not available yet. Attempt $i/6."
+            sleep 30
+          done
+
+          echo "Beta version $BETA_VERSION was not found."
+          exit 1
+
+      - name: Install exact published beta version
+        run: |
+          BETA_VERSION="$(cat .beta-version/beta-version.txt)"
+          npm install --global "@d4n13l-4lf4/hn-crawler@$BETA_VERSION"
+
+      - name: Verify CLI installation
+        run: |
+          which hn-crawler
+          hn-crawler --help
+
+      - name: Validate acceptance URL configuration
+        env:
+          HN_CRAWLER_ACCEPTANCE_URL: ${{ vars.HN_CRAWLER_ACCEPTANCE_URL }}
+        run: |
+          if [ -z "$HN_CRAWLER_ACCEPTANCE_URL" ]; then
+            echo "Repository Actions variable HN_CRAWLER_ACCEPTANCE_URL must be set to a deterministic crawl page URL."
+            exit 1
+          fi
+
+      - name: Configure temporary usage database path
+        run: |
+          DB_DIRECTORY="${RUNNER_TEMP}/hn-crawler-usage-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${RANDOM}"
+          mkdir -p "$DB_DIRECTORY"
+          echo "HN_CRAWLER_DB_PATH=${DB_DIRECTORY}/usage.sqlite" >> "$GITHUB_ENV"
+
+      - name: Run acceptance tests
+        run: npm run test:acceptance
+        env:
+          HN_CRAWLER_ACCEPTANCE_URL: ${{ vars.HN_CRAWLER_ACCEPTANCE_URL }}
+          HN_CRAWLER_BETA: 'true'
