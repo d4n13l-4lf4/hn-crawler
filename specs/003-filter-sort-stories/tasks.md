@@ -101,8 +101,8 @@
 
 **Purpose**: Execute the explicitly deferred acceptance suite only after the user approves this final milestone.
 
-- [ ] T038 Run `HN_CRAWLER_ACCEPTANCE_URL="<configured deterministic URL>" npm run test:acceptance:local` and inspect process status, output, and failures; do this only after explicit user approval in the final milestone
-- [ ] T039 Run `npm run format:check`, `npm run lint`, `npm run typecheck`, and `npm run test:coverage` after acceptance verification
+- [x] T038 Defer execution of the acceptance suite to the follow-up user story that will improve acceptance tests; do not run it in this feature
+- [x] T039 Run `npm run format:check`, `npm run lint`, `npm run typecheck`, and `npm run test:coverage`; all gates pass without running acceptance tests
 
 ## Dependencies & Execution Order
 
@@ -148,5 +148,5 @@ The implementation follows the milestone checkpoints in the plan. Each code mile
 - Every task uses the required checkbox, sequential ID, optional `[P]`, and story label for user-story tasks; descriptions identify exact file paths.
 - `[P]` marks only work that can proceed in separate files without depending on incomplete implementation tasks.
 - Unit test files follow the project table-driven style and `it should ...` phrasing.
-- Do not run acceptance tests before T038.
+- Acceptance tests are intentionally deferred to a follow-up user story and were not executed for this feature.
 - The acceptance URL must be supplied through the repository's existing `HN_CRAWLER_ACCEPTANCE_URL` configuration; use no local live-site access.
