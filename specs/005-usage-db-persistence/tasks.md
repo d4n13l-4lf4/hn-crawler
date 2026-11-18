@@ -182,11 +182,11 @@ The following tasks are appended after the original feature task set. They do no
 
 **Purpose**: Keep the usage CLI command dependent on an application inbound port/use case rather than the persistence output port.
 
-- [ ] T043 [P] Add table-driven `it should when` unit tests for the usage query use case, including returned records, repository invocation, and propagated read failures in `tests/unit/application/usecases/usage-query.usecase.test.ts`
-- [ ] T044 Define the usage query inbound port in `src/application/ports/in/usage-query.port.ts`, with a read operation returning `Usage[] | Promise<Usage[]>`
-- [ ] T045 Implement `src/application/usecases/usage-query.usecase.ts` to depend on `UsageRepositoryPort`, delegate reads, and implement the inbound usage query port
-- [ ] T046 Update `src/presentation/cli/usage.ts` and its unit tests to depend on a fake inbound usage query port, not `UsageRepositoryPort`; preserve table output and non-zero read failure behavior
-- [ ] T047 Wire the usage query use case in `src/presentation/main.ts` while retaining concrete repository construction in the composition root
-- [ ] T048 Run focused use-case and CLI tests, `npm run quality`, and `npm run build`; pause for review
+- [x] T043 [P] Add table-driven `it should when` unit tests for the usage query use case, including returned records, repository invocation, and propagated read failures in `tests/unit/application/usecases/usage-query.usecase.test.ts`
+- [x] T044 Define the usage query inbound port in `src/application/ports/in/usage-query.port.ts`, with a read operation returning `Usage[] | Promise<Usage[]>`
+- [x] T045 Implement `src/application/usecases/usage-query.usecase.ts` to depend on `UsageRepositoryPort`, delegate reads, and implement the inbound usage query port
+- [x] T046 Update `src/presentation/cli/usage.ts` and its unit tests to depend on a fake inbound usage query port, not `UsageRepositoryPort`; preserve table output and non-zero read failure behavior
+- [x] T047 Wire the usage query use case in `src/presentation/main.ts` while retaining concrete repository construction in the composition root
+- [x] T048 Run focused use-case and CLI tests, `npm run quality`, and `npm run build`; pause for review
 
 **Checkpoint**: The usage command depends only on the inbound application port and the use case reads through the outbound repository port.

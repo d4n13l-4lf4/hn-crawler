@@ -2,6 +2,7 @@
 
 import { CrawlerUseCase } from '@/application/usecases/crawler.usecase';
 import { TrackedCrawlerUseCase } from '@/application/usecases/decorators/tracked-crawler.usecase';
+import { UsageQueryUseCase } from '@/application/usecases/usage-query.usecase';
 import { pipelineFactory } from '@/application/pipeline/factory/factory';
 import { config } from '@/config/config';
 import { HnWebAdapter } from '@/infrastructure/web/hn-web.adapter';
@@ -23,13 +24,14 @@ async function main(): Promise<void> {
       database,
       config.usageRetentionLimit
     );
+    const usageQuery = new UsageQueryUseCase(usageRepository);
     const entrySource = new HnWebAdapter();
     const crawler = new CrawlerUseCase(entrySource, pipelineFactory);
     const trackedCrawler = new TrackedCrawlerUseCase(crawler, usageRepository);
 
     const cli = createCli([
       createCrawlCommand(trackedCrawler),
-      createUsageCommand(usageRepository),
+      createUsageCommand(usageQuery),
     ]);
     await cli.parseAsync(process.argv);
   } catch (error) {

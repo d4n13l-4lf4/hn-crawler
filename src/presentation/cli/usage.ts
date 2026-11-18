@@ -1,17 +1,17 @@
 import { Command } from 'commander';
-import type { UsageRepositoryPort } from '@/application/ports/out/usage-repository.port';
+import type { UsageQueryPort } from '@/application/ports/in/usage-query.port';
 import { Usage } from '@/domain/entities/usage.entity';
 
 const USAGE_ERROR = 'An error occurred while retrieving usage statistics.';
 
-export function createUsageCommand(repository: UsageRepositoryPort): Command {
+export function createUsageCommand(usageQuery: UsageQueryPort): Command {
   const command = new Command('usage').description(
     'Display current process usage statistics'
   );
 
   command.action(async () => {
     try {
-      const records = await repository.getAll();
+      const records = await usageQuery.getAll();
       console.log(formatUsageTable(records));
     } catch {
       console.error(USAGE_ERROR);

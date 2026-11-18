@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { UsageRepositoryPort } from '@/application/ports/out/usage-repository.port';
+import type { UsageQueryPort } from '@/application/ports/in/usage-query.port';
 import { AppliedFilters } from '@/domain/vo/applied-filters.vo';
 import { Usage } from '@/domain/entities/usage.entity';
 import { createUsageCommand } from '@/presentation/cli/usage';
@@ -55,8 +55,8 @@ describe('Usage command unit test', () => {
       const getAll = vi.fn().mockReturnValue(records);
       const error = vi.spyOn(console, 'error').mockImplementation(() => {});
       const log = vi.spyOn(console, 'log').mockImplementation(() => {});
-      const repository: UsageRepositoryPort = { save: vi.fn(), getAll };
-      const command = createUsageCommand(repository);
+      const usageQuery: UsageQueryPort = { getAll };
+      const command = createUsageCommand(usageQuery);
 
       await command.parseAsync(['node', 'hn-crawler', 'usage'], {
         from: 'user',
@@ -89,10 +89,8 @@ describe('Usage command unit test', () => {
     async ({ filters, expected }) => {
       const record = makeUsage(UUID, 1, filters, 2);
       const log = vi.spyOn(console, 'log').mockImplementation(() => {});
-      const command = createUsageCommand({
-        save: vi.fn(),
-        getAll: () => [record],
-      });
+      const getAll = vi.fn().mockReturnValue([record]);
+      const command = createUsageCommand({ getAll });
 
       await command.parseAsync(['node', 'hn-crawler', 'usage'], {
         from: 'user',
@@ -106,7 +104,7 @@ describe('Usage command unit test', () => {
   );
 
   it('should expose no feature-specific arguments or options', () => {
-    const command = createUsageCommand({ save: vi.fn(), getAll: vi.fn() });
+    const command = createUsageCommand({ getAll: vi.fn() });
 
     expect(command.options).toHaveLength(0);
     expect(command.registeredArguments).toHaveLength(0);
@@ -118,7 +116,7 @@ describe('Usage command unit test', () => {
     });
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
     const previousExitCode = process.exitCode;
-    const command = createUsageCommand({ save: vi.fn(), getAll });
+    const command = createUsageCommand({ getAll });
 
     await command.parseAsync(['node', 'hn-crawler', 'usage'], { from: 'user' });
 
@@ -130,8 +128,8 @@ describe('Usage command unit test', () => {
   });
 
   it('should reject unsupported arguments using the standard CLI error', async () => {
-    const repository = { save: vi.fn(), getAll: vi.fn().mockReturnValue([]) };
-    const command = createUsageCommand(repository);
+    const usageQuery = { getAll: vi.fn().mockReturnValue([]) };
+    const command = createUsageCommand(usageQuery);
     command.exitOverride();
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
     const exit = vi.spyOn(process, 'exit').mockImplementation((() => {
@@ -144,7 +142,7 @@ describe('Usage command unit test', () => {
       })
     ).rejects.toThrow();
 
-    expect(repository.getAll).not.toHaveBeenCalled();
+    expect(usageQuery.getAll).not.toHaveBeenCalled();
     expect(error).not.toHaveBeenCalled();
     expect(exit).not.toHaveBeenCalled();
     expect(command.options).toHaveLength(0);
