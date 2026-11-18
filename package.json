@@ -14,7 +14,9 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "!dist/**/*.map",
+    "!dist/**/*.d.ts"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
@@ -22,7 +24,7 @@
     "test:coverage": "vitest run tests/unit --coverage",
     "test:acceptance": "cucumber-js tests/acceptance",
     "test:acceptance:local": "npm run build && npm install -g . && (npm run test:acceptance; EXIT_CODE=$?; npm uninstall -g hn-crawler; CLEANUP_EXIT_CODE=$?; if [ $EXIT_CODE -ne 0 ]; then exit $EXIT_CODE; else exit $CLEANUP_EXIT_CODE; fi)",
-    "test:acceptance:local:env": "HN_CRAWLER_ACCEPTANCE_URL=\"https://static-b2ecb.web.app/static/news-fixture.html\", HN_CRAWLER_BETA=true npm run test:acceptance:local",
+    "test:acceptance:local:env": "dotenvx run -f .env.local -- npm run test:acceptance:local",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint src tests",
