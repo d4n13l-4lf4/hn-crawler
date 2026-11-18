@@ -24,15 +24,15 @@
 
 **Purpose**: Add the DB toolchain and schema required by the persistence and display stories.
 
-- [ ] T006 Add `drizzle-orm`, `drizzle-kit`, and `env-paths` dependencies in `package.json` and update the lockfile
-- [ ] T007 [P] Add a validated usage retention limit with default 100 and test-only DB path override to `src/config/config.ts`
-- [ ] T008 [P] Define the Drizzle usage table matching the four-field `Usage` entity in `src/infrastructure/persistence/sqlite/schema/usage.schema.ts`
-- [ ] T009 Configure Drizzle Kit to use the SQLite schema and `drizzle/migrations/` output in `drizzle.config.ts`
-- [ ] T010 Generate and review the initial usage-table migration under `drizzle/migrations/`
-- [ ] T011 Add local migration generation and inspection scripts in `package.json`
-- [ ] T012 Include `drizzle/migrations/` and required migration metadata in the published package `files` list in `package.json`
-- [ ] T013 Add table/config tests for schema columns, constraints, retention default/override, and invalid retention values in `tests/unit/infrastructure/persistence/sqlite/schema/usage.schema.test.ts` and `tests/unit/config/config.test.ts`
-- [ ] T014 Run `npm run quality` and `npm run build`; pause for review
+- [x] T006 Confirm `drizzle-orm`, `drizzle-kit`, `env-paths`, and `@libsql/client` dependencies are present in `package.json` and `package-lock.json`; no installation was needed
+- [x] T007 Add a validated usage retention limit with default 100 and test-only DB path override to `src/config/config.ts`
+- [x] T008 Define the Drizzle usage table matching the four-field `Usage` entity in `src/infrastructure/persistence/sqlite/schema/usage.schema.ts`
+- [x] T009 Configure Drizzle Kit to use the SQLite schema and `drizzle/migrations/` output in `drizzle.config.ts`
+- [x] T010 Generate and review the initial usage-table migration under `drizzle/migrations/20261118174132_friendly_zombie/`
+- [x] T011 Add local migration generation and inspection scripts in `package.json`
+- [x] T012 Include `drizzle/migrations/` and required migration metadata in the published package `files` list in `package.json`
+- [x] T013 Add table/config tests for schema columns, constraints, retention default/override, and invalid retention values in `tests/unit/infrastructure/persistence/sqlite/schema/usage.schema.test.ts` and `tests/unit/config/config.test.ts`
+- [x] T014 Run `npm run quality`, `npm run build`, `npm run db:check`, and a package dry-run; all passed (135 unit tests, 100% coverage); pause for review
 
 **Checkpoint**: Dependencies, configuration, schema, migration artifacts, and package inclusion are reviewable and green.
 
