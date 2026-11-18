@@ -15,7 +15,7 @@ export function createUsageCommand(repository: UsageRepositoryPort): Command {
       console.log(JSON.stringify(records.map(serializeUsage), null, 2));
     } catch {
       console.error(USAGE_ERROR);
-      process.exit(1);
+      process.exitCode = 1;
     }
   });
 

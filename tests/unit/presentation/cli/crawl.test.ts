@@ -100,27 +100,23 @@ describe('Crawl command unit test', () => {
     const failure = new Error('HTTP 503: unavailable');
     const crawler = { execute: vi.fn().mockRejectedValue(failure) };
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const exit = vi.spyOn(process, 'exit').mockImplementation((() => {
-      throw new Error('process exit');
-    }) as never);
+    const previousExitCode = process.exitCode;
     const command = createCrawlCommand(crawler, true);
 
-    await expect(
-      command.parseAsync(['node', 'hn-crawler', 'crawl'], { from: 'user' })
-    ).rejects.toThrow('process exit');
+    await command.parseAsync(['node', 'hn-crawler', 'crawl'], { from: 'user' });
 
     expect(error).toHaveBeenCalledWith(
       'An error occurred while running the crawler. Please try again.'
     );
-    expect(exit).toHaveBeenCalledWith(1);
+    expect(process.exitCode).toBe(1);
     expect(crawler.execute).toHaveBeenCalledOnce();
     expect(crawler.execute).toHaveBeenCalledWith({
       url: config.newsCombinatorUrl,
       sortBy: 'comments',
       titleWords: { operator: 'gt', value: 5 },
     });
+    process.exitCode = previousExitCode;
     error.mockRestore();
-    exit.mockRestore();
   });
 
   it.each([
@@ -226,24 +222,20 @@ describe('Crawl command unit test', () => {
     async ({ args, expectedError }) => {
       const crawler = createCrawler();
       const error = vi.spyOn(console, 'error').mockImplementation(() => {});
-      const exit = vi.spyOn(process, 'exit').mockImplementation((() => {
-        throw new Error('process exit');
-      }) as never);
+      const previousExitCode = process.exitCode;
       const command = createCrawlCommand(crawler, true);
 
-      await expect(
-        command.parseAsync(['node', 'hn-crawler', 'crawl', ...args], {
-          from: 'user',
-        })
-      ).rejects.toThrow('process exit');
+      await command.parseAsync(['node', 'hn-crawler', 'crawl', ...args], {
+        from: 'user',
+      });
 
       expect(error).toHaveBeenCalledWith(
         expect.stringContaining(expectedError)
       );
-      expect(exit).toHaveBeenCalledWith(1);
+      expect(process.exitCode).toBe(1);
       expect(crawler.execute).not.toHaveBeenCalled();
+      process.exitCode = previousExitCode;
       error.mockRestore();
-      exit.mockRestore();
     }
   );
 });

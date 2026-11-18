@@ -44,7 +44,7 @@
     "crawler",
     "cli"
   ],
-  "author": "Daniel Alfonso",
+  "author": "Daniel Aucatoma",
   "license": "MIT",
   "type": "commonjs",
   "bugs": {
@@ -52,25 +52,25 @@
   },
   "homepage": "https://github.com/d4n13l-4lf4/hn-crawler#readme",
   "dependencies": {
-    "@libsql/client": "^0.18.0",
+    "@libsql/client": "0.18.0",
     "cheerio": "1.0.0",
     "commander": "12.1.0",
-    "drizzle-orm": "^1.0.0-rc.5",
-    "env-paths": "^4.0.0"
+    "drizzle-orm": "1.0.0-rc.5",
+    "env-paths": "4.0.0"
   },
   "devDependencies": {
     "@cucumber/cucumber": "10.8.0",
-    "@types/node": "^26.6.6",
+    "@types/node": "26.6.6",
     "@typescript-eslint/eslint-plugin": "8.73.0",
     "@typescript-eslint/parser": "8.73.0",
-    "@vitest/coverage-v8": "^5.1.0",
-    "drizzle-kit": "^1.0.0-rc.5",
+    "@vitest/coverage-v8": "5.1.0",
+    "drizzle-kit": "1.0.0-rc.5",
     "eslint": "9.19.0",
     "husky": "9.1.7",
     "prettier": "3.5.3",
-    "tsc-alias": "^1.9.10",
-    "tsx": "^4.23.15",
+    "tsc-alias": "1.9.10",
+    "tsx": "4.23.15",
     "typescript": "5.7.3",
-    "vitest": "^5.1.0"
+    "vitest": "5.1.0"
   }
 }

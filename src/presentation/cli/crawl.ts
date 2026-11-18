@@ -63,11 +63,11 @@ export function createCrawlCommand(
       } catch (error) {
         if (error instanceof CliArgumentError) {
           console.error(error.message);
-          process.exit(1);
+          process.exitCode = 1;
           return;
         }
         console.error(CRAWL_ERROR);
-        process.exit(1);
+        process.exitCode = 1;
       }
     }
   );

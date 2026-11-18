@@ -83,18 +83,15 @@ describe('Usage command unit test', () => {
       throw new Error('repository failed');
     });
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const exit = vi.spyOn(process, 'exit').mockImplementation((() => {
-      throw new Error('process exit');
-    }) as never);
+    const previousExitCode = process.exitCode;
     const command = createUsageCommand({ save: vi.fn(), getAll });
 
-    await expect(
-      command.parseAsync(['node', 'hn-crawler', 'usage'], { from: 'user' })
-    ).rejects.toThrow('process exit');
+    await command.parseAsync(['node', 'hn-crawler', 'usage'], { from: 'user' });
 
     expect(getAll).toHaveBeenCalledOnce();
     expect(error).toHaveBeenCalled();
-    expect(exit).toHaveBeenCalledWith(1);
+    expect(process.exitCode).toBe(1);
+    process.exitCode = previousExitCode;
     vi.restoreAllMocks();
   });
 
