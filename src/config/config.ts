@@ -8,7 +8,7 @@ export function createConfig(environment: NodeJS.ProcessEnv = process.env) {
   return {
     newsCombinatorUrl: 'https://news.ycombinator.com/',
     usageRetentionLimit,
-    usageDatabasePath: environment.HN_CRAWLER_TEST_DB_PATH,
+    usageDatabasePath: environment.HN_CRAWLER_DB_PATH?.trim() || undefined,
   };
 }
 

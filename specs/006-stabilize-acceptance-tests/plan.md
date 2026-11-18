@@ -22,13 +22,13 @@ Make acceptance runs independent of the user's normal database by adding `HN_CRA
 
 ## Constitution Check
 
-| Principle | Status | Evidence |
-|---|---|---|
-| Hexagonal Architecture with Light DDD | PASS | DB path resolution remains in SQLite infrastructure and composition-root configuration; CLI presentation behavior is unchanged. |
-| Test-First Development | PASS | Add/update config and SQLite path unit tests, then run unit coverage and quality gates. Acceptance tests are authored/updated but intentionally left for the user to run. |
-| Pipes and Filters with Pure Functions | PASS | No crawler pipeline or domain processing changes. |
-| Simplicity and YAGNI | PASS | Reuse existing configuration, path helper, workflow and acceptance step structure; no new dependencies or layers. |
-| Deterministic Domain Rules | PASS WITH EXISTING CONSTRAINT | No domain rules change. Existing externally configured `HN_CRAWLER_ACCEPTANCE_URL` remains; deterministic local fixture serving is explicitly outside this feature. |
+| Principle                             | Status                        | Evidence                                                                                                                                                                  |
+| ------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hexagonal Architecture with Light DDD | PASS                          | DB path resolution remains in SQLite infrastructure and composition-root configuration; CLI presentation behavior is unchanged.                                           |
+| Test-First Development                | PASS                          | Add/update config and SQLite path unit tests, then run unit coverage and quality gates. Acceptance tests are authored/updated but intentionally left for the user to run. |
+| Pipes and Filters with Pure Functions | PASS                          | No crawler pipeline or domain processing changes.                                                                                                                         |
+| Simplicity and YAGNI                  | PASS                          | Reuse existing configuration, path helper, workflow and acceptance step structure; no new dependencies or layers.                                                         |
+| Deterministic Domain Rules            | PASS WITH EXISTING CONSTRAINT | No domain rules change. Existing externally configured `HN_CRAWLER_ACCEPTANCE_URL` remains; deterministic local fixture serving is explicitly outside this feature.       |
 
 ## Design Decisions
 

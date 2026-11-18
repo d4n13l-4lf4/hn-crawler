@@ -16,15 +16,15 @@
 
 ### Tests for User Story 1
 
-- [ ] T001 [P] [US1] Add config cases asserting non-empty `HN_CRAWLER_DB_PATH` wins, empty/unset values fall back, and legacy `HN_CRAWLER_TEST_DB_PATH` is not used in `tests/unit/config/config.test.ts`
-- [ ] T002 [P] [US1] Add SQLite path cases asserting the explicit file path is returned and its parent directory is created in `tests/unit/infrastructure/persistence/sqlite/sqlite-path.test.ts`
+- [x] T001 [P] [US1] Add config cases asserting non-empty `HN_CRAWLER_DB_PATH` wins, empty/unset values fall back, and legacy `HN_CRAWLER_TEST_DB_PATH` is not used in `tests/unit/config/config.test.ts`
+- [x] T002 [P] [US1] Add SQLite path cases asserting the explicit file path is returned and its parent directory is created in `tests/unit/infrastructure/persistence/sqlite/sqlite-path.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] Expose `HN_CRAWLER_DB_PATH` as the configured full DB path and remove/supersede `HN_CRAWLER_TEST_DB_PATH` in `src/config/config.ts`
-- [ ] T004 [US1] Update `getSqlitePath` to prefer the explicit full DB path and otherwise retain the env-path default in `src/infrastructure/persistence/sqlite/sqlite-path.ts`
-- [ ] T005 [US1] Update acceptance subprocess environment setup to pass `HN_CRAWLER_DB_PATH` consistently to crawl and usage commands in `tests/acceptance/steps/usage.steps.ts` and `tests/acceptance/steps/crawl.steps.ts`
-- [ ] T006 [US1] Run focused config/path unit tests and `npm run typecheck`; pause for review
+- [x] T003 [US1] Expose `HN_CRAWLER_DB_PATH` as the configured full DB path and remove/supersede `HN_CRAWLER_TEST_DB_PATH` in `src/config/config.ts`
+- [x] T004 [US1] Update `getSqlitePath` to prefer the explicit full DB path and otherwise retain the env-path default in `src/infrastructure/persistence/sqlite/sqlite-path.ts`
+- [x] T005 [US1] Update acceptance subprocess environment setup to pass `HN_CRAWLER_DB_PATH` consistently to crawl and usage commands in `tests/acceptance/steps/usage.steps.ts` and `tests/acceptance/steps/crawl.steps.ts`
+- [x] T006 [US1] Run focused config/path unit tests and `npm run typecheck`; pause for review
 
 **Checkpoint**: Explicit DB path selection is covered by unit tests; acceptance subprocesses use the same full path contract.
 
@@ -36,11 +36,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T007 [US2] Keep the Commander `error:` assertion for unknown-option failures and correct crawl argument validation assertions to match their current custom messages plus non-zero status in `tests/acceptance/steps/crawl.steps.ts`
-- [ ] T008 [US2] Verify each failing crawl scenario in `tests/acceptance/features/crawl.feature` pairs its expected error-output assertion with a non-zero status assertion
-- [ ] T009 [P] [US2] Remove the obsolete Hello World acceptance feature from `tests/acceptance/features/hello-world.feature`
-- [ ] T010 [P] [US2] Remove the obsolete Hello World step definitions from `tests/acceptance/steps/hello-world.steps.ts`
-- [ ] T011 [US2] Inspect remaining Gherkin and step definitions for undefined steps or obsolete Hello World references without executing acceptance tests; pause for review
+- [x] T007 [US2] Keep the Commander `error:` assertion for unknown-option failures and correct crawl argument validation assertions to match their current custom messages plus non-zero status in `tests/acceptance/steps/crawl.steps.ts`
+- [x] T008 [US2] Verify each failing crawl scenario in `tests/acceptance/features/crawl.feature` pairs its expected error-output assertion with a non-zero status assertion
+- [x] T009 [P] [US2] Remove the obsolete Hello World acceptance feature from `tests/acceptance/features/hello-world.feature`
+- [x] T010 [P] [US2] Remove the obsolete Hello World step definitions from `tests/acceptance/steps/hello-world.steps.ts`
+- [x] T011 [US2] Inspect remaining Gherkin and step definitions for undefined steps or obsolete Hello World references without executing acceptance tests; pause for review
 
 **Checkpoint**: Acceptance coverage describes current crawl/usage commands; error assertions distinguish Commander output from custom validation output.
 

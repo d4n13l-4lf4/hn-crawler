@@ -174,16 +174,6 @@ Then(
 );
 
 Then(
-  'I should see an argument error in the error output',
-  function (this: { result?: CommandResult }) {
-    assert.ok(
-      this.result?.stderr.includes('error:'),
-      `Expected an argument error, got ${this.result?.stderr}`
-    );
-  }
-);
-
-Then(
   'I should not see {string} in the output',
   function (this: { result?: CommandResult }, unexpected: string) {
     assert.ok(
@@ -229,7 +219,11 @@ function runCli(
 ): CommandResult {
   const result: SpawnSyncReturns<string> = spawnSync('hn-crawler', args, {
     encoding: 'utf8',
-    env: { ...process.env, ...env },
+    env: {
+      ...process.env,
+      HN_CRAWLER_DB_PATH: process.env.HN_CRAWLER_DB_PATH,
+      ...env,
+    },
     shell: false,
   });
   return {

@@ -46,7 +46,7 @@ Feature: Crawl Hacker News stories
 
   Scenario: Reject both ranking options together
     When I run the crawl command with conflicting ranking options in beta mode
-    Then I should see an argument error in the error output
+    Then I should see "The --top-comments and --top-points options cannot be used together." in the error output
     And the crawl exit code should be non-zero
 
   Scenario: Reject an invalid title-word limit
@@ -56,7 +56,7 @@ Feature: Crawl Hacker News stories
 
   Scenario Outline: Reject malformed title-word filters
     When I run the crawl command with title filter "<filter>" in beta mode
-    Then I should see an argument error in the error output
+    Then I should see "Invalid title words filter: <filter>" in the error output
     And the crawl exit code should be non-zero
 
     Examples:

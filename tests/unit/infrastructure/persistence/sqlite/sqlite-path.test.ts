@@ -27,11 +27,18 @@ describe('getSqlitePath', () => {
       shouldResolveDefault: true,
     },
     {
-      should: 'use the explicit database path override',
+      should: 'use the explicit full database path override',
       override: '/tmp/hn-crawler-test.sqlite',
       expectedPath: '/tmp/hn-crawler-test.sqlite',
       expectedDirectory: '/tmp',
       shouldResolveDefault: false,
+    },
+    {
+      should: 'fall back to env-paths when the explicit path is empty',
+      override: '',
+      expectedPath: '/user/data/hn-crawler-nodejs/usage.sqlite',
+      expectedDirectory: '/user/data/hn-crawler-nodejs',
+      shouldResolveDefault: true,
     },
   ];
 
