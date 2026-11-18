@@ -1,10 +1,7 @@
-// HTTP client for fetching Hacker News data
-
-import { HnEntry } from '../../domain/models';
-
-export class HnHttpClient {
-  async fetchEntries(): Promise<HnEntry[]> {
-    // Placeholder - will be implemented in future stories
-    return [];
+export async function fetchPage(url: string): Promise<string> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
   }
+  return response.text();
 }

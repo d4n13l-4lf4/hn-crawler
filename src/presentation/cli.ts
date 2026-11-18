@@ -1,9 +1,9 @@
 // CLI command definition for Hacker News Crawler
 
 import { Command } from 'commander';
-import { CrawlHnUseCase } from '../application/crawl-hn.use-case';
+import { CrawlerPort } from '../application/ports/in/crawler.port';
 
-export function createCli(_useCase: CrawlHnUseCase): Command {
+export function createCli(_useCase: CrawlerPort): Command {
   const program = new Command();
 
   program

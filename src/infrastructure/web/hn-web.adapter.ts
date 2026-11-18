@@ -1,18 +1,24 @@
-// Web adapter for Hacker News integration
+import { EntrySourcePort } from '../../application/ports/out/entry-source.port';
+import { HNEntry } from '../../domain/entities/hn-entry.entity';
+import { fetchPage } from './hn-http.client';
+import { parseHnEntries } from './hn-crawler.parser';
 
-import { EntrySourcePort } from '../../application/ports/entry-source.port';
-import { HnEntry } from '../../domain/models';
-import { HnHttpClient } from './hn-http.client';
-import { HnCheerioParser } from './hn-cheerio.parser';
+const DEFAULT_URL = 'https://news.ycombinator.com/';
 
 export class HnWebAdapter implements EntrySourcePort {
   constructor(
-    private readonly httpClient: HnHttpClient,
-    private readonly parser: HnCheerioParser
+    private readonly httpClient: { fetch: (url: string) => Promise<string> } = {
+      fetch: fetchPage,
+    },
+    private readonly parser: {
+      parse: (html: string) => AsyncIterable<HNEntry>;
+    } = {
+      parse: parseHnEntries,
+    }
   ) {}
 
-  async fetchEntries(): Promise<HnEntry[]> {
-    // Placeholder - will be implemented in future stories
-    return [];
+  async *fetchEntries(url = DEFAULT_URL): AsyncGenerator<HNEntry> {
+    const html = await this.httpClient.fetch(url);
+    yield* this.parser.parse(html);
   }
 }

@@ -1,21 +1,19 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { CrawlerPort } from '../../../src/application/ports/in/crawler.port';
 import { createCli } from '../../../src/presentation/cli';
-import { CrawlHnUseCase } from '../../../src/application/crawl-hn.use-case';
 
-vi.mock('../../../src/application/crawl-hn.use-case');
-
-describe('CLI Command', () => {
-  it('should output "Hello World" when executed with no arguments', async () => {
-    const mockUseCase = new CrawlHnUseCase({} as any, {} as any);
-    const spy = vi.spyOn(console, 'log').mockImplementation(() => {});
-
-    const cli = createCli(mockUseCase);
+describe('CLI command', () => {
+  it('should output "Hello World" when executed with no arguments', () => {
+    const crawler: CrawlerPort = { execute: vi.fn().mockResolvedValue([]) };
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const cli = createCli(crawler);
 
     try {
       cli.parse(['node', 'main.js'], { from: 'user' });
-      expect(spy).toHaveBeenCalledWith('Hello World');
+      expect(log).toHaveBeenCalledWith('Hello World');
+      expect(crawler.execute).not.toHaveBeenCalled();
     } finally {
-      spy.mockRestore();
+      log.mockRestore();
     }
   });
 });
