@@ -27,11 +27,11 @@ The command builds and installs the package locally before executing the black-b
 
 ## Expected behavior checks
 
-| Invocation | Expected processing |
-|---|---|
-| `hn-crawler crawl` | First up to 30 entries, then `gt:5`, then comments descending |
-| `hn-crawler crawl --top-points` | All first up to 30 entries, points descending |
+| Invocation                                           | Expected processing                                           |
+| ---------------------------------------------------- | ------------------------------------------------------------- |
+| `hn-crawler crawl`                                   | First up to 30 entries, then `gt:5`, then comments descending |
+| `hn-crawler crawl --top-points`                      | All first up to 30 entries, points descending                 |
 | `hn-crawler crawl --title-words le:5 --top-comments` | First up to 30 entries, then `le:5`, then comments descending |
-| `hn-crawler crawl --title-words gt:5 --top-points` | First up to 30 entries, then `gt:5`, then points descending |
+| `hn-crawler crawl --title-words gt:5 --top-points`   | First up to 30 entries, then `gt:5`, then points descending   |
 
 Success returns a JSON array with at most 30 objects and the established four fields. Failures return non-zero status; crawler failures use the existing generic message. See [CLI contract](contracts/crawl-cli.md) and [data model](data-model.md).
