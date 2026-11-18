@@ -41,7 +41,7 @@
 - [x] T011 [P] [US1] Add black-box Cucumber scenarios for all supported filter/ranking combinations, defaults, output shape/order, and no-match output in `tests/acceptance/features/crawl.feature`
 - [x] T012 [P] [US1] Add black-box Cucumber scenarios for conflicting flags, invalid title-word arguments, exact maximum message, crawler failure message, and actual process exit status in `tests/acceptance/features/crawl.feature`
 - [x] T013 [US1] Update process invocation and assertions to avoid all source artifact paths and check stdout, stderr, and status in `tests/acceptance/steps/crawl.steps.ts`; do not run the acceptance suite
-- [ ] T014 [US1] Run `npm run format:check`, `npm run lint`, `npm run typecheck`, and `npm run test:coverage`; pause for review without executing acceptance tests
+- [x] T014 [US1] Run `npm run format:check`, `npm run lint`, `npm run typecheck`, and `npm run test:coverage`; pause for review without executing acceptance tests
 
 **Checkpoint**: Acceptance tests describe the desired behavior and remain unexecuted as requested.
 
@@ -93,9 +93,9 @@
 
 **Purpose**: Align project architecture guidance with the supported behavior after runtime implementation is complete.
 
-- [ ] T035 Update `docs/ARCHITECTURE.md` domain rules to document all supported filter/ranking combinations and stable tie behavior
-- [ ] T036 Update `.specify/memory/constitution.md` deterministic domain rules to match the completed implementation
-- [ ] T037 Review whether removing obsolete pipeline code requires any further cleanup and record the final file set in `specs/003-filter-sort-stories/plan.md`
+- [x] T035 Update `docs/ARCHITECTURE.md` domain rules to document all supported filter/ranking combinations and stable tie behavior
+- [x] T036 Update `.specify/memory/constitution.md` deterministic domain rules to match the completed implementation
+- [x] T037 Review whether removing obsolete pipeline code requires any further cleanup and record the final file set in `specs/003-filter-sort-stories/plan.md`
 
 ## Phase 6: Final Verification
 

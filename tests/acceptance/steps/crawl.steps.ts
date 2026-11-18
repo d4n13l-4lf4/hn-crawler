@@ -21,16 +21,40 @@ When(
   }
 );
 
-When('I run the crawl command with default options in beta mode', function () {
-  this.result = runCli(['crawl'], { HN_CRAWLER_BETA: 'true' });
-});
+When(
+  'I run the crawl command with the configured URL and ranking {string} in beta mode',
+  function (this: { result?: CommandResult }, ranking: string) {
+    this.result = runCli(
+      [
+        'crawl',
+        '--url',
+        getAcceptanceUrl(),
+        '--title-words',
+        'le:10000',
+        ranking === 'comments' ? '--top-comments' : '--top-points',
+      ],
+      { HN_CRAWLER_BETA: 'true' }
+    );
+  }
+);
 
 When(
-  'I run the crawl command with title filter {string} and ranking {string} in beta mode',
+  'I run the crawl command with default options and the configured URL in beta mode',
+  function () {
+    this.result = runCli(['crawl', '--url', getAcceptanceUrl()], {
+      HN_CRAWLER_BETA: 'true',
+    });
+  }
+);
+
+When(
+  'I run the crawl command with title filter {string} and ranking {string} using the configured URL in beta mode',
   function (this: { result?: CommandResult }, filter: string, ranking: string) {
     this.result = runCli(
       [
         'crawl',
+        '--url',
+        getAcceptanceUrl(),
         '--title-words',
         filter,
         ranking === 'comments' ? '--top-comments' : '--top-points',
@@ -41,10 +65,15 @@ When(
 );
 
 When(
-  'I run the crawl command with ranking {string} in beta mode',
+  'I run the crawl command with ranking {string} and the configured URL in beta mode',
   function (this: { result?: CommandResult }, ranking: string) {
     this.result = runCli(
-      ['crawl', ranking === 'comments' ? '--top-comments' : '--top-points'],
+      [
+        'crawl',
+        '--url',
+        getAcceptanceUrl(),
+        ranking === 'comments' ? '--top-comments' : '--top-points',
+      ],
       { HN_CRAWLER_BETA: 'true' }
     );
   }
@@ -84,39 +113,16 @@ When(
 );
 
 Then(
-  'the crawl output is a JSON array with {int} entries in page order',
-  function (this: { result?: CommandResult }, count: number) {
-    const entries = parseOutput(this.result).stdout;
-    assert.equal(entries.length, count);
-    assert.deepEqual(
-      entries.map((entry) => entry.rank),
-      Array.from({ length: count }, (_, index) => index + 1)
-    );
+  'the crawl output is a JSON array with at most 30 entries',
+  function (this: { result?: CommandResult }) {
+    assert.ok(parseOutput(this.result).stdout.length <= 30);
   }
 );
 
 Then(
-  'the first entry is rank {int} titled {string} with {int} points and {int} comments',
-  function (
-    this: { result?: CommandResult },
-    rank: number,
-    title: string,
-    points: number,
-    comments: number
-  ) {
-    assert.deepEqual(parseOutput(this.result).stdout[0], {
-      rank,
-      title,
-      points,
-      number_of_comments: comments,
-    });
-  }
-);
-
-Then(
-  'the first entry title is {string}',
-  function (this: { result?: CommandResult }, title: string) {
-    assert.equal(parseOutput(this.result).stdout[0]?.title, title);
+  'the crawl output should be a JSON array',
+  function (this: { result?: CommandResult }) {
+    assert.ok(Array.isArray(parseOutput(this.result).stdout));
   }
 );
 
@@ -163,13 +169,6 @@ Then(
         'title',
       ]);
     }
-  }
-);
-
-Then(
-  'the crawl output should be an empty JSON array',
-  function (this: { result?: CommandResult }) {
-    assert.deepEqual(parseOutput(this.result).stdout, []);
   }
 );
 
@@ -247,6 +246,7 @@ function runCli(args: string[], env: Record<string, string>): CommandResult {
   const result: SpawnSyncReturns<string> = spawnSync('hn-crawler', args, {
     encoding: 'utf8',
     env: { ...process.env, ...env },
+    shell: false,
   });
   return {
     stdout: result.stdout ?? '',

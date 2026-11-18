@@ -20,7 +20,7 @@ npm run test:coverage
 Acceptance tests are intentionally left until the final reviewed milestone. When approved, run the documented local acceptance command with `HN_CRAWLER_ACCEPTANCE_URL` set in the environment:
 
 ```bash
-HN_CRAWLER_ACCEPTANCE_URL="<deterministic-page-url>" npm run test:acceptance:local
+HN_CRAWLER_ACCEPTANCE_URL="<deterministic-page-url>" HN_CRAWLER_BETA=true npm run test:acceptance:local
 ```
 
 The command builds and installs the package locally before executing the black-box CLI acceptance suite. In CI, the acceptance workflow uses the published beta artifact and the repository-level URL configuration described by the existing workflow setup.

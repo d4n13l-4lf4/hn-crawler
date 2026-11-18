@@ -72,6 +72,7 @@ src/
 │   ├── usecases/crawler.usecase.ts
 │   └── pipeline/
 │       ├── orchestrator/async.pipe.ts
+│       ├── pipeline.types.ts
 │       ├── pipeline.types.d.ts
 │       ├── operators/filter.ts
 │       ├── operators/top-k.ts
@@ -98,9 +99,9 @@ tests/
     └── presentation/cli/crawl.test.ts
 ```
 
-Create `src/application/pipeline/orchestrator/async.pipe.ts` as the async-only composition base, replacing the existing scaffolding at `orchestration/pipe.ts`; remove the old pipe and its tests once all references have moved. The pipe accepts an `AsyncIterable` source and composes `AsyncStep` values; no sync-source promotion is required. The suggested factory implementation remains inside the application layer. A type/port in the inbound application boundary will describe the factory contract so the use case does not import the concrete factory module. Composition root wiring injects the concrete factory.
+`src/application/pipeline/orchestrator/async.pipe.ts` is the async-only composition base. The superseded `orchestration/pipe.ts`, sync iterable helper, array-based composed pipelines, and fixed-purpose ranking/filter stubs and tests have been removed. The pipe accepts an `AsyncIterable` source and composes `AsyncStep` values; no sync-source promotion is required. The factory implementation remains inside the application layer, and the use case depends on an application-owned factory contract. Composition root wiring injects the concrete factory.
 
-The existing `top-by-comments.step.ts`, `top-by-points.step.ts`, and `composed/long-titles.pipeline.ts` / `short-titles.pipeline.ts` stubs are candidates for removal once replacement tests and imports are in place; tasks must confirm references before deleting. `top-k.ts` is an operator, while ranking selectors are provided by the pipeline factory. The top-K window is fixed by the crawler candidate limit at 30, so all qualifying candidates are retained and stable source-order ties are preserved.
+`top-k.ts` is an operator, while ranking selectors are provided by the pipeline factory. The top-K window is fixed by the crawler candidate limit at 30, so all qualifying candidates are retained and stable source-order ties are preserved.
 
 **Structure Decision**: Continue the existing single-project, hexagonal TypeScript CLI structure. Keep shared pipeline primitives under `application/pipeline`, business predicates in `domain/policies`, and all concrete dependencies in `src/presentation/main.ts`. Acceptance tests remain external black-box process tests and must not reference `src` artifact paths.
 
