@@ -50,10 +50,10 @@ describe('CrawlerUseCase Unit Test', () => {
       const result = await useCase.execute('https://example.com/news');
 
       expect(result).toHaveLength(expectedEntries);
-      expect(result.map((entry) => entry.rank)).toEqual(
+      expect(result.map((entry) => entry.rank.value)).toEqual(
         Array.from({ length: expectedEntries }, (_, index) => index + 1)
       );
-      expect(result.at(-1)?.rank ?? 0).toBe(expectedLastRank);
+      expect(result.at(-1)?.rank.value ?? 0).toBe(expectedLastRank);
       expect(fetchEntries).toHaveBeenCalledOnce();
       expect(fetchEntries).toHaveBeenCalledWith('https://example.com/news');
     }
@@ -89,8 +89,8 @@ describe('CrawlerUseCase Unit Test', () => {
     const result = await useCase.execute('https://news.ycombinator.com/');
 
     expect(result).toHaveLength(30);
-    expect(result[0].rank).toBe(1);
-    expect(result[29].rank).toBe(30);
+    expect(result[0].rank.value).toBe(1);
+    expect(result[29].rank.value).toBe(30);
     expect(source.fetchEntries).toHaveBeenCalledOnce();
     expect(source.fetchEntries).toHaveBeenCalledWith(
       'https://news.ycombinator.com/'

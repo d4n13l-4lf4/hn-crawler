@@ -63,8 +63,8 @@ description: 'Task list for Crawl Top Stories refinements'
 
 ### Milestone 4 — Import alias consistency
 
-- [X] T012 [US1] Convert eligible feature-internal relative imports in `src/` and `tests/unit/` to the existing `@/*` alias without changing runtime behavior
-- [X] T013 [US1] Run build, formatter, lint, typecheck, and unit coverage to verify alias resolution
+- [x] T012 [US1] Convert eligible feature-internal relative imports in `src/` and `tests/unit/` to the existing `@/*` alias without changing runtime behavior
+- [x] T013 [US1] Run build, formatter, lint, typecheck, and unit coverage to verify alias resolution
 
 **Checkpoint**: Review import-only changes and non-acceptance checks; stop for user confirmation before Milestone 5.
 
@@ -72,19 +72,19 @@ description: 'Task list for Crawl Top Stories refinements'
 
 **Tests first**
 
-- [ ] T014 [P] [US1] Add table-driven tests in `tests/unit/domain/vo/title.test.ts` for raw title values and empty/invalid inputs defaulting to `''`
-- [ ] T015 [P] [US1] Add table-driven tests in `tests/unit/domain/vo/numeric.test.ts` for digit parsing, no match, invalid input, and NaN defaulting to `0`
-- [ ] T016 [US1] Update `tests/unit/domain/entities/hn-entry.entity.test.ts` to assert `Title` and `Numeric` value object fields/accessors and primitive values
-- [ ] T017 [US1] Update `tests/unit/infrastructure/web/hn-crawler.parser.test.ts` to assert best-effort source extraction, first fixture entry values, row order, and zero/empty defaults through value objects
-- [ ] T018 [US1] Update `tests/unit/presentation/cli/crawl.test.ts` to assert serialized JSON contains primitive `rank`, `title`, `points`, and `number_of_comments` values only
+- [X] T014 [P] [US1] Add table-driven tests in `tests/unit/domain/vo/title.test.ts` for raw title values and empty/invalid inputs defaulting to `''`
+- [X] T015 [P] [US1] Add table-driven tests in `tests/unit/domain/vo/numeric.test.ts` for digit parsing, no match, invalid input, and NaN defaulting to `0`
+- [X] T016 [US1] Update `tests/unit/domain/entities/hn-entry.entity.test.ts` to assert `Title` and `Numeric` value object fields/accessors and primitive values
+- [X] T017 [US1] Update `tests/unit/infrastructure/web/hn-crawler.parser.test.ts` to assert best-effort source extraction, first fixture entry values, row order, and zero/empty defaults through value objects
+- [X] T018 [US1] Update `tests/unit/presentation/cli/crawl.test.ts` to assert serialized JSON contains primitive `rank`, `title`, `points`, and `number_of_comments` values only
 
 **Implementation**
 
-- [ ] T019 [US1] Add dependency-free `src/domain/vo/title.ts` accepting raw string input and defaulting to `''`
-- [ ] T020 [US1] Add dependency-free `src/domain/vo/numeric.ts` accepting raw number/text input, using a precompiled `/\d+/` matcher where needed, and defaulting unmatched/invalid/NaN input to `0`
-- [ ] T021 [US1] Update `src/domain/entities/hn-entry.entity.ts` to use `Title` and `Numeric` for title, rank, points, and number of comments while preserving stable primitive accessors for presentation serialization
-- [ ] T022 [US1] Refactor `src/infrastructure/web/hn-crawler.parser.ts` to capture title/score/comment text best-effort, keep separate score and comment matchers, pass captured values to the value objects, and remove `normalizeText`/`parseInteger`
-- [ ] T023 [US1] Run focused VO/entity/parser/CLI unit tests, build, and all non-acceptance quality gates
+- [X] T019 [US1] Add dependency-free `src/domain/vo/title.ts` accepting raw string input and defaulting to `''`
+- [X] T020 [US1] Add dependency-free `src/domain/vo/numeric.ts` accepting raw number/text input, using a precompiled `/\d+/` matcher where needed, and defaulting unmatched/invalid/NaN input to `0`
+- [X] T021 [US1] Update `src/domain/entities/hn-entry.entity.ts` to use `Title` and `Numeric` for title, rank, points, and number of comments while preserving stable primitive accessors for presentation serialization
+- [X] T022 [US1] Refactor `src/infrastructure/web/hn-crawler.parser.ts` to capture title/score/comment text best-effort, keep separate score and comment matchers, pass captured values to the value objects, and remove `normalizeText`/`parseInteger`
+- [X] T023 [US1] Run focused VO/entity/parser/CLI unit tests, build, and all non-acceptance quality gates
 
 **Checkpoint**: Review VO domain behavior, parser responsibility, output serialization, and green non-acceptance gates; stop for user confirmation before Milestone 6.
 

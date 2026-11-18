@@ -1,6 +1,9 @@
 import { load } from 'cheerio';
 import { HNEntry } from '@/domain/entities/hn-entry.entity';
 
+const POINTS_MATCHER = /(\d+)\s+points?/i;
+const COMMENTS_MATCHER = /(\d+)\s+comments?/i;
+
 export async function* parseHnEntries(html: string): AsyncGenerator<HNEntry> {
   const $ = load(html);
   const storyRows = $('tr.athing.submission').toArray();
@@ -9,30 +12,19 @@ export async function* parseHnEntries(html: string): AsyncGenerator<HNEntry> {
     const row = storyRows[index];
     const story = $(row);
     const followingRow = story.next('tr');
-    const title = normalizeText(
-      story.find('span.titleline > a').first().text()
-    );
+    const title = story.find('span.titleline > a').first().text();
     const scoreText = followingRow.find('.score').first().text();
     const commentText = followingRow
       .find('a[href^="item?id="]')
-      .filter((_, link) => /\d+\s+comments?/.test($(link).text()))
+      .filter((_, link) => COMMENTS_MATCHER.test($(link).text()))
       .last()
       .text();
 
     yield new HNEntry(
       index + 1,
       title,
-      parseInteger(scoreText),
-      parseInteger(commentText)
+      POINTS_MATCHER.exec(scoreText)?.[1] ?? '',
+      COMMENTS_MATCHER.exec(commentText)?.[1] ?? ''
     );
   }
-}
-
-function parseInteger(text: string): number {
-  const match = text.match(/\d+(?=\s*(?:points?|comments?)\b)/i);
-  return match ? Number.parseInt(match[0], 10) : 0;
-}
-
-function normalizeText(text: string): string {
-  return text.replace(/\s+/g, ' ').trim();
 }

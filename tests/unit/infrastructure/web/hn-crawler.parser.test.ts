@@ -57,7 +57,7 @@ describe('Hacker News parser unit test', () => {
     for await (const entry of parseHnEntries(sampleHtml)) result.push(entry);
 
     expect(result).toHaveLength(30);
-    expect(result.map((entry) => entry.rank)).toEqual(
+    expect(result.map((entry) => entry.rank.value)).toEqual(
       Array.from({ length: 30 }, (_, index) => index + 1)
     );
   });

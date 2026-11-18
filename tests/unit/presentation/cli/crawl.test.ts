@@ -103,4 +103,26 @@ describe('Crawl command unit test', () => {
     expect(crawler.execute).toHaveBeenCalledWith(config.newsCombinatorUrl);
     vi.restoreAllMocks();
   });
+
+  it('should serialize only the primitive value object fields', async () => {
+    const crawler = createCrawler([new HNEntry(1, 'My news', 1, 2)]);
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const command = createCrawlCommand(crawler, true);
+
+    await command.parseAsync(['node', 'hn-crawler', 'crawl'], {
+      from: 'user',
+    });
+
+    const serialized = JSON.parse(log.mock.calls[0][0] as string);
+    expect(serialized).toEqual([
+      { rank: 1, title: 'My news', points: 1, number_of_comments: 2 },
+    ]);
+    expect(Object.keys(serialized[0])).toEqual([
+      'rank',
+      'title',
+      'points',
+      'number_of_comments',
+    ]);
+    vi.restoreAllMocks();
+  });
 });

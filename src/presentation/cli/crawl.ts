@@ -25,10 +25,10 @@ export function createCrawlCommand(
       console.log(
         JSON.stringify(
           entries.map(({ rank, title, points, number_of_comments }) => ({
-            rank,
-            title,
-            points,
-            number_of_comments,
+            rank: rank.value,
+            title: title.value,
+            points: points.value,
+            number_of_comments: number_of_comments.value,
           })),
           null,
           2
