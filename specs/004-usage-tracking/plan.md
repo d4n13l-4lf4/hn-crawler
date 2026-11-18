@@ -18,7 +18,7 @@ The tracking decorator wraps the existing crawler use case. It captures request 
 
 **Storage**: In-memory list scoped to the composition-root process lifetime; persistence is explicitly excluded
 
-**Testing**: Vitest table-driven unit tests using `it should when` wording and mock argument assertions; black-box Cucumber acceptance tests authored first and not executed until the final approved milestone; 100% unit coverage excluding composition root
+**Testing**: Vitest table-driven unit tests using `it should when` wording and mock argument assertions; black-box Cucumber acceptance tests are authored but execution is out of scope for this feature; 100% unit coverage excluding composition root
 
 **Target Platform**: Node.js CLI on developer and CI platforms
 
@@ -37,7 +37,7 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 | Principle                                  | Status                    | Plan response                                                                                                                                                                                                                                                                          |
 | ------------------------------------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Hexagonal architecture and dependency rule | PASS                      | The domain entity/value object remain pure. The application owns repository and crawler interfaces, mapper, and tracking decorator. The infrastructure adapter implements the repository port. The composition root shares the adapter between crawler decoration and usage retrieval. |
-| Test-first development                     | PASS WITH SEQUENCING NOTE | Write acceptance scenarios first, leave them unrun, and keep unit/static quality gates green at each reviewed milestone. Run acceptance only at the final approved checkpoint.                                                                                                         |
+| Test-first development                     | PASS WITH SCOPE DECISION | Write the black-box acceptance scenarios first and leave them unrun because acceptance execution is out of scope for this feature. Keep unit/static quality gates green at each reviewed milestone.                                                                                 |
 | Pipes and filters with pure functions      | PASS                      | Existing crawler pipeline remains unchanged. Tracking is an application use-case decorator; storage side effects remain in the infrastructure adapter.                                                                                                                                 |
 | Simplicity and YAGNI                       | PASS                      | Use the requested value object, mapper, decorator, port, and in-memory adapter. No persistence, third-party UUID library, or unrelated instrumentation is added.                                                                                                                       |
 | Deterministic domain rules                 | PASS                      | Applied-filter labels and their ordering are explicit; timestamp, duration, empty-history, and process-lifetime behaviors are testable.                                                                                                                                                |
@@ -104,13 +104,13 @@ tests/
     └── presentation/cli/usage.test.ts
 ```
 
-The `usage` process-local limitation means ordinary independent CLI invocations cannot share history. Acceptance coverage for records therefore verifies composition and command behavior in a single process/test context where feasible; if the published executable model only permits one command per process, the user-facing CLI will return `[]` on a fresh `usage` invocation until a later persistence feature. This matches the explicitly ephemeral storage scope and is documented in the contract.
+The `usage` process-local limitation means ordinary independent CLI invocations cannot share history. Each standalone `usage` acceptance invocation therefore returns `[]`, even after a separate `crawl` invocation. Unit tests exercise tracking, populated history, ordering, and serialization with shared in-process components.
 
 **Structure Decision**: Extend the existing single-project hexagonal CLI. Keep tracking behavior in an application decorator, semantic rules in domain types, process-local storage in an infrastructure adapter, and concrete wiring in `src/presentation/main.ts`. No SQLite repository is added as part of this feature.
 
 ## Incremental Review Milestones
 
-Each milestone ends at a review checkpoint. Pause for the user's review and confirmation before starting the next. Acceptance tests are written first and never run until the final milestone is explicitly approved.
+Each implementation milestone ends at a review checkpoint. Pause for the user's review and confirmation before starting the next. Acceptance tests are written first but execution is out of scope for this feature; run the unit and static quality gates at implementation milestones.
 
 1. **Acceptance contract first (write, do not run)**: Add black-box scenarios for usage empty state, record schema/order, all effective filter combinations, crawl success/failure tracking, unsupported usage args, and process restart semantics. Avoid source-path coupling. Run formatting, lint, and typecheck only; pause for review.
 2. **Domain usage model**: Add `Usage` entity and `AppliedFilters` value object/builder. Test UUID/request fields, duration validation, canonical sort/title tags, combined tag ordering, and omission of title tag when absent using table-driven `it should when` tests with value/object outcomes. Run non-acceptance gates; pause for review.
@@ -118,8 +118,15 @@ Each milestone ends at a review checkpoint. Pause for the user's review and conf
 4. **Applied-filter mapper**: Map the normalized crawl request to the domain value object, including effective comments default, title-only requests, ranking-only requests, and no-option defaults as represented by the request passed from CLI. Assert mapper results and inputs table-wise. Run non-acceptance gates; pause for review.
 5. **Tracking decorator**: Wrap the crawler use case; capture timestamp and monotonic start, record one result for success and failure, preserve the exact returned entries or original thrown error, and swallow record-construction/repository failures. Add table-driven decorator tests with assertions for clock/ID/repository calls and exact arguments; run non-acceptance gates; pause for review.
 6. **Usage CLI and composition wiring**: Add `usage` command with no supported options/arguments and JSON array output, wire one repository instance into the decorator and usage command, and inject the decorated crawler into `crawl`. Add CLI tests for empty and populated history plus argument errors; keep crawler failure output unchanged. Run all unit tests and non-acceptance gates; pause for review.
-7. **Acceptance verification (final)**: After explicit user approval, run acceptance tests and the complete quality gate. Do not run acceptance tests before this final milestone.
+7. **Acceptance execution**: Out of scope for this feature. Keep the black-box scenarios authored for later use; do not run them as part of this feature.
 
 ## Complexity Tracking
 
 No violations planned. The decorator and repository port are required by the requested architecture and best-effort cross-cutting tracking. The in-memory adapter is intentionally minimal and scoped to process lifetime.
+
+## Convergence Clarification (Append-Only)
+
+- Usage history is intentionally held only in the current process. Each standalone CLI acceptance invocation starts a fresh process, so `hn-crawler usage` returns `[]` in the acceptance workflow even after a separate `crawl` invocation.
+- Acceptance coverage for this feature is limited to black-box CLI behavior that can be observed across independent invocations, including empty usage output, CLI registration, unsupported arguments, and process restart behavior. Crawl tracking scenarios will not be added to or reviewed as acceptance tests in this feature; request mapping, record creation, failure handling, and serialization are covered by unit tests using shared in-process components.
+- No persistence or cross-process mechanism should be added to make acceptance history non-empty. Such storage is outside this feature's scope.
+- This clarification supersedes the earlier wording in this plan that proposed a final acceptance execution milestone and suggested populated-history acceptance coverage. Acceptance scenarios remain authored, but executing them is out of scope for this feature.

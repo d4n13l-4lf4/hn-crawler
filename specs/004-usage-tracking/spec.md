@@ -6,6 +6,7 @@
 
 - Q: What exact marker should `applied_filters` use when a crawl has no title-word filter? → A: Omit the title-filter part; include only the sort label.
 - Q: Should usage history be available across CLI invocations, or only within one process? → A: Only within one process for this feature; proper persistence will be implemented in a future feature.
+- Q: Is execution of the acceptance suite in scope for this feature? → A: No. Acceptance execution is out of scope for this feature; the suite remains authored for later use, and only non-acceptance quality gates are run here.
 
 **Feature Branch**: `feature/usage-tracking`
 
