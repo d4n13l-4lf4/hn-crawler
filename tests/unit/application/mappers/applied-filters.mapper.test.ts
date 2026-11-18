@@ -19,7 +19,7 @@ describe('AppliedFilters mapper unit test', () => {
         sortBy: 'comments',
         titleWords: { operator: 'gt', value: 5 },
       },
-      expected: 'sort:number_of_comments:desc|sort:title_words:gt:5',
+      expected: 'sort:number_of_comments:desc,sort:title_words:gt:5',
     },
     {
       should: 'map points ranking without a title filter',
@@ -35,7 +35,7 @@ describe('AppliedFilters mapper unit test', () => {
         sortBy: 'comments',
         titleWords: { operator: 'le', value: 5 },
       },
-      expected: 'sort:number_of_comments:desc|sort:title_words:le:5',
+      expected: 'sort:number_of_comments:desc,sort:title_words:le:5',
     },
     {
       should: 'preserve an explicit points and title combination',
@@ -45,7 +45,7 @@ describe('AppliedFilters mapper unit test', () => {
         sortBy: 'points',
         titleWords: { operator: 'gt', value: 12 },
       },
-      expected: 'sort:number_of_points:desc|sort:title_words:gt:12',
+      expected: 'sort:number_of_points:desc,sort:title_words:gt:12',
     },
   ];
 

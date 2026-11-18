@@ -34,14 +34,14 @@ describe('AppliedFilters value object unit test', () => {
       when: 'a gt title rule is applied',
       sortBy: 'comments',
       titleWords: { operator: 'gt', value: 5 },
-      expected: 'sort:number_of_comments:desc|sort:title_words:gt:5',
+      expected: 'sort:number_of_comments:desc,sort:title_words:gt:5',
     },
     {
       should: 'append a less-than-or-equal title rule after sorting',
       when: 'a le title rule is applied',
       sortBy: 'points',
       titleWords: { operator: 'le', value: 5 },
-      expected: 'sort:number_of_points:desc|sort:title_words:le:5',
+      expected: 'sort:number_of_points:desc,sort:title_words:le:5',
     },
   ];
 
@@ -52,6 +52,15 @@ describe('AppliedFilters value object unit test', () => {
       .build();
 
     expect(filters.toString()).toBe(testCase.expected);
+  });
+
+  it('should restore the persisted applied filter text', () => {
+    const persistedFilters =
+      'sort:number_of_comments:desc,sort:title_words:gt:5';
+
+    expect(AppliedFilters.fromString(persistedFilters).toString()).toBe(
+      persistedFilters
+    );
   });
 
   it('should require a sort choice when building applied filters', () => {

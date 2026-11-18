@@ -1,0 +1,192 @@
+# Tasks: Persist Usage History
+
+**Input**: Design documents from `/specs/005-usage-db-persistence/`
+
+**Prerequisites**: `plan.md`, `spec.md`, `research.md`, `data-model.md`, `contracts/usage-cli.md`, `quickstart.md`
+
+**Tests**: TDD is required. Acceptance scenarios are added first but MUST NOT be executed for this feature. Unit and integration tests follow the repository's table-driven `it should when` style and verify results plus important dependency calls/arguments. Maintain 100% unit coverage.
+
+**Organization**: Tasks are ordered by shared infrastructure and user story. Each milestone ends with non-acceptance quality gates and a user review pause.
+
+## Phase 1: Acceptance Contract (Write First, Do Not Run)
+
+**Purpose**: Define the black-box persistence journey before implementation while keeping acceptance execution out of scope.
+
+- [x] T001 [P] [US1] Add a black-box scenario that runs `crawl` and then `usage` as two separate CLI invocations sharing one temporary database path in `tests/acceptance/features/usage.feature`
+- [x] T002 [P] [US2] Add usage table scenarios for persisted history, aligned columns, and empty history in `tests/acceptance/features/usage.feature`
+- [x] T003 [P] [US3] Omit the 100-record acceptance scenario as explicitly scoped; retention remains a unit/integration concern documented in the plan
+- [x] T004 Implement black-box subprocess steps that share a temporary DB path between invocations and clean it up in `tests/acceptance/steps/usage.steps.ts`
+- [x] T005 Verify feature/step wording and run `npm run lint` and `npm run typecheck`; do not run acceptance tests. Formatting is valid for TypeScript; Prettier does not parse Gherkin and the repository format gate currently reports an unrelated existing plan formatting issue. Pause for review.
+
+**Checkpoint**: Acceptance scenarios describe the intended CLI behavior and remain unexecuted.
+
+## Phase 2: Foundation - Dependencies, Configuration, Schema, and Migrations
+
+**Purpose**: Add the DB toolchain and schema required by the persistence and display stories.
+
+- [x] T006 Confirm `drizzle-orm`, `drizzle-kit`, `env-paths`, and `@libsql/client` dependencies are present in `package.json` and `package-lock.json`; no installation was needed
+- [x] T007 Add a validated usage retention limit with default 100 and test-only DB path override to `src/config/config.ts`
+- [x] T008 Define the Drizzle usage table matching the four-field `Usage` entity in `src/infrastructure/persistence/sqlite/schema/usage.schema.ts`
+- [x] T009 Configure Drizzle Kit to use the SQLite schema and `drizzle/migrations/` output in `drizzle.config.ts`
+- [x] T010 Generate and review the initial usage-table migration under `drizzle/migrations/20261118174132_friendly_zombie/`
+- [x] T011 Add local migration generation and inspection scripts in `package.json`
+- [x] T012 Include `drizzle/migrations/` and required migration metadata in the published package `files` list in `package.json`
+- [x] T013 Add table/config tests for schema columns, constraints, retention default/override, and invalid retention values in `tests/unit/infrastructure/persistence/sqlite/schema/usage.schema.test.ts` and `tests/unit/config/config.test.ts`
+- [x] T014 Run `npm run quality`, `npm run build`, `npm run db:check`, and a package dry-run; all passed (135 unit tests, 100% coverage); pause for review
+
+**Checkpoint**: Dependencies, configuration, schema, migration artifacts, and package inclusion are reviewable and green.
+
+## Phase 3: User Story 1 - Persist Crawl Usage (Priority: P1)
+
+**Goal**: Persist crawl usage to a per-user SQLite file so records survive independent CLI invocations, without changing crawl outcomes when writes fail.
+
+**Independent Test**: With a temporary database path, save a usage entity, close/reopen the DB, and retrieve the same record. Verify retention and best-effort write behavior with a small configured limit.
+
+### Tests for User Story 1
+
+- [x] T015 [P] [US1] Add table-driven tests for default env-path resolution, test-path override, and directory creation in `tests/unit/infrastructure/persistence/sqlite/sqlite-path.test.ts`
+- [x] T016 [P] [US1] Add tests for successful startup migration, repeat startup, migration failure, and temporary DB cleanup in `tests/unit/infrastructure/persistence/sqlite/sqlite-migrator.test.ts`
+- [x] T017 [P] [US1] Add table-driven repository tests for save/get mapping, insertion ordering, persistence after reopen, retention default/custom/reduction, and transactional failures in `tests/unit/infrastructure/persistence/sqlite/repositories/usage.repository.test.ts`
+- [x] T018 [US1] Add tracked-crawler integration coverage proving SQLite save failures preserve successful results and original crawl errors in `tests/unit/application/usecases/decorators/tracked-crawler.sqlite.test.ts`
+
+### Implementation for User Story 1
+
+- [x] T019 [US1] Implement `sqlite-path.ts` using `env-paths('hn-crawler')`, a database filename, safe test override, and recursive data-directory creation in `src/infrastructure/persistence/sqlite/sqlite-path.ts`
+- [x] T020 [US1] Implement the SQLite connection/client using the selected Drizzle adapter and `node:sqlite` in `src/infrastructure/persistence/sqlite/sqlite.client.ts`
+- [x] T021 [US1] Implement programmatic Drizzle migration loading from packaged `drizzle/migrations/` in `src/infrastructure/persistence/sqlite/sqlite-migrator.ts`
+- [x] T022 [US1] Implement `UsageRepositoryPort` save/getAll operations and transactional insertion-sequence retention pruning in `src/infrastructure/persistence/sqlite/repositories/usage.repository.ts`
+- [x] T023 [US1] Wire SQLite path, client, migrations, and repository in `src/presentation/main.ts` before command dispatch while preserving best-effort crawl tracking
+- [x] T024 [US1] Run focused persistence tests, `npm run quality`, and `npm run build`; pause for review
+
+**Checkpoint**: Usage entries are stored in SQLite across process lifetimes; writes remain best effort and retention is bounded.
+
+## Phase 4: User Story 2 - View Usage in a Readable Table (Priority: P1)
+
+**Goal**: Display persisted usage records in a readable, aligned ASCII table.
+
+**Independent Test**: Supply records with varied lengths and delimiter/newline characters to `usage`; verify exact headings/field order, alignment, single-line rows, empty history, and read-error exit behavior.
+
+### Tests for User Story 2
+
+- [x] T025 [P] [US2] Add table-driven formatter tests for widths, alignment, UUID ID, empty history, delimiters, and line breaks in `tests/unit/presentation/cli/usage.test.ts`
+- [x] T026 [P] [US2] Add usage command tests for database retrieval output and clear non-zero read failures in `tests/unit/presentation/cli/usage.test.ts`
+
+### Implementation for User Story 2
+
+- [x] T027 [US2] Replace JSON serialization with `Usage data` ASCII table output using columns ID, Request Timestamp, Applied Filters, and Duration (ms) in `src/presentation/cli/usage.ts`
+- [x] T028 [US2] Ensure table rendering sanitizes delimiter/newline characters without dropping field content or creating extra rows in `src/presentation/cli/usage.ts`
+- [x] T029 [US2] Run usage CLI unit tests, `npm run quality`, and `npm run build`; pause for review
+
+**Checkpoint**: The usage command presents persisted history in the documented readable table format.
+
+## Phase 5: User Story 3 - Limit Stored History (Priority: P1)
+
+**Goal**: Retain only the newest configured number of records, default 100.
+
+**Independent Test**: Save more than a small configured limit, restart or reopen the DB, and verify the newest rows remain in insertion order.
+
+### Tests for User Story 3
+
+- [x] T030 [P] [US3] Add repository tests proving the default limit is 100 and the newest 100 survive an over-limit write sequence in `tests/unit/infrastructure/persistence/sqlite/repositories/usage.repository.test.ts`
+- [x] T031 [P] [US3] Add repository tests proving custom limit and configuration reduction prune oldest rows on the next save in `tests/unit/infrastructure/persistence/sqlite/repositories/usage.repository.test.ts`
+
+### Implementation for User Story 3
+
+- [x] T032 [US3] Apply the configured retention limit atomically with each save and preserve newest-first selection/insertion-order retrieval in `src/infrastructure/persistence/sqlite/repositories/usage.repository.ts`
+- [x] T033 [US3] Verify retention config validation and default wiring through the composition root in `src/config/config.ts` and `src/presentation/main.ts`
+- [x] T034 [US3] Run focused retention tests, `npm run quality`, and `npm run build`; pause for review
+
+**Checkpoint**: The persisted history remains bounded by application configuration.
+
+## Phase 6: Integration, Packaging, and Final Non-Acceptance Gates
+
+**Purpose**: Verify startup migration, repository sharing, package contents, and documented local commands without executing acceptance tests.
+
+- [x] T035 [US1] Ensure startup migration completes before usage or crawl command handling and reports migration failure as a clear non-zero startup error in `src/presentation/main.ts`
+- [x] T036 [US1] Verify the test-only database path is honored by acceptance subprocesses while normal CLI runs use `env-paths` in `src/infrastructure/persistence/sqlite/sqlite-path.ts` and `tests/acceptance/steps/usage.steps.ts`
+- [x] T037 [US1] Verify migration SQL and metadata are present in the packed package contents and local migration scripts work without running acceptance tests; update `package.json` and `specs/005-usage-db-persistence/quickstart.md` if needed
+- [x] T038 Run `npm run quality` and `npm run build`, inspect acceptance tests and scripts without executing them, record results, and pause for final review. Acceptance execution is out of scope for this feature.
+
+## Dependencies & Execution Order
+
+### Phase Dependencies
+
+- **Phase 1 (Acceptance Contract)**: First by TDD; acceptance remains unrun.
+- **Phase 2 (Foundation)**: Blocks DB path/client/migration/repository implementation.
+- **Phase 3 (US1)**: Depends on configuration, schema, migration artifacts, and foundation.
+- **Phase 4 (US2)**: Depends on the repository read path from US1.
+- **Phase 5 (US3)**: Repository retention can be tested alongside US1, but its review checkpoint follows the persistence milestone.
+- **Phase 6**: Depends on all implementation stories.
+
+### User Story Dependencies
+
+- **US1**: Persistence and best-effort writes; depends on Phase 2.
+- **US2**: Table output from persisted reads; depends on US1 repository integration.
+- **US3**: Bounded record retention; depends on the SQLite repository introduced for US1. Its repository logic can be implemented in the same code increment as US1 but is validated as a separate story milestone.
+
+### Parallel Opportunities
+
+- T007, T008, and T009 use separate files and can proceed in parallel after the dependencies are chosen.
+- T015, T016, and T017 are independent test files and can be authored in parallel before their corresponding implementations; T018 is separate integration coverage.
+- T025 and T026 share the same test file and should be combined or done sequentially.
+- T030 and T031 share the repository test file and should be combined or done sequentially.
+- Acceptance scenarios T001–T004 touch shared feature/step artifacts and should be completed as one small milestone before implementation.
+
+### Parallel Example: Foundation
+
+```text
+Task: T007 retention and test path config in src/config/config.ts
+Task: T008 usage schema in src/infrastructure/persistence/sqlite/schema/usage.schema.ts
+Task: T009 drizzle.config.ts
+```
+
+### Implementation Strategy
+
+#### MVP First
+
+Complete Phase 1, then Phase 2, then US1 persistence. Pause for review after each milestone. The first working increment should support DB path selection, migration at startup, writing and reading a persisted usage record, and best-effort writes.
+
+#### Incremental Delivery
+
+1. Author acceptance scenarios; leave them unrun.
+2. Add DB dependencies, schema, migrations, config, and package metadata.
+3. Implement path/client/migrator and persistence repository; review with non-acceptance gates.
+4. Replace JSON output with table rendering and validate it through unit tests.
+5. Validate retention behavior and final packaging/build.
+6. Acceptance execution is out of scope for this feature.
+
+## Notes
+
+- Acceptance tests are authored first but MUST NOT be run in this feature.
+- Do not add a 100-record acceptance scenario. Test retention limits in unit/integration tests with small values; default behavior is also covered in repository tests.
+- Normal DB path is per-user via `env-paths('hn-crawler')`; tests override the path to a temporary file shared by separate subprocess invocations.
+- Unit tests use `it should when` naming and table-driven cases; assert outputs and significant mock calls/arguments.
+- Keep obsolete in-memory usage repository tests only if the adapter remains used elsewhere; delete them if no longer relevant once SQLite composition is wired.
+
+## Appended Refinement Tasks
+
+The following tasks are appended after the original feature task set. They do not replace or remove any original milestone or task. Each refinement is a separate review milestone.
+
+### Phase 7: Canonical Applied Filter Separator
+
+**Purpose**: Represent multiple applied filter labels using commas in the domain value object and all newly persisted records.
+
+- [x] T039 [P] Add or update table-driven tests for comma-separated sort and title-filter labels, no-title cases, and `fromString` round trips in `tests/unit/domain/vo/applied-filters.vo.test.ts`
+- [x] T040 Update integration, repository, CLI, acceptance fixtures, and any canonical filter expectations from pipe-separated to comma-separated values across `tests/unit/application/usecases/decorators/`, `tests/unit/infrastructure/persistence/sqlite/`, `tests/unit/presentation/cli/`, and `tests/acceptance/`
+- [x] T041 Change the `AppliedFilters` canonical join separator to comma in `src/domain/vo/applied-filters.vo.ts`; preserve stored values as-is and retain table escaping for literal pipe delimiters in `src/presentation/cli/usage.ts`
+- [x] T042 Run focused applied-filter tests, `npm run quality`, and `npm run build`; pause for review
+
+**Checkpoint**: New applied-filter values use commas, all related expectations reflect that contract, and the non-acceptance gates pass.
+
+### Phase 8: Usage Query Inbound Port and Use Case
+
+**Purpose**: Keep the usage CLI command dependent on an application inbound port/use case rather than the persistence output port.
+
+- [x] T043 [P] Add table-driven `it should when` unit tests for the usage query use case, including returned records, repository invocation, and propagated read failures in `tests/unit/application/usecases/usage-query.usecase.test.ts`
+- [x] T044 Define the usage query inbound port in `src/application/ports/in/usage-query.port.ts`, with a read operation returning `Usage[] | Promise<Usage[]>`
+- [x] T045 Implement `src/application/usecases/usage-query.usecase.ts` to depend on `UsageRepositoryPort`, delegate reads, and implement the inbound usage query port
+- [x] T046 Update `src/presentation/cli/usage.ts` and its unit tests to depend on a fake inbound usage query port, not `UsageRepositoryPort`; preserve table output and non-zero read failure behavior
+- [x] T047 Wire the usage query use case in `src/presentation/main.ts` while retaining concrete repository construction in the composition root
+- [x] T048 Run focused use-case and CLI tests, `npm run quality`, and `npm run build`; pause for review
+
+**Checkpoint**: The usage command depends only on the inbound application port and the use case reads through the outbound repository port.

@@ -16,7 +16,7 @@ Successful invocation writes a JSON array to stdout. Empty history is `[]`. Each
 {
   "request_id": "<UUIDv7>",
   "request_timestamp": 123123123,
-  "applied_filters": "sort:number_of_comments:desc|sort:title_words:gt:5",
+  "applied_filters": "sort:number_of_comments:desc,sort:title_words:gt:5",
   "duration_ms": 122
 }
 ```

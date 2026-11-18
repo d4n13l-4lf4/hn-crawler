@@ -21,8 +21,12 @@ export class AppliedFilters {
     return new AppliedFilters(
       [sortLabel, titleLabel]
         .filter((label): label is string => label !== undefined)
-        .join('|')
+        .join(',')
     );
+  }
+
+  static fromString(value: string): AppliedFilters {
+    return new AppliedFilters(value);
   }
 
   toString(): string {
