@@ -174,16 +174,6 @@ Then(
 );
 
 Then(
-  'I should see an argument error in the error output',
-  function (this: { result?: CommandResult }) {
-    assert.ok(
-      this.result?.stderr.includes('error:'),
-      `Expected an argument error, got ${this.result?.stderr}`
-    );
-  }
-);
-
-Then(
   'I should not see {string} in the output',
   function (this: { result?: CommandResult }, unexpected: string) {
     assert.ok(

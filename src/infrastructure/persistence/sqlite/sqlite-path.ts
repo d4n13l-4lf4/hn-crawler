@@ -11,9 +11,10 @@ async function getEnvPaths(): Promise<EnvPaths> {
 }
 
 export async function getSqlitePath(overridePath?: string): Promise<string> {
-  const envPaths = overridePath ? undefined : await getEnvPaths();
-  const databasePath =
-    overridePath ?? join(envPaths!('hn-crawler').data, 'usage.sqlite');
+  const explicitPath = overridePath?.trim();
+  const databasePath = explicitPath
+    ? explicitPath
+    : join((await getEnvPaths())('hn-crawler').data, 'usage.sqlite');
 
   mkdirSync(dirname(databasePath), { recursive: true });
 

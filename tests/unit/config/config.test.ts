@@ -26,10 +26,26 @@ describe('Config unit test', () => {
     );
   });
 
-  it('should preserve the configured test database path when supplied', () => {
-    expect(
-      createConfig({ HN_CRAWLER_TEST_DB_PATH: '/tmp/usage.sqlite' })
-        .usageDatabasePath
-    ).toBe('/tmp/usage.sqlite');
-  });
+  it.each([
+    {
+      should: 'use the explicit database path when configured',
+      environment: { HN_CRAWLER_DB_PATH: '/tmp/usage.sqlite' },
+      expected: '/tmp/usage.sqlite',
+    },
+    {
+      should: 'fall back when the explicit database path is empty',
+      environment: { HN_CRAWLER_DB_PATH: '' },
+      expected: undefined,
+    },
+    {
+      should: 'ignore the legacy test-only database path',
+      environment: { HN_CRAWLER_TEST_DB_PATH: '/tmp/legacy.sqlite' },
+      expected: undefined,
+    },
+  ])(
+    'should $should when loading configuration',
+    ({ environment, expected }) => {
+      expect(createConfig(environment).usageDatabasePath).toBe(expected);
+    }
+  );
 });

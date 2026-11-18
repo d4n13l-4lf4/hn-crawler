@@ -130,7 +130,7 @@ function testDbEnvironment(world: UsageWorld): Record<string, string> {
     'Temporary usage database path was not configured'
   );
   return {
-    HN_CRAWLER_TEST_DB_PATH: world.usageDbPath,
+    HN_CRAWLER_DB_PATH: world.usageDbPath,
     HN_CRAWLER_USAGE_LIMIT: process.env.HN_CRAWLER_USAGE_LIMIT ?? '100',
   };
 }
