@@ -12,7 +12,7 @@
 
 **Purpose**: No project initialization is needed; the TypeScript CLI, test tools, and feature scaffolding already exist.
 
-- [ ] T001 Review the acceptance URL environment variable and standalone CLI invocation in `tests/acceptance/steps/crawl.steps.ts` and `package.json` without running acceptance tests
+- [X] T001 Review the acceptance URL environment variable and standalone CLI invocation in `tests/acceptance/steps/crawl.steps.ts` and `package.json` without running acceptance tests
 
 ## Phase 2: Foundational Pipeline Components
 
@@ -38,9 +38,9 @@
 
 ### Milestone A: Acceptance scenarios written first (do not run)
 
-- [ ] T011 [P] [US1] Add black-box Cucumber scenarios for all supported filter/ranking combinations, defaults, output shape/order, and no-match output in `tests/acceptance/features/crawl.feature`
-- [ ] T012 [P] [US1] Add black-box Cucumber scenarios for conflicting flags, invalid title-word arguments, exact maximum message, crawler failure message, and actual process exit status in `tests/acceptance/features/crawl.feature`
-- [ ] T013 [US1] Update process invocation and assertions to avoid all source artifact paths and check stdout, stderr, and status in `tests/acceptance/steps/crawl.steps.ts`; do not run the acceptance suite
+- [X] T011 [P] [US1] Add black-box Cucumber scenarios for all supported filter/ranking combinations, defaults, output shape/order, and no-match output in `tests/acceptance/features/crawl.feature`
+- [X] T012 [P] [US1] Add black-box Cucumber scenarios for conflicting flags, invalid title-word arguments, exact maximum message, crawler failure message, and actual process exit status in `tests/acceptance/features/crawl.feature`
+- [X] T013 [US1] Update process invocation and assertions to avoid all source artifact paths and check stdout, stderr, and status in `tests/acceptance/steps/crawl.steps.ts`; do not run the acceptance suite
 - [ ] T014 [US1] Run `npm run format:check`, `npm run lint`, `npm run typecheck`, and `npm run test:coverage`; pause for review without executing acceptance tests
 
 **Checkpoint**: Acceptance tests describe the desired behavior and remain unexecuted as requested.
@@ -83,9 +83,9 @@
 
 **Independent Test**: A failing CLI invocation has the expected stderr and non-zero status; a successful invocation has status zero. Acceptance tests use the runnable package/command, not source paths.
 
-- [ ] T032 [US2] Review every failure scenario and step to ensure both expected output and non-zero process status are asserted in `tests/acceptance/features/crawl.feature` and `tests/acceptance/steps/crawl.steps.ts`
-- [ ] T033 [US2] Remove source-artifact path references from acceptance execution configuration and use the installed runnable CLI contract in `tests/acceptance/steps/crawl.steps.ts` and `package.json`
-- [ ] T034 [US2] Confirm successful scenarios assert status zero and failing scenarios assert non-zero status in `tests/acceptance/features/crawl.feature`
+- [X] T032 [US2] Review every failure scenario and step to ensure both expected output and non-zero process status are asserted in `tests/acceptance/features/crawl.feature` and `tests/acceptance/steps/crawl.steps.ts`
+- [X] T033 [US2] Remove source-artifact path references from acceptance execution configuration and use the installed runnable CLI contract in `tests/acceptance/steps/crawl.steps.ts` and `package.json`
+- [X] T034 [US2] Confirm successful scenarios assert status zero and failing scenarios assert non-zero status in `tests/acceptance/features/crawl.feature`
 
 **Checkpoint**: Acceptance suite is ready for final execution and remains unrun before user review.
 
