@@ -20,9 +20,9 @@ A standalone CLI that scrapes the first 30 entries of Hacker News (number, title
 ## Domain rules
 
 - **Word count:** whitespace-separated tokens containing at least one letter or digit. `This is - a self-explained example` has 5 words.
-- **Long titles:** more than 5 words, ordered by comments (descending).
-- **Short titles:** 5 words or fewer, ordered by points (descending).
-- Ties keep the original Hacker News rank. Missing points or comments (e.g. job posts) count as 0.
+- **Title-word filters:** retain titles with more than a configured number of words (`gt`) or at most a configured number (`le`). The CLI defaults to more than five words; either filter can be combined with either ranking metric.
+- **Ranking:** sort eligible entries by comments or points in descending order. Comments are the default ranking metric. Missing selected values count as 0.
+- Ties keep the original Hacker News rank.
 - **Usage record:** timestamp, applied filter, source URL, entries scraped, entries returned, duration and outcome (success, or error with message).
 
 ## Scaffolding
@@ -31,25 +31,21 @@ A standalone CLI that scrapes the first 30 entries of Hacker News (number, title
 hn-web-crawler/
 ├── src/
 │   ├── domain/
-│   │   ├── models.ts
-│   │   └── text-utils.ts
+│   │   ├── entities/hn-entry.entity.ts
+│   │   ├── policies/entry-filter.policy.ts
+│   │   └── vo/
 │   ├── application/
 │   │   ├── ports/
-│   │   │   ├── entry-source.port.ts
-│   │   │   └── usage-repo.port.ts
+│   │   │   ├── in/crawler.port.ts
+│   │   │   └── out/entry-source.port.ts
 │   │   ├── pipeline/
-│   │   │   ├── pipe.ts
-│   │   │   ├── operators.ts
 │   │   │   ├── pipeline.types.d.ts
-│   │   │   ├── steps/
-│   │   │   │   ├── filter-more-than-five-words.step.ts
-│   │   │   │   ├── filter-up-to-five-words.step.ts
-│   │   │   │   ├── top-by-comments.step.ts
-│   │   │   │   └── top-by-points.step.ts
-│   │   │   └── composed/
-│   │   │       ├── long-titles.pipeline.ts
-│   │   │       └── short-titles.pipeline.ts
-│   │   └── crawl-hn.use-case.ts
+│   │   │   ├── orchestrator/async.pipe.ts
+│   │   │   ├── operators/filter.ts
+│   │   │   ├── operators/top-k.ts
+│   │   │   ├── steps/filter-title-words.step.ts
+│   │   │   └── factory/factory.ts
+│   │   └── usecases/crawler.usecase.ts
 │   ├── infrastructure/
 │   │   ├── web/
 │   │   │   ├── hn-http.client.ts
@@ -58,7 +54,8 @@ hn-web-crawler/
 │   │   └── persistence/
 │   │       └── sqlite-usage.repo.ts
 │   └── presentation/
-│       ├── cli.ts
+│       ├── cli/
+│       │   └── crawl.ts
 │       └── main.ts                 <-- composition root / DI
 ├── tests/
 │   ├── fixtures/
@@ -81,22 +78,23 @@ Root-level configuration files for the tools in the stack (linter, formatter, te
 
 ### Folder responsibilities
 
-| Folder                              | Responsibility                                                                                                                                                                                                         |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/domain`                        | Pure core: entities and value objects (`HNEntry`, `FilterType`, `UsageRecord`) and stateless text utilities (`countWords`, `extractNumber`). No external dependencies; unaware of streams, HTTP, databases or the CLI. |
-| `src/application`                   | The main use case (`crawl-hn`): reads entries from a port, applies a pipeline, records usage.                                                                                                                          |
-| `src/application/ports`             | Driven interfaces that decouple orchestration from I/O: the entry source (sync or async iterable of entries) and the usage repository.                                                                                 |
-| `src/application/pipeline`          | Generic stream building blocks: `pipe`/`pipeAsync` and operators (`filter`, `map`, `take`, `eagerTopK`), plus their type declarations.                                                                                 |
-| `src/application/pipeline/steps`    | Single-responsibility steps configured with domain rules: lazy filters (`filter-*`) and bounded eager windows (`top-by-*`).                                                                                            |
-| `src/application/pipeline/composed` | Pre-wired pipelines (`long-titles`, `short-titles`) combining steps into business flows.                                                                                                                               |
-| `src/infrastructure/web`            | HTTP fetching, lazy HTML-to-entry parsing with Cheerio, and the adapter implementing the entry-source port.                                                                                                            |
-| `src/infrastructure/persistence`    | Usage repository implementation on SQLite.                                                                                                                                                                             |
-| `src/presentation`                  | Driving adapter: `cli.ts` handles argument parsing and output formatting; `main.ts` is the composition root where concrete adapters are instantiated and injected into the use case.                                   |
-| `tests/fixtures`                    | Static HTML snapshots shared by all test levels, so no test needs the live site.                                                                                                                                       |
-| `tests/unit`                        | Mirrors `src`; see `QA.md`.                                                                                                                                                                                            |
-| `tests/acceptance`                  | Gherkin `features` and `steps` exercising the CLI; see `QA.md`.                                                                                                                                                        |
-| `docs`                              | Project documentation.                                                                                                                                                                                                 |
-| `.github/workflows`, `.husky`       | CI/CD workflows and git hooks; see `CICD.md`.                                                                                                                                                                          |
+| Folder                                  | Responsibility                                                                                                                                                                       |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/domain`                            | Pure core: entities, value objects, and policies such as title-word predicates. No external dependencies; unaware of streams, HTTP, databases or the CLI.                            |
+| `src/application`                       | The crawler use case reads entries from a port, requests a configured pipeline through an application-owned contract, and applies it.                                                |
+| `src/application/ports`                 | Interfaces that decouple the crawler use case from entry-source and pipeline implementations.                                                                                        |
+| `src/application/pipeline`              | Async stream building blocks: `pipeAsync`, lazy `filter`, bounded `topK`, configured title filters, and the pipeline factory.                                                        |
+| `src/application/pipeline/orchestrator` | Composes asynchronous iterable steps in order.                                                                                                                                       |
+| `src/application/pipeline/steps`        | Single-responsibility asynchronous steps configured with domain policies.                                                                                                            |
+| `src/application/pipeline/factory`      | Creates a pipeline for the requested ranking and optional title-word filter.                                                                                                         |
+| `src/infrastructure/web`                | HTTP fetching, lazy HTML-to-entry parsing with Cheerio, and the adapter implementing the entry-source port.                                                                          |
+| `src/infrastructure/persistence`        | Usage repository implementation on SQLite.                                                                                                                                           |
+| `src/presentation`                      | Driving adapter: `cli.ts` handles argument parsing and output formatting; `main.ts` is the composition root where concrete adapters are instantiated and injected into the use case. |
+| `tests/fixtures`                        | Static HTML snapshots shared by all test levels, so no test needs the live site.                                                                                                     |
+| `tests/unit`                            | Mirrors `src`; see `QA.md`.                                                                                                                                                          |
+| `tests/acceptance`                      | Gherkin `features` and `steps` exercising the CLI; see `QA.md`.                                                                                                                      |
+| `docs`                                  | Project documentation.                                                                                                                                                               |
+| `.github/workflows`, `.husky`           | CI/CD workflows and git hooks; see `CICD.md`.                                                                                                                                        |
 
 ### Conventions
 
@@ -107,16 +105,13 @@ Root-level configuration files for the tools in the stack (linter, formatter, te
 ## Component design decisions
 
 - **Async generators** stream data step by step instead of loading everything in memory.
-- **Pure, reusable functions** handle ingestion and processing. A source can be sync or async, and the stream upgrades to async when a step needs it.
-- **Pipeline style:** `pipeAsync(source, ...operators)` composes operators; steps and composed pipelines are built from them.
-- **Operator typing:** the generic sits on the returned function, so `T` is inferred from the source and call sites need no explicit type. Overloads keep sync input sync and promote anything async.
+- **Pure, reusable functions** handle processing. The entry-source port supplies an async iterable, and pipeline operators consume async iterables.
+- **Pipeline style:** `pipeAsync(source, ...operators)` composes async operators; a factory wires policy steps with the selected ranking.
+- **Operator typing:** the generic sits on the returned function, so `T` is inferred from the source and call sites need no explicit type.
 - **Declaration files:** pipe and operator types live in a dedicated `.d.ts` with a different basename from its implementation (TypeScript ignores a `.d.ts` that shares a `.ts` file's name). It is consumed with `import type`.
 
 ```typescript
-function take(limit: number): {
-  <T>(source: Iterable<T>): Generator<T>;
-  <T>(source: AsyncIterable<T> | Iterable<T>): AsyncGenerator<T>;
-};
+type AsyncStep<In, Out> = (source: AsyncIterable<In>) => AsyncGenerator<Out>;
 ```
 
 - **Configurable source:** the scrape subcommand takes the page URL as a parameter (default: Hacker News), so the same CLI can run against fixtures.

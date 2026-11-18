@@ -8,6 +8,12 @@ type CrawlCommandTestCase = {
   should: string;
   entries: HNEntry[];
   expectedOutput: string;
+  args?: string[];
+  expectedRequest?: {
+    url: string;
+    sortBy: 'comments' | 'points';
+    titleWords?: { operator: 'gt' | 'le'; value: number };
+  };
 };
 
 function createCrawler(entries: HNEntry[] = []): CrawlerPort {
@@ -21,26 +27,74 @@ describe('Crawl command unit test', () => {
       entries: [new HNEntry(1, 'My news', 1, 2)],
       expectedOutput:
         '[\n  {\n    "rank": 1,\n    "title": "My news",\n    "points": 1,\n    "number_of_comments": 2\n  }\n]',
+      expectedRequest: {
+        url: config.newsCombinatorUrl,
+        sortBy: 'comments',
+        titleWords: { operator: 'gt', value: 5 },
+      },
     },
     {
       should: 'display an empty JSON array when there are no entries',
       entries: [],
       expectedOutput: '[]',
+      expectedRequest: {
+        url: config.newsCombinatorUrl,
+        sortBy: 'comments',
+        titleWords: { operator: 'gt', value: 5 },
+      },
+    },
+    {
+      should: 'apply the points ranking when requested',
+      entries: [],
+      expectedOutput: '[]',
+      args: ['--top-points'],
+      expectedRequest: {
+        url: config.newsCombinatorUrl,
+        sortBy: 'points',
+        titleWords: { operator: 'gt', value: 5 },
+      },
+    },
+    {
+      should: 'apply the title filter and comments ranking when requested',
+      entries: [],
+      expectedOutput: '[]',
+      args: ['--title-words', 'le:2'],
+      expectedRequest: {
+        url: config.newsCombinatorUrl,
+        sortBy: 'comments',
+        titleWords: { operator: 'le', value: 2 },
+      },
+    },
+    {
+      should: 'apply any filter and ranking combination',
+      entries: [],
+      expectedOutput: '[]',
+      args: ['--title-words', 'gt:9', '--top-points'],
+      expectedRequest: {
+        url: config.newsCombinatorUrl,
+        sortBy: 'points',
+        titleWords: { operator: 'gt', value: 9 },
+      },
     },
   ];
 
-  it.each(testCases)('should $should', async ({ entries, expectedOutput }) => {
-    const crawler = createCrawler(entries);
-    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
-    const command = createCrawlCommand(crawler, true);
+  it.each(testCases)(
+    'should $should',
+    async ({ entries, expectedOutput, args = [], expectedRequest }) => {
+      const crawler = createCrawler(entries);
+      const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const command = createCrawlCommand(crawler, true);
 
-    await command.parseAsync(['node', 'hn-crawler', 'crawl'], { from: 'user' });
+      await command.parseAsync(['node', 'hn-crawler', 'crawl', ...args], {
+        from: 'user',
+      });
 
-    expect(log).toHaveBeenCalledWith(expectedOutput);
-    expect(crawler.execute).toHaveBeenCalledOnce();
-    expect(crawler.execute).toHaveBeenCalledWith(config.newsCombinatorUrl);
-    log.mockRestore();
-  });
+      expect(log).toHaveBeenCalledWith(expectedOutput);
+      expect(crawler.execute).toHaveBeenCalledOnce();
+      expect(crawler.execute).toHaveBeenCalledWith(expectedRequest);
+      log.mockRestore();
+    }
+  );
 
   it('should display the generic message and exit non-zero when crawling fails', async () => {
     const failure = new Error('HTTP 503: unavailable');
@@ -60,7 +114,11 @@ describe('Crawl command unit test', () => {
     );
     expect(exit).toHaveBeenCalledWith(1);
     expect(crawler.execute).toHaveBeenCalledOnce();
-    expect(crawler.execute).toHaveBeenCalledWith(config.newsCombinatorUrl);
+    expect(crawler.execute).toHaveBeenCalledWith({
+      url: config.newsCombinatorUrl,
+      sortBy: 'comments',
+      titleWords: { operator: 'gt', value: 5 },
+    });
     error.mockRestore();
     exit.mockRestore();
   });
@@ -86,7 +144,11 @@ describe('Crawl command unit test', () => {
     );
 
     expect(crawler.execute).toHaveBeenCalledOnce();
-    expect(crawler.execute).toHaveBeenCalledWith('http://127.0.0.1:4321');
+    expect(crawler.execute).toHaveBeenCalledWith({
+      url: 'http://127.0.0.1:4321',
+      sortBy: 'comments',
+      titleWords: { operator: 'gt', value: 5 },
+    });
     vi.restoreAllMocks();
   });
 
@@ -100,7 +162,11 @@ describe('Crawl command unit test', () => {
     });
 
     expect(crawler.execute).toHaveBeenCalledOnce();
-    expect(crawler.execute).toHaveBeenCalledWith(config.newsCombinatorUrl);
+    expect(crawler.execute).toHaveBeenCalledWith({
+      url: config.newsCombinatorUrl,
+      sortBy: 'comments',
+      titleWords: { operator: 'gt', value: 5 },
+    });
     vi.restoreAllMocks();
   });
 
@@ -125,4 +191,59 @@ describe('Crawl command unit test', () => {
     ]);
     vi.restoreAllMocks();
   });
+
+  const invalidArgumentCases = [
+    {
+      should: 'reject both ranking options together',
+      args: ['--top-comments', '--top-points'],
+      expectedError: 'cannot be used together',
+    },
+    {
+      should: 'reject a title limit below one',
+      args: ['--title-words', 'gt:0'],
+      expectedError: 'Invalid title words filter',
+    },
+    {
+      should: 'reject an unsupported title comparator',
+      args: ['--title-words', 'ge:5'],
+      expectedError: 'Invalid title words filter',
+    },
+    {
+      should: 'reject a non-integer title limit',
+      args: ['--title-words', 'gt:abc'],
+      expectedError: 'Invalid title words filter',
+    },
+    {
+      should: 'show the friendly message for a title limit above 10000',
+      args: ['--title-words', 'gt:10001'],
+      expectedError:
+        'The maximum value for the title words filter is 10000. Please use a value between 1 and 10000 (e.g., gt:100).',
+    },
+  ];
+
+  it.each(invalidArgumentCases)(
+    'should $should and exit non-zero',
+    async ({ args, expectedError }) => {
+      const crawler = createCrawler();
+      const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const exit = vi.spyOn(process, 'exit').mockImplementation((() => {
+        throw new Error('process exit');
+      }) as never);
+      const command = createCrawlCommand(crawler, true);
+
+      await expect(
+        command.parseAsync(['node', 'hn-crawler', 'crawl', ...args], {
+          from: 'user',
+        })
+      ).rejects.toThrow('process exit');
+
+      expect(error).toHaveBeenCalledWith(
+        expect.stringContaining(expectedError)
+      );
+      expect(exit).toHaveBeenCalledWith(1);
+      expect(crawler.execute).not.toHaveBeenCalled();
+      error.mockRestore();
+      exit.mockRestore();
+    }
+  );
 });

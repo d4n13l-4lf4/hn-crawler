@@ -1,5 +1,3 @@
-// TypeScript definitions for pipeline types
+import type { AsyncOperator, AsyncStep } from './pipeline.types';
 
-import { HnEntry } from '../../domain/models';
-
-export type EntryPipeline = (entries: HnEntry[]) => HnEntry[];
+export type { AsyncOperator, AsyncStep };

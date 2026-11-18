@@ -1,6 +1,5 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 import { spawnSync, SpawnSyncReturns } from 'node:child_process';
-import { join } from 'node:path';
 import assert from 'node:assert/strict';
 
 interface CommandResult {
@@ -16,16 +15,73 @@ Given('the configured acceptance crawl URL is available', function () {
 When(
   'I run the crawl command with the configured URL in beta mode',
   function () {
-    this.result = runCli(['crawl', '--url', getAcceptanceUrl()], {
-      HN_CRAWLER_BETA: 'true',
-    });
+    this.result = runCli(['crawl', '--url', getAcceptanceUrl()]);
+  }
+);
+
+When(
+  'I run the crawl command with the configured URL and ranking {string} in beta mode',
+  function (this: { result?: CommandResult }, ranking: string) {
+    this.result = runCli([
+      'crawl',
+      '--url',
+      getAcceptanceUrl(),
+      '--title-words',
+      'le:10000',
+      ranking === 'comments' ? '--top-comments' : '--top-points',
+    ]);
+  }
+);
+
+When(
+  'I run the crawl command with default options and the configured URL in beta mode',
+  function () {
+    this.result = runCli(['crawl', '--url', getAcceptanceUrl()]);
+  }
+);
+
+When(
+  'I run the crawl command with title filter {string} and ranking {string} using the configured URL in beta mode',
+  function (this: { result?: CommandResult }, filter: string, ranking: string) {
+    this.result = runCli([
+      'crawl',
+      '--url',
+      getAcceptanceUrl(),
+      '--title-words',
+      filter,
+      ranking === 'comments' ? '--top-comments' : '--top-points',
+    ]);
+  }
+);
+
+When(
+  'I run the crawl command with ranking {string} and the configured URL in beta mode',
+  function (this: { result?: CommandResult }, ranking: string) {
+    this.result = runCli([
+      'crawl',
+      '--url',
+      getAcceptanceUrl(),
+      ranking === 'comments' ? '--top-comments' : '--top-points',
+    ]);
+  }
+);
+
+When(
+  'I run the crawl command with title filter {string} in beta mode',
+  function (this: { result?: CommandResult }, filter: string) {
+    this.result = runCli(['crawl', '--title-words', filter]);
+  }
+);
+
+When(
+  'I run the crawl command with conflicting ranking options in beta mode',
+  function () {
+    this.result = runCli(['crawl', '--top-comments', '--top-points']);
   }
 );
 
 When('I run the crawl command with an invalid URL in beta mode', function () {
-  this.result = runCli(['crawl', '--url', 'https://'], {
-    HN_CRAWLER_BETA: 'true',
-  });
+  this.result = runCli(['crawl', '--url', 'https://']);
 });
 
 When(
@@ -38,39 +94,62 @@ When(
 );
 
 Then(
-  'the crawl output is a JSON array with {int} entries in page order',
+  'the crawl output is a JSON array with at most 30 entries',
+  function (this: { result?: CommandResult }) {
+    assert.ok(parseOutput(this.result).stdout.length <= 30);
+  }
+);
+
+Then(
+  'the crawl output should be a JSON array',
+  function (this: { result?: CommandResult }) {
+    assert.ok(Array.isArray(parseOutput(this.result).stdout));
+  }
+);
+
+Then(
+  'the crawl output should contain only titles with more than {int} words',
   function (this: { result?: CommandResult }, count: number) {
-    const entries = parseOutput(this.result).stdout;
-    assert.equal(entries.length, count);
-    assert.deepEqual(
-      entries.map((entry) => entry.rank),
-      Array.from({ length: count }, (_, index) => index + 1)
-    );
+    for (const entry of parseOutput(this.result).stdout) {
+      assert.ok(countWords(String(entry.title)) > count);
+    }
   }
 );
 
 Then(
-  'the first entry is rank {int} titled {string} with {int} points and {int} comments',
-  function (
-    this: { result?: CommandResult },
-    rank: number,
-    title: string,
-    points: number,
-    comments: number
-  ) {
-    assert.deepEqual(parseOutput(this.result).stdout[0], {
-      rank,
-      title,
-      points,
-      number_of_comments: comments,
-    });
+  'the crawl output should contain only titles with at most {int} words',
+  function (this: { result?: CommandResult }, count: number) {
+    for (const entry of parseOutput(this.result).stdout) {
+      assert.ok(countWords(String(entry.title)) <= count);
+    }
   }
 );
 
 Then(
-  'the first entry title is {string}',
-  function (this: { result?: CommandResult }, title: string) {
-    assert.equal(parseOutput(this.result).stdout[0]?.title, title);
+  'the crawl output should be ordered by comments descending',
+  function (this: { result?: CommandResult }) {
+    assertDescending(parseOutput(this.result).stdout, 'number_of_comments');
+  }
+);
+
+Then(
+  'the crawl output should be ordered by points descending',
+  function (this: { result?: CommandResult }) {
+    assertDescending(parseOutput(this.result).stdout, 'points');
+  }
+);
+
+Then(
+  'every output entry should contain exactly the established story fields',
+  function (this: { result?: CommandResult }) {
+    for (const entry of parseOutput(this.result).stdout) {
+      assert.deepEqual(Object.keys(entry).sort(), [
+        'number_of_comments',
+        'points',
+        'rank',
+        'title',
+      ]);
+    }
   }
 );
 
@@ -90,6 +169,16 @@ Then(
     assert.ok(
       this.result?.stderr.includes('error: unknown option'),
       `Expected a standard unknown-option error, got ${this.result?.stderr}`
+    );
+  }
+);
+
+Then(
+  'I should see an argument error in the error output',
+  function (this: { result?: CommandResult }) {
+    assert.ok(
+      this.result?.stderr.includes('error:'),
+      `Expected an argument error, got ${this.result?.stderr}`
     );
   }
 );
@@ -134,23 +223,39 @@ function getAcceptanceUrl(): string {
   return url;
 }
 
-function runCli(args: string[], env: Record<string, string>): CommandResult {
-  const binary =
-    process.env.HN_CRAWLER_BIN ??
-    join(process.cwd(), 'dist/presentation/main.js');
-  const result: SpawnSyncReturns<string> = spawnSync(
-    process.execPath,
-    [binary, ...args],
-    {
-      encoding: 'utf8',
-      env: { ...process.env, ...env },
-    }
-  );
+function runCli(
+  args: string[],
+  env: Record<string, string> = {}
+): CommandResult {
+  const result: SpawnSyncReturns<string> = spawnSync('hn-crawler', args, {
+    encoding: 'utf8',
+    env: { ...process.env, ...env },
+    shell: false,
+  });
   return {
     stdout: result.stdout ?? '',
     stderr: result.stderr ?? '',
     status: result.status,
   };
+}
+
+function countWords(title: string): number {
+  return title
+    .trim()
+    .split(/\s+/)
+    .filter((word) => /[\p{L}\p{N}]/u.test(word)).length;
+}
+
+function assertDescending(
+  entries: Array<Record<string, unknown>>,
+  property: string
+): void {
+  for (let index = 1; index < entries.length; index += 1) {
+    assert.ok(
+      Number(entries[index - 1][property]) >= Number(entries[index][property]),
+      `Expected ${property} in descending order`
+    );
+  }
 }
 
 function parseOutput(result?: CommandResult): {
