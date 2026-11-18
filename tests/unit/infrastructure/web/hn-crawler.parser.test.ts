@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { parseHnEntries } from '../../../../src/infrastructure/web/hn-crawler.parser';
-import { HNEntry } from '../../../../src/domain/entities/hn-entry.entity';
+import { parseHnEntries } from '@/infrastructure/web/hn-crawler.parser';
+import { HNEntry } from '@/domain/entities/hn-entry.entity';
 
 const sampleHtml = readFileSync(
   resolve(process.cwd(), 'tests/resources/hacker-news.html'),

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { CrawlerUseCase } from '../../../../src/application/usecases/crawler.usecase';
-import { HNEntry } from '../../../../src/domain/entities/hn-entry.entity';
+import { CrawlerUseCase } from '@/application/usecases/crawler.usecase';
+import { HNEntry } from '@/domain/entities/hn-entry.entity';
 
 type CrawlerUseCaseTestCase = {
   should: string;

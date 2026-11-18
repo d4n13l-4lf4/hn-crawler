@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Command } from 'commander';
-import { createCli } from '../../../../src/presentation/cli/cli';
+import { createCli } from '@/presentation/cli/cli';
 
 describe('CLI builder unit test', () => {
   it('should register each supplied subcommand', () => {

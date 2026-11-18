@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { HNEntry } from '../../../../src/domain/entities/hn-entry.entity';
-import { HnWebAdapter } from '../../../../src/infrastructure/web/hn-web.adapter';
+import { HNEntry } from '@/domain/entities/hn-entry.entity';
+import { HnWebAdapter } from '@/infrastructure/web/hn-web.adapter';
 
 async function* entries(): AsyncGenerator<HNEntry> {
   yield new HNEntry(1, 'Story', 10, 2);

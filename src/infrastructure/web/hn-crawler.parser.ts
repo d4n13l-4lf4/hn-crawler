@@ -1,5 +1,5 @@
 import { load } from 'cheerio';
-import { HNEntry } from '../../domain/entities/hn-entry.entity';
+import { HNEntry } from '@/domain/entities/hn-entry.entity';
 
 export async function* parseHnEntries(html: string): AsyncGenerator<HNEntry> {
   const $ = load(html);

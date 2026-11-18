@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { CrawlerPort } from '../../../../src/application/ports/in/crawler.port';
-import { HNEntry } from '../../../../src/domain/entities/hn-entry.entity';
-import { createCrawlCommand } from '../../../../src/presentation/cli/crawl';
-import { config } from '../../../../src/config/config';
+import { CrawlerPort } from '@/application/ports/in/crawler.port';
+import { HNEntry } from '@/domain/entities/hn-entry.entity';
+import { createCrawlCommand } from '@/presentation/cli/crawl';
+import { config } from '@/config/config';
 
 type CrawlCommandTestCase = {
   should: string;

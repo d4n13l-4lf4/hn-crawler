@@ -1,6 +1,6 @@
-import { CrawlerPort } from '../ports/in/crawler.port';
-import { EntrySourcePort } from '../ports/out/entry-source.port';
-import { HNEntry } from '../../domain/entities/hn-entry.entity';
+import { CrawlerPort } from '@/application/ports/in/crawler.port';
+import { EntrySourcePort } from '@/application/ports/out/entry-source.port';
+import { HNEntry } from '@/domain/entities/hn-entry.entity';
 
 export class CrawlerUseCase implements CrawlerPort {
   constructor(private readonly entrySource: EntrySourcePort) {}

@@ -1,7 +1,7 @@
-import { EntrySourcePort } from '../../application/ports/out/entry-source.port';
-import { HNEntry } from '../../domain/entities/hn-entry.entity';
-import { fetchPage } from './hn-http.client';
-import { parseHnEntries } from './hn-crawler.parser';
+import { EntrySourcePort } from '@/application/ports/out/entry-source.port';
+import { HNEntry } from '@/domain/entities/hn-entry.entity';
+import { fetchPage } from '@/infrastructure/web/hn-http.client';
+import { parseHnEntries } from '@/infrastructure/web/hn-crawler.parser';
 
 const DEFAULT_URL = 'https://news.ycombinator.com/';
 

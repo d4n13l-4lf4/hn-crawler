@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fetchPage } from '../../../../src/infrastructure/web/hn-http.client';
+import { fetchPage } from '@/infrastructure/web/hn-http.client';
 
 describe('HN HTTP client unit test', () => {
   afterEach(() => {

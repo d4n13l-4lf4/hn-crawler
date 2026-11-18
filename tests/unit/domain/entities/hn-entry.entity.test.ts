@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { HNEntry } from '../../../../src/domain/entities/hn-entry.entity';
+import { HNEntry } from '@/domain/entities/hn-entry.entity';
 
 type HNEntryTestCase = {
   should: string;

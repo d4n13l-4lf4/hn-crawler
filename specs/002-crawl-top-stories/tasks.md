@@ -52,19 +52,19 @@ description: 'Task list for Crawl Top Stories refinements'
 
 **Tests first**
 
-- [X] T009 [US1] Update `tests/unit/infrastructure/web/hn-http.client.test.ts` with table-driven fetch-error cases asserting outcome, requested URL mock arguments, contextual message, and `cause` identity
+- [x] T009 [US1] Update `tests/unit/infrastructure/web/hn-http.client.test.ts` with table-driven fetch-error cases asserting outcome, requested URL mock arguments, contextual message, and `cause` identity
 
 **Implementation**
 
-- [X] T010 [US1] Update `src/infrastructure/web/hn-http.client.ts` to catch fetch failures and throw a contextual `Error` with `{ cause: error }`, preserving HTTP status handling
-- [X] T011 [US1] Run focused HTTP client unit tests and non-acceptance quality gates
+- [x] T010 [US1] Update `src/infrastructure/web/hn-http.client.ts` to catch fetch failures and throw a contextual `Error` with `{ cause: error }`, preserving HTTP status handling
+- [x] T011 [US1] Run focused HTTP client unit tests and non-acceptance quality gates
 
 **Checkpoint**: Review HTTP failure context/cause and green focused checks; stop for user confirmation before Milestone 4.
 
 ### Milestone 4 — Import alias consistency
 
-- [ ] T012 [US1] Convert eligible feature-internal relative imports in `src/` and `tests/unit/` to the existing `@/*` alias without changing runtime behavior
-- [ ] T013 [US1] Run build, formatter, lint, typecheck, and unit coverage to verify alias resolution
+- [X] T012 [US1] Convert eligible feature-internal relative imports in `src/` and `tests/unit/` to the existing `@/*` alias without changing runtime behavior
+- [X] T013 [US1] Run build, formatter, lint, typecheck, and unit coverage to verify alias resolution
 
 **Checkpoint**: Review import-only changes and non-acceptance checks; stop for user confirmation before Milestone 5.
 
