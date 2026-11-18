@@ -57,9 +57,9 @@
 
 ### Milestone A: Applied filter mapper
 
-- [ ] T016 [P] [US1] Implement `mapAppliedFilters` from `CrawlRequest` to `AppliedFilters` in `src/application/mappers/applied-filters.mapper.ts`
-- [ ] T017 [P] [US1] Add table-driven `it should when` mapper tests for comments/points ranking, optional title rules, and default request values with exact expected labels in `tests/unit/application/mappers/applied-filters.mapper.test.ts`
-- [ ] T018 [US1] Run mapper tests and non-acceptance quality gates; pause for review
+- [x] T016 [P] [US1] Implement `mapAppliedFilters` from `CrawlRequest` to `AppliedFilters` in `src/application/mappers/applied-filters.mapper.ts`
+- [x] T017 [P] [US1] Add table-driven `it should when` mapper tests for comments/points ranking, optional title rules, and default request values with exact expected labels in `tests/unit/application/mappers/applied-filters.mapper.test.ts`
+- [x] T018 [US1] Run `npm run quality`; all non-acceptance gates pass with 100% unit coverage
 
 **Checkpoint**: The application mapping is tested independently of the decorator and infrastructure.
 
