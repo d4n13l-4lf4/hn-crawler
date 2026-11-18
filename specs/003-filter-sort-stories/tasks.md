@@ -58,22 +58,22 @@
 
 ### Milestone C: Crawler use case and composition wiring
 
-- [X] T021 [US1] Define user-level crawl filter/ranking request types and an injected pipeline factory contract independent of `PipelineConfig` in `src/application/ports/in/crawler.port.ts`
-- [X] T022 [US1] Update crawler use case to retrieve at most the first 30 entries, obtain a pipeline from its injected factory, and apply it to the retrieved stream in `src/application/usecases/crawler.usecase.ts`
-- [X] T023 [US1] Add table-driven use-case tests for result contents, candidate cutoff, source/factory call counts and exact arguments, filter/ranking combinations, and propagated failures in `tests/unit/application/usecases/crawler.usecase.test.ts`
-- [X] T024 [US1] Wire the concrete pipeline factory into the crawler use case in `src/presentation/main.ts`
-- [X] T025 [US1] Run `npm run test:unit -- tests/unit/application/usecases/crawler.usecase.test.ts` and the non-acceptance quality gates; pause for review before CLI changes
+- [x] T021 [US1] Define user-level crawl filter/ranking request types and an injected pipeline factory contract independent of `PipelineConfig` in `src/application/ports/in/crawler.port.ts`
+- [x] T022 [US1] Update crawler use case to retrieve at most the first 30 entries, obtain a pipeline from its injected factory, and apply it to the retrieved stream in `src/application/usecases/crawler.usecase.ts`
+- [x] T023 [US1] Add table-driven use-case tests for result contents, candidate cutoff, source/factory call counts and exact arguments, filter/ranking combinations, and propagated failures in `tests/unit/application/usecases/crawler.usecase.test.ts`
+- [x] T024 [US1] Wire the concrete pipeline factory into the crawler use case in `src/presentation/main.ts`
+- [x] T025 [US1] Run `npm run test:unit -- tests/unit/application/usecases/crawler.usecase.test.ts` and the non-acceptance quality gates; pause for review before CLI changes
 
 **Checkpoint**: Crawler processing is injected and tested without coupling the use case to pipeline folder configuration types.
 
 ### Milestone D: CLI arguments and error behavior
 
-- [ ] T026 [US1] Add `--top-comments`, `--top-points`, and `--title-words <rule>` parsing with default values and conflict validation in `src/presentation/cli/crawl.ts`
-- [ ] T027 [US1] Pass selected ranking and title-word configuration through the crawler inbound port while preserving beta-only URL behavior in `src/presentation/cli/crawl.ts`
-- [ ] T028 [US1] Ensure invalid arguments and crawler failures exit non-zero, use the exact maximum-value message, and preserve the existing generic crawler error message in `src/presentation/cli/crawl.ts`
-- [ ] T029 [US1] Add table-driven CLI unit tests for defaults, each option, option combinations, conflicting flags, malformed/boundary values, output shape, failures, and expected mock arguments in `tests/unit/presentation/cli/crawl.test.ts`
-- [ ] T030 [US1] Remove superseded long/short composed pipeline stubs and old ranking steps/tests from `src/application/pipeline/composed/long-titles.pipeline.ts`, `src/application/pipeline/composed/short-titles.pipeline.ts`, `src/application/pipeline/steps/filter-more-than-five-words.step.ts`, `src/application/pipeline/steps/filter-up-to-five-words.step.ts`, `src/application/pipeline/steps/top-by-comments.step.ts`, `src/application/pipeline/steps/top-by-points.step.ts`, and matching `tests/unit/application/pipeline/` files after confirming no imports remain
-- [ ] T031 [US1] Run `npm run test:unit` and the non-acceptance quality gates; pause for review before final acceptance verification
+- [x] T026 [US1] Add `--top-comments`, `--top-points`, and `--title-words <rule>` parsing with default values and conflict validation in `src/presentation/cli/crawl.ts`
+- [x] T027 [US1] Pass selected ranking and title-word configuration through the crawler inbound port while preserving beta-only URL behavior in `src/presentation/cli/crawl.ts`
+- [x] T028 [US1] Ensure invalid arguments and crawler failures exit non-zero, use the exact maximum-value message, and preserve the existing generic crawler error message in `src/presentation/cli/crawl.ts`
+- [x] T029 [US1] Add table-driven CLI unit tests for defaults, each option, option combinations, conflicting flags, malformed/boundary values, output shape, failures, and expected mock arguments in `tests/unit/presentation/cli/crawl.test.ts`
+- [x] T030 [US1] Remove superseded long/short composed pipeline stubs and old ranking steps/tests from `src/application/pipeline/composed/long-titles.pipeline.ts`, `src/application/pipeline/composed/short-titles.pipeline.ts`, `src/application/pipeline/steps/filter-more-than-five-words.step.ts`, `src/application/pipeline/steps/filter-up-to-five-words.step.ts`, `src/application/pipeline/steps/top-by-comments.step.ts`, `src/application/pipeline/steps/top-by-points.step.ts`, and matching `tests/unit/application/pipeline/` files after confirming no imports remain
+- [x] T031 [US1] Run `npm run test:unit` and the non-acceptance quality gates; pause for review before final acceptance verification
 
 **Checkpoint**: User Story 1 behavior is implemented; acceptance suite remains unrun until approved final verification.
 
