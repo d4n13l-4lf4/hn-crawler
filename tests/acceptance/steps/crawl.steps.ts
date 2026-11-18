@@ -53,20 +53,18 @@ When(
 When(
   'I run the crawl command with title filter {string} in beta mode',
   function (this: { result?: CommandResult }, filter: string) {
-    this.result = runCli(
-      ['crawl', '--title-words', filter],
-      { HN_CRAWLER_BETA: 'true' }
-    );
+    this.result = runCli(['crawl', '--title-words', filter], {
+      HN_CRAWLER_BETA: 'true',
+    });
   }
 );
 
 When(
   'I run the crawl command with conflicting ranking options in beta mode',
   function () {
-    this.result = runCli(
-      ['crawl', '--top-comments', '--top-points'],
-      { HN_CRAWLER_BETA: 'true' }
-    );
+    this.result = runCli(['crawl', '--top-comments', '--top-points'], {
+      HN_CRAWLER_BETA: 'true',
+    });
   }
 );
 
@@ -246,14 +244,10 @@ function getAcceptanceUrl(): string {
 }
 
 function runCli(args: string[], env: Record<string, string>): CommandResult {
-  const result: SpawnSyncReturns<string> = spawnSync(
-    'hn-crawler',
-    args,
-    {
-      encoding: 'utf8',
-      env: { ...process.env, ...env },
-    }
-  );
+  const result: SpawnSyncReturns<string> = spawnSync('hn-crawler', args, {
+    encoding: 'utf8',
+    env: { ...process.env, ...env },
+  });
   return {
     stdout: result.stdout ?? '',
     stderr: result.stderr ?? '',

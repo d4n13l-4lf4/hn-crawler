@@ -1,3 +1,5 @@
-export type AsyncOperator<In, Out = In> = (
-  source: AsyncIterable<In>
-) => AsyncGenerator<Out>;
+import type { AsyncOperator } from '@/application/pipeline/pipeline.types';
+
+export type { AsyncOperator } from '@/application/pipeline/pipeline.types';
+
+export type AsyncOperatorFactory<In, Out = In> = AsyncOperator<In, Out>;

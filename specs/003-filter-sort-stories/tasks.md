@@ -12,21 +12,21 @@
 
 **Purpose**: No project initialization is needed; the TypeScript CLI, test tools, and feature scaffolding already exist.
 
-- [X] T001 Review the acceptance URL environment variable and standalone CLI invocation in `tests/acceptance/steps/crawl.steps.ts` and `package.json` without running acceptance tests
+- [x] T001 Review the acceptance URL environment variable and standalone CLI invocation in `tests/acceptance/steps/crawl.steps.ts` and `package.json` without running acceptance tests
 
 ## Phase 2: Foundational Pipeline Components
 
 **Purpose**: Establish generic async stream types and operators required by the crawler feature.
 
-- [ ] T002 [P] Define AsyncIterable-only `AsyncStep` and operator types in `src/application/pipeline/pipeline.types.d.ts`
-- [ ] T003 [P] Add the async pipe orchestrator in `src/application/pipeline/orchestrator/async.pipe.ts`
-- [ ] T004 [P] Add lazy async-generator `filter` operator in `src/application/pipeline/operators/filter.ts`
-- [ ] T005 [P] Add stable bounded descending `topK` operator in `src/application/pipeline/operators/top-k.ts`
-- [ ] T006 Add table-driven pipe tests for ordered composition, empty steps, source propagation, and failure propagation in `tests/unit/application/pipeline/orchestrator/async.pipe.test.ts`
-- [ ] T007 Add table-driven filter tests for matching, no matches, laziness, early termination, and errors in `tests/unit/application/pipeline/operators/filter.test.ts`
-- [ ] T008 Add table-driven top-K tests for descending order, window size, empty input, ties preserving source order, missing/zero scores, and source errors in `tests/unit/application/pipeline/operators/top-k.test.ts`
-- [ ] T009 Remove superseded pipe implementation and tests from `src/application/pipeline/orchestration/pipe.ts` and `tests/unit/application/pipeline/orchestration/pipe.test.ts`, and remove obsolete helpers/types only after confirming they have no remaining references
-- [ ] T010 Run focused pipeline unit tests plus `npm run format:check`, `npm run lint`, `npm run typecheck`, and `npm run test:coverage`; pause for review before the next milestone
+- [X] T002 [P] Define AsyncIterable-only `AsyncStep` and operator types in `src/application/pipeline/pipeline.types.d.ts`
+- [X] T003 [P] Add the async pipe orchestrator in `src/application/pipeline/orchestrator/async.pipe.ts`
+- [X] T004 [P] Add lazy async-generator `filter` operator in `src/application/pipeline/operators/filter.ts`
+- [X] T005 [P] Add stable bounded descending `topK` operator in `src/application/pipeline/operators/top-k.ts`
+- [X] T006 Add table-driven pipe tests for ordered composition, empty steps, source propagation, and failure propagation in `tests/unit/application/pipeline/orchestrator/async.pipe.test.ts`
+- [X] T007 Add table-driven filter tests for matching, no matches, laziness, early termination, and errors in `tests/unit/application/pipeline/operators/filter.test.ts`
+- [X] T008 Add table-driven top-K tests for descending order, window size, empty input, ties preserving source order, missing/zero scores, and source errors in `tests/unit/application/pipeline/operators/top-k.test.ts`
+- [X] T009 Remove superseded pipe implementation and tests from `src/application/pipeline/orchestration/pipe.ts` and `tests/unit/application/pipeline/orchestration/pipe.test.ts`, and remove obsolete helpers/types only after confirming they have no remaining references
+- [X] T010 Run focused pipeline unit tests plus `npm run format:check`, `npm run lint`, `npm run typecheck`, and `npm run test:coverage`; pause for review before the next milestone
 
 **Checkpoint**: Async pipeline foundations and gates are green; acceptance tests remain unrun.
 
@@ -38,9 +38,9 @@
 
 ### Milestone A: Acceptance scenarios written first (do not run)
 
-- [X] T011 [P] [US1] Add black-box Cucumber scenarios for all supported filter/ranking combinations, defaults, output shape/order, and no-match output in `tests/acceptance/features/crawl.feature`
-- [X] T012 [P] [US1] Add black-box Cucumber scenarios for conflicting flags, invalid title-word arguments, exact maximum message, crawler failure message, and actual process exit status in `tests/acceptance/features/crawl.feature`
-- [X] T013 [US1] Update process invocation and assertions to avoid all source artifact paths and check stdout, stderr, and status in `tests/acceptance/steps/crawl.steps.ts`; do not run the acceptance suite
+- [x] T011 [P] [US1] Add black-box Cucumber scenarios for all supported filter/ranking combinations, defaults, output shape/order, and no-match output in `tests/acceptance/features/crawl.feature`
+- [x] T012 [P] [US1] Add black-box Cucumber scenarios for conflicting flags, invalid title-word arguments, exact maximum message, crawler failure message, and actual process exit status in `tests/acceptance/features/crawl.feature`
+- [x] T013 [US1] Update process invocation and assertions to avoid all source artifact paths and check stdout, stderr, and status in `tests/acceptance/steps/crawl.steps.ts`; do not run the acceptance suite
 - [ ] T014 [US1] Run `npm run format:check`, `npm run lint`, `npm run typecheck`, and `npm run test:coverage`; pause for review without executing acceptance tests
 
 **Checkpoint**: Acceptance tests describe the desired behavior and remain unexecuted as requested.
@@ -83,9 +83,9 @@
 
 **Independent Test**: A failing CLI invocation has the expected stderr and non-zero status; a successful invocation has status zero. Acceptance tests use the runnable package/command, not source paths.
 
-- [X] T032 [US2] Review every failure scenario and step to ensure both expected output and non-zero process status are asserted in `tests/acceptance/features/crawl.feature` and `tests/acceptance/steps/crawl.steps.ts`
-- [X] T033 [US2] Remove source-artifact path references from acceptance execution configuration and use the installed runnable CLI contract in `tests/acceptance/steps/crawl.steps.ts` and `package.json`
-- [X] T034 [US2] Confirm successful scenarios assert status zero and failing scenarios assert non-zero status in `tests/acceptance/features/crawl.feature`
+- [x] T032 [US2] Review every failure scenario and step to ensure both expected output and non-zero process status are asserted in `tests/acceptance/features/crawl.feature` and `tests/acceptance/steps/crawl.steps.ts`
+- [x] T033 [US2] Remove source-artifact path references from acceptance execution configuration and use the installed runnable CLI contract in `tests/acceptance/steps/crawl.steps.ts` and `package.json`
+- [x] T034 [US2] Confirm successful scenarios assert status zero and failing scenarios assert non-zero status in `tests/acceptance/features/crawl.feature`
 
 **Checkpoint**: Acceptance suite is ready for final execution and remains unrun before user review.
 

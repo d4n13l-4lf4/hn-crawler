@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { filter } from '@/application/pipeline/operators/filter';
-import { drain, toAsyncIterable } from '../../../../helpers/async';
+import { drain } from '../../../../helpers/async';
 
 type FilterOperatorTestCase<T> = {
   should: string;
@@ -11,6 +11,10 @@ type FilterOperatorTestCase<T> = {
 };
 
 describe('Filter Operator Unit Test', () => {
+  async function* from<T>(input: T[]): AsyncGenerator<T> {
+    yield* input;
+  }
+
   const testCases: FilterOperatorTestCase<number | string>[] = [
     {
       should: 'keep negative numbers',
@@ -59,7 +63,7 @@ describe('Filter Operator Unit Test', () => {
   it.each(testCases)(
     'should $should when $when',
     async ({ predicate, input, expected }) => {
-      const result = await drain(filter(predicate)(toAsyncIterable(input)));
+      const result = await drain(filter(predicate)(from(input)));
 
       expect(result).toEqual(expected);
     }
@@ -108,9 +112,7 @@ describe('Filter Operator Unit Test', () => {
       throw new Error('predicate failed');
     });
 
-    await expect(failing(toAsyncIterable([1])).next()).rejects.toThrow(
-      'predicate failed'
-    );
+    await expect(failing(from([1])).next()).rejects.toThrow('predicate failed');
   });
 
   it('should propagate an error thrown by the source', async () => {
