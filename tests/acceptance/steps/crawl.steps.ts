@@ -39,7 +39,7 @@ class CrawlWorld extends World {
   }
 
   async close(): Promise<void> {
-    if (!this.server) return;
+    if (!this.server?.listening) return;
     await new Promise<void>((resolve, reject) =>
       this.server?.close((error) => (error ? reject(error) : resolve()))
     );
@@ -92,8 +92,8 @@ Given(
 );
 
 When(
-  'I run {string} with the local page URL in beta mode',
-  function (this: CrawlWorld, _command: string) {
+  'I run the crawl command with the local page URL in beta mode',
+  function (this: CrawlWorld) {
     assert.ok(this.serverUrl, 'Local source server has not been started');
     this.result = runCli(['crawl', '--url', this.serverUrl], {
       HN_CRAWLER_BETA: 'true',
@@ -104,7 +104,9 @@ When(
 When(
   'I run {string} in production mode',
   function (this: CrawlWorld, command: string) {
-    this.result = runCli(command.split(' ').slice(1), { HN_CRAWLER_BETA: '' });
+    this.result = runCli(command.split(' ').slice(1), {
+      HN_CRAWLER_BETA: '',
+    });
   }
 );
 
@@ -178,7 +180,7 @@ Then(
   }
 );
 
-Then('the exit code should be 0', function (this: CrawlWorld) {
+Then('the crawl exit code should be 0', function (this: CrawlWorld) {
   assert.equal(
     this.result?.status,
     0,
@@ -186,7 +188,7 @@ Then('the exit code should be 0', function (this: CrawlWorld) {
   );
 });
 
-Then('the exit code should be non-zero', function (this: CrawlWorld) {
+Then('the crawl exit code should be non-zero', function (this: CrawlWorld) {
   assert.notEqual(
     this.result?.status,
     0,
