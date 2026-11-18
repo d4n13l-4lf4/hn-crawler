@@ -65,10 +65,10 @@
 
 ### Milestone B: Tracking decorator
 
-- [ ] T019 [US1] Implement `TrackedCrawlerUseCase` in `src/application/usecases/decorators/tracked-crawler.usecase.ts`; wrap the crawler port, capture request-start UTC milliseconds and monotonic start, map filters, and construct a UUIDv7 usage record for both resolve and reject paths
-- [ ] T020 [US1] Isolate usage entity construction and repository-save errors so tracking cannot alter returned entries or replace the original crawler exception in `src/application/usecases/decorators/tracked-crawler.usecase.ts`
-- [ ] T021 [US1] Add table-driven `it should when` decorator tests for success, crawler error, save error, exact record fields, IDs/timestamps/durations, and repository calls/arguments in `tests/unit/application/usecases/decorators/tracked-crawler.usecase.test.ts`
-- [ ] T022 [US1] Run focused decorator tests and non-acceptance quality gates; pause for review
+- [x] T019 [US1] Implement `TrackedCrawlerUseCase` in `src/application/usecases/decorators/tracked-crawler.usecase.ts`; wrap the crawler port, capture request-start UTC milliseconds and monotonic start, map filters, and construct a UUIDv7 usage record for both resolve and reject paths
+- [x] T020 [US1] Isolate usage entity construction and repository-save errors so tracking cannot alter returned entries or replace the original crawler exception in `src/application/usecases/decorators/tracked-crawler.usecase.ts`
+- [x] T021 [US1] Add table-driven `it should when` decorator tests for success, crawler error, save error, exact record fields, IDs/timestamps/durations, and repository calls/arguments in `tests/unit/application/usecases/decorators/tracked-crawler.usecase.test.ts`
+- [x] T022 [US1] Run focused decorator tests and non-acceptance quality gates; pause for review
 
 **Checkpoint**: Tracking is best effort and preserves core crawl behavior.
 
