@@ -24,3 +24,5 @@ export function createPipeline(config: PipelineConfig): AsyncOperator<HNEntry> {
     for await (const entry of pipeAsync(source, ...steps)) yield entry;
   };
 }
+
+export const pipelineFactory = { create: createPipeline };

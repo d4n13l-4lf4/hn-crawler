@@ -58,11 +58,11 @@
 
 ### Milestone C: Crawler use case and composition wiring
 
-- [ ] T021 [US1] Define user-level crawl filter/ranking request types and an injected pipeline factory contract independent of `PipelineConfig` in `src/application/ports/in/crawler.port.ts`
-- [ ] T022 [US1] Update crawler use case to retrieve at most the first 30 entries, obtain a pipeline from its injected factory, and apply it to the retrieved stream in `src/application/usecases/crawler.usecase.ts`
-- [ ] T023 [US1] Add table-driven use-case tests for result contents, candidate cutoff, source/factory call counts and exact arguments, filter/ranking combinations, and propagated failures in `tests/unit/application/usecases/crawler.usecase.test.ts`
-- [ ] T024 [US1] Wire the concrete pipeline factory into the crawler use case in `src/presentation/main.ts`
-- [ ] T025 [US1] Run `npm run test:unit -- tests/unit/application/usecases/crawler.usecase.test.ts` and the non-acceptance quality gates; pause for review before CLI changes
+- [X] T021 [US1] Define user-level crawl filter/ranking request types and an injected pipeline factory contract independent of `PipelineConfig` in `src/application/ports/in/crawler.port.ts`
+- [X] T022 [US1] Update crawler use case to retrieve at most the first 30 entries, obtain a pipeline from its injected factory, and apply it to the retrieved stream in `src/application/usecases/crawler.usecase.ts`
+- [X] T023 [US1] Add table-driven use-case tests for result contents, candidate cutoff, source/factory call counts and exact arguments, filter/ranking combinations, and propagated failures in `tests/unit/application/usecases/crawler.usecase.test.ts`
+- [X] T024 [US1] Wire the concrete pipeline factory into the crawler use case in `src/presentation/main.ts`
+- [X] T025 [US1] Run `npm run test:unit -- tests/unit/application/usecases/crawler.usecase.test.ts` and the non-acceptance quality gates; pause for review before CLI changes
 
 **Checkpoint**: Crawler processing is injected and tested without coupling the use case to pipeline folder configuration types.
 

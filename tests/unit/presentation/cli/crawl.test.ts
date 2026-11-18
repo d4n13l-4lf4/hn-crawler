@@ -38,7 +38,11 @@ describe('Crawl command unit test', () => {
 
     expect(log).toHaveBeenCalledWith(expectedOutput);
     expect(crawler.execute).toHaveBeenCalledOnce();
-    expect(crawler.execute).toHaveBeenCalledWith(config.newsCombinatorUrl);
+    expect(crawler.execute).toHaveBeenCalledWith({
+      url: config.newsCombinatorUrl,
+      sortBy: 'comments',
+      titleWords: { operator: 'gt', value: 5 },
+    });
     log.mockRestore();
   });
 
@@ -60,7 +64,11 @@ describe('Crawl command unit test', () => {
     );
     expect(exit).toHaveBeenCalledWith(1);
     expect(crawler.execute).toHaveBeenCalledOnce();
-    expect(crawler.execute).toHaveBeenCalledWith(config.newsCombinatorUrl);
+    expect(crawler.execute).toHaveBeenCalledWith({
+      url: config.newsCombinatorUrl,
+      sortBy: 'comments',
+      titleWords: { operator: 'gt', value: 5 },
+    });
     error.mockRestore();
     exit.mockRestore();
   });
@@ -86,7 +94,11 @@ describe('Crawl command unit test', () => {
     );
 
     expect(crawler.execute).toHaveBeenCalledOnce();
-    expect(crawler.execute).toHaveBeenCalledWith('http://127.0.0.1:4321');
+    expect(crawler.execute).toHaveBeenCalledWith({
+      url: 'http://127.0.0.1:4321',
+      sortBy: 'comments',
+      titleWords: { operator: 'gt', value: 5 },
+    });
     vi.restoreAllMocks();
   });
 
@@ -100,7 +112,11 @@ describe('Crawl command unit test', () => {
     });
 
     expect(crawler.execute).toHaveBeenCalledOnce();
-    expect(crawler.execute).toHaveBeenCalledWith(config.newsCombinatorUrl);
+    expect(crawler.execute).toHaveBeenCalledWith({
+      url: config.newsCombinatorUrl,
+      sortBy: 'comments',
+      titleWords: { operator: 'gt', value: 5 },
+    });
     vi.restoreAllMocks();
   });
 

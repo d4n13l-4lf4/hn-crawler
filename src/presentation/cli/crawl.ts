@@ -19,9 +19,11 @@ export function createCrawlCommand(
 
   command.action(async (options: { url?: string }) => {
     try {
-      const entries = await crawler.execute(
-        options.url ?? config.newsCombinatorUrl
-      );
+      const entries = await crawler.execute({
+        url: options.url ?? config.newsCombinatorUrl,
+        sortBy: 'comments',
+        titleWords: { operator: 'gt', value: 5 },
+      });
       console.log(
         JSON.stringify(
           entries.map(({ rank, title, points, number_of_comments }) => ({

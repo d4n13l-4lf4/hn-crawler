@@ -1,99 +1,161 @@
 import { describe, expect, it, vi } from 'vitest';
 import { CrawlerUseCase } from '@/application/usecases/crawler.usecase';
 import { HNEntry } from '@/domain/entities/hn-entry.entity';
+import type {
+  CrawlRequest,
+  PipelineFactory,
+} from '@/application/ports/in/crawler.port';
+import { drain } from '../../../helpers/async';
 
 type CrawlerUseCaseTestCase = {
   should: string;
-  when: string;
-  sourceEntries: number;
-  expectedEntries: number;
-  expectedLastRank: number;
+  sourceEntries: HNEntry[];
+  expectedPipelineInput: HNEntry[];
+  pipelineResult: HNEntry[];
+  request: CrawlRequest;
+  expectedEntries: HNEntry[];
 };
 
-async function* entries(count: number): AsyncGenerator<HNEntry> {
-  for (let rank = 1; rank <= count; rank += 1) {
-    yield new HNEntry(rank, `Story ${rank}`, rank, rank + 1);
-  }
+async function* from(entries: HNEntry[]): AsyncGenerator<HNEntry> {
+  yield* entries;
 }
 
 describe('CrawlerUseCase Unit Test', () => {
+  const sourceEntries = [
+    new HNEntry(1, 'one', 1, 1),
+    new HNEntry(2, 'two', 2, 2),
+    new HNEntry(3, 'three', 3, 3),
+  ];
+  const filteredEntries = [sourceEntries[2], sourceEntries[0]];
+
   const testCases: CrawlerUseCaseTestCase[] = [
     {
-      should: 'return all entries in source order',
-      when: 'the source has fewer than 30 entries',
-      sourceEntries: 3,
-      expectedEntries: 3,
-      expectedLastRank: 3,
+      should: 'return the entries produced by the configured pipeline',
+      sourceEntries,
+      expectedPipelineInput: sourceEntries,
+      pipelineResult: filteredEntries,
+      request: {
+        url: 'https://example.com/news',
+        sortBy: 'points',
+        titleWords: { operator: 'gt', value: 5 },
+      },
+      expectedEntries: filteredEntries,
     },
     {
-      should: 'return only the first 30 entries in source order',
-      when: 'the source has more than 30 entries',
-      sourceEntries: 31,
-      expectedEntries: 30,
-      expectedLastRank: 30,
-    },
-    {
-      should: 'return an empty list',
-      when: 'the source has no entries',
-      sourceEntries: 0,
-      expectedEntries: 0,
-      expectedLastRank: 0,
+      should: 'return an empty list when the pipeline has no matches',
+      sourceEntries,
+      expectedPipelineInput: sourceEntries,
+      pipelineResult: [],
+      request: {
+        url: 'https://example.com/news',
+        sortBy: 'comments',
+        titleWords: { operator: 'le', value: 5 },
+      },
+      expectedEntries: [],
     },
   ];
 
   it.each(testCases)(
-    'should $should when $when',
-    async ({ sourceEntries, expectedEntries, expectedLastRank }) => {
-      const fetchEntries = vi.fn(() => entries(sourceEntries));
-      const useCase = new CrawlerUseCase({ fetchEntries });
-
-      const result = await useCase.execute('https://example.com/news');
-
-      expect(result).toHaveLength(expectedEntries);
-      expect(result.map((entry) => entry.rank.value)).toEqual(
-        Array.from({ length: expectedEntries }, (_, index) => index + 1)
+    'should $should',
+    async ({
+      sourceEntries,
+      expectedPipelineInput,
+      pipelineResult,
+      request,
+      expectedEntries,
+    }) => {
+      const fetchEntries = vi.fn(() => from(sourceEntries));
+      const applyPipeline = vi.fn((_source: AsyncIterable<HNEntry>) =>
+        from(pipelineResult)
       );
-      expect(result.at(-1)?.rank.value ?? 0).toBe(expectedLastRank);
+      const create = vi.fn(() => applyPipeline);
+      const pipelineFactory: PipelineFactory = { create };
+      const useCase = new CrawlerUseCase({ fetchEntries }, pipelineFactory);
+
+      const result = await useCase.execute(request);
+
+      expect(result).toEqual(expectedEntries);
       expect(fetchEntries).toHaveBeenCalledOnce();
-      expect(fetchEntries).toHaveBeenCalledWith('https://example.com/news');
+      expect(fetchEntries).toHaveBeenCalledWith(request.url);
+      expect(create).toHaveBeenCalledOnce();
+      expect(create).toHaveBeenCalledWith({
+        sortBy: request.sortBy,
+        titleWords: request.titleWords,
+      });
+      expect(applyPipeline).toHaveBeenCalledOnce();
+      const stream = applyPipeline.mock.calls[0][0];
+      expect(await drain(stream)).toEqual(expectedPipelineInput);
     }
   );
 
-  it('should pass a provided URL to the entry source', async () => {
-    const fetchEntries = vi.fn(() => entries(1));
-    const useCase = new CrawlerUseCase({ fetchEntries });
+  it('should limit the source to the first 30 entries before applying the pipeline', async () => {
+    async function* manyEntries(): AsyncGenerator<HNEntry> {
+      for (let rank = 1; rank <= 35; rank += 1) {
+        yield new HNEntry(rank, `Story ${rank}`, rank, rank);
+      }
+    }
 
-    const result = await useCase.execute('https://example.com/news');
+    let received: HNEntry[] = [];
+    const applyPipeline = vi.fn(async function* (
+      source: AsyncIterable<HNEntry>
+    ) {
+      for await (const entry of source) {
+        received.push(entry);
+        yield entry;
+      }
+    });
+    const create = vi.fn(() => applyPipeline);
+    const fetchEntries = vi.fn(() => manyEntries());
+    const useCase = new CrawlerUseCase({ fetchEntries }, { create });
 
-    expect(result).toEqual([new HNEntry(1, 'Story 1', 1, 2)]);
-    expect(fetchEntries).toHaveBeenCalledOnce();
-    expect(fetchEntries).toHaveBeenCalledWith('https://example.com/news');
-  });
-
-  it('should pass the provided configured URL to the entry source unchanged', async () => {
-    const fetchEntries = vi.fn(() => entries(1));
-    const useCase = new CrawlerUseCase({ fetchEntries });
-
-    const configuredUrl = 'https://news.ycombinator.com/';
-    const result = await useCase.execute(configuredUrl);
-
-    expect(result).toEqual([new HNEntry(1, 'Story 1', 1, 2)]);
-    expect(fetchEntries).toHaveBeenCalledOnce();
-    expect(fetchEntries).toHaveBeenCalledWith(configuredUrl);
-  });
-
-  it('should stop consuming the source after the 30th entry', async () => {
-    const source = { fetchEntries: vi.fn(() => entries(31)) };
-    const useCase = new CrawlerUseCase(source);
-
-    const result = await useCase.execute('https://news.ycombinator.com/');
+    const result = await useCase.execute({
+      url: 'https://news.ycombinator.com/',
+      sortBy: 'comments',
+    });
 
     expect(result).toHaveLength(30);
     expect(result[0].rank.value).toBe(1);
     expect(result[29].rank.value).toBe(30);
-    expect(source.fetchEntries).toHaveBeenCalledOnce();
-    expect(source.fetchEntries).toHaveBeenCalledWith(
-      'https://news.ycombinator.com/'
-    );
+    expect(received).toHaveLength(30);
+    expect(create).toHaveBeenCalledOnce();
+    expect(create).toHaveBeenCalledWith({
+      sortBy: 'comments',
+      titleWords: undefined,
+    });
+    expect(fetchEntries).toHaveBeenCalledOnce();
+    expect(fetchEntries).toHaveBeenCalledWith('https://news.ycombinator.com/');
+  });
+
+  it('should propagate an entry-source error', async () => {
+    const fetchEntries = vi.fn(async function* () {
+      throw new Error('source failed');
+    });
+    const create = vi.fn(() => async function* () {});
+    const useCase = new CrawlerUseCase({ fetchEntries }, { create });
+
+    await expect(
+      useCase.execute({ url: 'https://example.com', sortBy: 'comments' })
+    ).rejects.toThrow('source failed');
+    expect(fetchEntries).toHaveBeenCalledOnce();
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it('should propagate a pipeline error', async () => {
+    const fetchEntries = vi.fn(() => from(sourceEntries));
+    const brokenPipeline = vi.fn(async function* () {
+      throw new Error('pipeline failed');
+    });
+    const create = vi.fn(() => brokenPipeline);
+    const useCase = new CrawlerUseCase({ fetchEntries }, { create });
+
+    await expect(
+      useCase.execute({ url: 'https://example.com', sortBy: 'comments' })
+    ).rejects.toThrow('pipeline failed');
+    expect(fetchEntries).toHaveBeenCalledOnce();
+    expect(create).toHaveBeenCalledOnce();
+    expect(create).toHaveBeenCalledWith({
+      sortBy: 'comments',
+      titleWords: undefined,
+    });
   });
 });
