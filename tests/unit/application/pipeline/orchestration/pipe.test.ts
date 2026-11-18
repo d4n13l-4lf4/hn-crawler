@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   pipeAsync,
   AsyncStep,
-} from '../../../../src/application/pipeline/pipe';
+} from '@/application/pipeline/orchestration/pipe';
 
 type AsyncPipeTestCase = {
   should: string;
