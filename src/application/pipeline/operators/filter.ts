@@ -1,4 +1,4 @@
-import type { AsyncOperator } from '@/application/pipeline/pipeline.types';
+import type { AsyncOperator } from '@/application/pipeline/pipeline.type';
 
 export function filter<T>(predicate: (item: T) => boolean): AsyncOperator<T> {
   return async function* (source) {

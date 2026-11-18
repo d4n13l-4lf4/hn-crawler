@@ -1,4 +1,4 @@
-import type { AsyncOperator } from '@/application/pipeline/pipeline.types';
+import type { AsyncOperator } from '@/application/pipeline/pipeline.type';
 
 export function topK<T>(
   limit: number,

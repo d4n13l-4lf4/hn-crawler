@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { UsageQueryPort } from '@/application/ports/in/usage-query.port';
 import { AppliedFilters } from '@/domain/vo/applied-filters.vo';
 import { Usage } from '@/domain/entities/usage.entity';
@@ -9,6 +9,21 @@ const FILTERS = AppliedFilters.builder()
   .sortBy('comments')
   .titleWords({ operator: 'gt', value: 5 })
   .build();
+
+const ORIGINAL_TIME_ZONE = process.env.TZ;
+
+beforeEach(() => {
+  process.env.TZ = 'UTC';
+});
+
+afterEach(() => {
+  if (ORIGINAL_TIME_ZONE === undefined) {
+    delete process.env.TZ;
+  } else {
+    process.env.TZ = ORIGINAL_TIME_ZONE;
+  }
+  vi.restoreAllMocks();
+});
 
 function makeUsage(
   requestId: string,
@@ -26,8 +41,8 @@ describe('Usage command unit test', () => {
       records: [],
       expectedOutput: [
         'Usage data',
-        'ID | Request Timestamp | Applied Filters | Duration (ms)',
-        '---|-------------------|-----------------|--------------',
+        'ID | Request Date and Time | Applied Filters | Duration (ms)',
+        '---|-----------------------|-----------------|--------------',
       ].join('\n'),
     },
     {
@@ -43,10 +58,10 @@ describe('Usage command unit test', () => {
       ],
       expectedOutput: [
         'Usage data',
-        'ID                                   | Request Timestamp | Applied Filters                                    | Duration (ms)',
-        '-------------------------------------|-------------------|----------------------------------------------------|--------------',
-        `${UUID} |         123123123 | sort:number_of_comments:desc,sort:title_words:gt:5 |           122`,
-        '018f0f4b-7b7c-7abc-8def-0123456789ac |         123123124 | sort:number_of_points:desc                         |            10',
+        'ID                                   | Request Date and Time     | Applied Filters                                    | Duration (ms)',
+        '-------------------------------------|---------------------------|----------------------------------------------------|--------------',
+        `${UUID} | 1970-01-02 10:12:03 (UTC) | sort:number_of_comments:desc,sort:title_words:gt:5 |           122`,
+        '018f0f4b-7b7c-7abc-8def-0123456789ac | 1970-01-02 10:12:03 (UTC) | sort:number_of_points:desc                         |            10',
       ].join('\n'),
     },
   ])(
@@ -72,6 +87,100 @@ describe('Usage command unit test', () => {
       vi.restoreAllMocks();
     }
   );
+
+  it.each([
+    {
+      should: 'render UTC timestamps with the UTC timezone label',
+      timezone: 'UTC',
+      timestamp: Date.UTC(2026, 10, 18, 21, 13),
+      expected: '2026-11-18 21:13:00 (UTC)',
+    },
+    {
+      should:
+        'render local time and use a numeric offset when the timezone has no abbreviation',
+      timezone: 'Asia/Kathmandu',
+      timestamp: Date.UTC(2026, 10, 18, 21, 13),
+      expected: '2026-11-19 02:58:00 (GMT+5:45)',
+    },
+    {
+      should: 'render local wall-clock time and abbreviation',
+      timezone: 'Europe/Madrid',
+      timestamp: Date.UTC(2026, 10, 18, 21, 13),
+      expected: '2026-11-18 22:13:00 (CET)',
+    },
+    {
+      should: 'apply the timezone abbreviation for the timestamp instant',
+      timezone: 'Europe/Madrid',
+      timestamp: Date.UTC(2026, 6, 18, 19, 13),
+      expected: '2026-07-18 21:13:00 (CEST)',
+    },
+    {
+      should: 'use UTC when the system timezone has a generic label',
+      timezone: 'Etc/GMT',
+      timestamp: Date.UTC(2026, 10, 18, 21, 13),
+      expected: '2026-11-18 21:13:00 (UTC)',
+    },
+  ])(
+    'should $should when formatting a stored timestamp',
+    async ({ timezone, timestamp, expected }) => {
+      process.env.TZ = timezone;
+      const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const command = createUsageCommand({
+        getAll: vi
+          .fn()
+          .mockReturnValue([makeUsage(UUID, timestamp, FILTERS, 122)]),
+      });
+
+      await command.parseAsync(['node', 'hn-crawler', 'usage'], {
+        from: 'user',
+      });
+
+      expect(log).toHaveBeenCalledOnce();
+      expect(log.mock.calls[0][0]).toContain(expected);
+    }
+  );
+
+  it('should fall back to UTC when the system timezone is unavailable', async () => {
+    process.env.TZ = 'Invalid/Unknown';
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const command = createUsageCommand({
+      getAll: vi
+        .fn()
+        .mockReturnValue([
+          makeUsage(UUID, Date.UTC(2026, 10, 18, 21, 13), FILTERS, 122),
+        ]),
+    });
+
+    await command.parseAsync(['node', 'hn-crawler', 'usage'], { from: 'user' });
+
+    expect(log).toHaveBeenCalledOnce();
+    expect(log.mock.calls[0][0]).toContain('2026-11-18 21:13:00 (GMT+0)');
+  });
+
+  it.each([
+    {
+      should:
+        'fall back to UTC when the timestamp is outside the supported date range',
+      timestamp: Number.MAX_SAFE_INTEGER,
+    },
+  ])('should $should when formatting fails', async ({ timestamp }) => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const command = createUsageCommand({
+      getAll: vi
+        .fn()
+        .mockReturnValue([makeUsage(UUID, timestamp, FILTERS, 122)]),
+    });
+    const previousExitCode = process.exitCode;
+
+    await command.parseAsync(['node', 'hn-crawler', 'usage'], { from: 'user' });
+
+    expect(error).toHaveBeenCalledOnce();
+    expect(error).toHaveBeenCalledWith(
+      'An error occurred while retrieving usage statistics.'
+    );
+    expect(process.exitCode).toBe(1);
+    process.exitCode = previousExitCode;
+  });
 
   it.each([
     {

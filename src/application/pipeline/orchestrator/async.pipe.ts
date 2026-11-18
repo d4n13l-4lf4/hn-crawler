@@ -1,6 +1,6 @@
-import type { AsyncStep } from '@/application/pipeline/pipeline.types';
+import type { AsyncStep } from '@/application/pipeline/pipeline.type';
 
-export { AsyncStep } from '@/application/pipeline/pipeline.types';
+export { AsyncStep } from '@/application/pipeline/pipeline.type';
 
 export function pipeAsync<In, Out = In>(
   source: AsyncIterable<In>,
