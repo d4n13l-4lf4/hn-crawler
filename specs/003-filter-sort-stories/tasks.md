@@ -18,15 +18,15 @@
 
 **Purpose**: Establish generic async stream types and operators required by the crawler feature.
 
-- [X] T002 [P] Define AsyncIterable-only `AsyncStep` and operator types in `src/application/pipeline/pipeline.types.d.ts`
-- [X] T003 [P] Add the async pipe orchestrator in `src/application/pipeline/orchestrator/async.pipe.ts`
-- [X] T004 [P] Add lazy async-generator `filter` operator in `src/application/pipeline/operators/filter.ts`
-- [X] T005 [P] Add stable bounded descending `topK` operator in `src/application/pipeline/operators/top-k.ts`
-- [X] T006 Add table-driven pipe tests for ordered composition, empty steps, source propagation, and failure propagation in `tests/unit/application/pipeline/orchestrator/async.pipe.test.ts`
-- [X] T007 Add table-driven filter tests for matching, no matches, laziness, early termination, and errors in `tests/unit/application/pipeline/operators/filter.test.ts`
-- [X] T008 Add table-driven top-K tests for descending order, window size, empty input, ties preserving source order, missing/zero scores, and source errors in `tests/unit/application/pipeline/operators/top-k.test.ts`
-- [X] T009 Remove superseded pipe implementation and tests from `src/application/pipeline/orchestration/pipe.ts` and `tests/unit/application/pipeline/orchestration/pipe.test.ts`, and remove obsolete helpers/types only after confirming they have no remaining references
-- [X] T010 Run focused pipeline unit tests plus `npm run format:check`, `npm run lint`, `npm run typecheck`, and `npm run test:coverage`; pause for review before the next milestone
+- [x] T002 [P] Define AsyncIterable-only `AsyncStep` and operator types in `src/application/pipeline/pipeline.types.d.ts`
+- [x] T003 [P] Add the async pipe orchestrator in `src/application/pipeline/orchestrator/async.pipe.ts`
+- [x] T004 [P] Add lazy async-generator `filter` operator in `src/application/pipeline/operators/filter.ts`
+- [x] T005 [P] Add stable bounded descending `topK` operator in `src/application/pipeline/operators/top-k.ts`
+- [x] T006 Add table-driven pipe tests for ordered composition, empty steps, source propagation, and failure propagation in `tests/unit/application/pipeline/orchestrator/async.pipe.test.ts`
+- [x] T007 Add table-driven filter tests for matching, no matches, laziness, early termination, and errors in `tests/unit/application/pipeline/operators/filter.test.ts`
+- [x] T008 Add table-driven top-K tests for descending order, window size, empty input, ties preserving source order, missing/zero scores, and source errors in `tests/unit/application/pipeline/operators/top-k.test.ts`
+- [x] T009 Remove superseded pipe implementation and tests from `src/application/pipeline/orchestration/pipe.ts` and `tests/unit/application/pipeline/orchestration/pipe.test.ts`, and remove obsolete helpers/types only after confirming they have no remaining references
+- [x] T010 Run focused pipeline unit tests plus `npm run format:check`, `npm run lint`, `npm run typecheck`, and `npm run test:coverage`; pause for review before the next milestone
 
 **Checkpoint**: Async pipeline foundations and gates are green; acceptance tests remain unrun.
 
@@ -47,12 +47,12 @@
 
 ### Milestone B: Domain title policy and pipeline factory
 
-- [ ] T015 [P] [US1] Add pure title-word predicates for `gt` and `le` using the established word-count rule in `src/domain/policies/entry-filter.policy.ts`
-- [ ] T016 [P] [US1] Add table-driven policy tests for whitespace, punctuation-only tokens, internal punctuation, boundary counts, and empty titles in `tests/unit/domain/policies/entry-filter.policy.test.ts`
-- [ ] T017 [US1] Define factory configuration (`comments | points`, optional title-word rule) and async pipeline factory in `src/application/pipeline/factory/factory.ts`
-- [ ] T018 [US1] Add a configured title filter step in `src/application/pipeline/steps/filter-title-words.step.ts` using the domain policy
-- [ ] T019 [US1] Add table-driven tests for configured filter and sort pipeline composition, defaults supplied by caller, all four combinations, stable ties, missing metrics, and no matches in `tests/unit/application/pipeline/factory/factory.test.ts` and `tests/unit/application/pipeline/steps/filter-title-words.step.test.ts`
-- [ ] T020 [US1] Run `npm run test:unit -- tests/unit/domain/policies/entry-filter.policy.test.ts tests/unit/application/pipeline/factory/factory.test.ts` and the non-acceptance quality gates; pause for review before use-case changes
+- [X] T015 [P] [US1] Add pure title-word predicates for `gt` and `le` using the established word-count rule in `src/domain/policies/entry-filter.policy.ts`
+- [X] T016 [P] [US1] Add table-driven policy tests for whitespace, punctuation-only tokens, internal punctuation, boundary counts, and empty titles in `tests/unit/domain/policies/entry-filter.policy.test.ts`
+- [X] T017 [US1] Define factory configuration (`comments | points`, optional title-word rule) and async pipeline factory in `src/application/pipeline/factory/factory.ts`
+- [X] T018 [US1] Add a configured title filter step in `src/application/pipeline/steps/filter-title-words.step.ts` using the domain policy
+- [X] T019 [US1] Add table-driven tests for configured filter and sort pipeline composition, defaults supplied by caller, all four combinations, stable ties, missing metrics, and no matches in `tests/unit/application/pipeline/factory/factory.test.ts` and `tests/unit/application/pipeline/steps/filter-title-words.step.test.ts`
+- [X] T020 [US1] Run `npm run test:unit -- tests/unit/domain/policies/entry-filter.policy.test.ts tests/unit/application/pipeline/factory/factory.test.ts` and the non-acceptance quality gates; pause for review before use-case changes
 
 **Checkpoint**: Domain predicates and configured pipeline are independently tested and green.
 
