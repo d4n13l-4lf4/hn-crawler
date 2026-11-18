@@ -80,18 +80,18 @@
 
 ### Milestone A: Usage command
 
-- [ ] T023 [P] [US2] Implement `usage` subcommand in `src/presentation/cli/usage.ts`, accepting no feature-specific args/options and serializing repository records as the contract's JSON array
-- [ ] T024 [P] [US2] Add table-driven `it should when` tests for empty history, populated records, exact JSON fields/order, repository read failure, and unsupported args in `tests/unit/presentation/cli/usage.test.ts`
-- [ ] T025 [US2] Run focused usage CLI unit tests and non-acceptance quality gates; pause for review
+- [x] T023 [P] [US2] Implement `usage` subcommand in `src/presentation/cli/usage.ts`, accepting no feature-specific args/options and serializing repository records as the contract's JSON array
+- [x] T024 [P] [US2] Add table-driven `it should when` tests for empty history, populated records, exact JSON fields/order, repository read failure, and unsupported args in `tests/unit/presentation/cli/usage.test.ts`
+- [x] T025 [US2] Run focused usage CLI unit tests and non-acceptance quality gates; pause for review
 
 **Checkpoint**: Usage output is independently reviewable against the CLI contract.
 
 ### Milestone B: Composition root integration
 
-- [ ] T026 [US1] Wire one in-memory repository, core crawler, and tracking decorator in `src/presentation/main.ts`; inject the decorated crawler into `createCrawlCommand`
-- [ ] T027 [US2] Register `createUsageCommand` with the same repository instance in `src/presentation/main.ts` and verify both commands share process-local storage
-- [ ] T028 [US1] Update crawl command request normalization only as needed to pass effective sort/title choices to the decorator while preserving current crawl output, error text, and option semantics in `src/presentation/cli/crawl.ts`
-- [ ] T029 Run all unit tests and non-acceptance quality gates; pause for review
+- [x] T026 [US1] Wire one in-memory repository, core crawler, and tracking decorator in `src/presentation/main.ts`; inject the decorated crawler into `createCrawlCommand`
+- [x] T027 [US2] Register `createUsageCommand` with the same repository instance in `src/presentation/main.ts` and verify both commands share process-local storage
+- [x] T028 [US1] Update crawl command request normalization only as needed to pass effective sort/title choices to the decorator while preserving current crawl output, error text, and option semantics in `src/presentation/cli/crawl.ts`
+- [x] T029 Run all unit tests and non-acceptance quality gates; pause for review
 
 **Checkpoint**: Both commands are wired to the same in-memory history; independent processes intentionally start empty.
 
