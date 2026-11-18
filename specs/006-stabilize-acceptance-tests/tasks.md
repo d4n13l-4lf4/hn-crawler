@@ -52,10 +52,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T012 [US3] Add an acceptance workflow step that creates a unique temporary SQLite file path and appends `HN_CRAWLER_DB_PATH` to `GITHUB_ENV` before the test step in `.github/workflows/acceptance-tests.yml`
-- [ ] T013 [US3] Preserve the existing `HN_CRAWLER_ACCEPTANCE_URL` validation and `HN_CRAWLER_BETA` mapping while making the generated path available to `npm run test:acceptance` and spawned CLI processes in `.github/workflows/acceptance-tests.yml`
-- [ ] T014 [US3] Update the manual acceptance command and expected setup to use `HN_CRAWLER_DB_PATH` in `specs/006-stabilize-acceptance-tests/quickstart.md`
-- [ ] T015 [US3] Run all focused tests, `npm run quality`, and `npm run build`; statically inspect workflow changes, do not execute acceptance tests, and pause for user manual acceptance review
+- [x] T012 [US3] Add an acceptance workflow step that creates a unique temporary SQLite file path and appends `HN_CRAWLER_DB_PATH` to `GITHUB_ENV` before the test step in `.github/workflows/acceptance-tests.yml`
+- [x] T013 [US3] Preserve the existing `HN_CRAWLER_ACCEPTANCE_URL` validation and `HN_CRAWLER_BETA` mapping while making the generated path available to `npm run test:acceptance` and spawned CLI processes in `.github/workflows/acceptance-tests.yml`
+- [x] T014 [US3] Update the manual acceptance command and expected setup to use `HN_CRAWLER_DB_PATH` in `specs/006-stabilize-acceptance-tests/quickstart.md`
+- [x] T015 [US3] Run all focused tests, `npm run quality`, and `npm run build`; statically inspect workflow changes, do not execute acceptance tests, and pause for user manual acceptance review
 
 **Checkpoint**: CI prepares an isolated DB path; quality and build are green; acceptance remains unrun for the user.
 

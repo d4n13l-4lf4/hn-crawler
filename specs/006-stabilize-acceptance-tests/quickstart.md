@@ -18,7 +18,7 @@ After reviewing the implementation, configure the deterministic crawl URL and ru
 ```bash
 HN_CRAWLER_ACCEPTANCE_URL='<deterministic-page-url>' \
 HN_CRAWLER_BETA=true \
-HN_CRAWLER_DB_PATH="$(mktemp -u)/hn-crawler-usage.sqlite" \
+HN_CRAWLER_DB_PATH="$(mktemp -d)/hn-crawler-usage-$$/usage.sqlite" \
 npm run test:acceptance:local
 ```
 

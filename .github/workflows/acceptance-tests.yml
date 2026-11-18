@@ -89,6 +89,12 @@ jobs:
             exit 1
           fi
 
+      - name: Configure temporary usage database path
+        run: |
+          DB_DIRECTORY="${RUNNER_TEMP}/hn-crawler-usage-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${RANDOM}"
+          mkdir -p "$DB_DIRECTORY"
+          echo "HN_CRAWLER_DB_PATH=${DB_DIRECTORY}/usage.sqlite" >> "$GITHUB_ENV"
+
       - name: Run acceptance tests
         run: npm run test:acceptance
         env:

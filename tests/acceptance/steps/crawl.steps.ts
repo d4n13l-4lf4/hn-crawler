@@ -219,11 +219,7 @@ function runCli(
 ): CommandResult {
   const result: SpawnSyncReturns<string> = spawnSync('hn-crawler', args, {
     encoding: 'utf8',
-    env: {
-      ...process.env,
-      HN_CRAWLER_DB_PATH: process.env.HN_CRAWLER_DB_PATH,
-      ...env,
-    },
+    env: { ...process.env, ...env },
     shell: false,
   });
   return {
