@@ -102,10 +102,10 @@
 
 **Purpose**: Verify startup migration, repository sharing, package contents, and documented local commands without executing acceptance tests.
 
-- [ ] T035 [US1] Ensure startup migration completes before usage or crawl command handling and reports migration failure as a clear non-zero startup error in `src/presentation/main.ts`
-- [ ] T036 [US1] Verify the test-only database path is honored by acceptance subprocesses while normal CLI runs use `env-paths` in `src/infrastructure/persistence/sqlite/sqlite-path.ts` and `tests/acceptance/steps/usage.steps.ts`
-- [ ] T037 [US1] Verify migration SQL and metadata are present in the packed package contents and local migration scripts work without running acceptance tests; update `package.json` and `specs/005-usage-db-persistence/quickstart.md` if needed
-- [ ] T038 Run `npm run quality` and `npm run build`, inspect acceptance tests and scripts without executing them, record results, and pause for final review
+- [x] T035 [US1] Ensure startup migration completes before usage or crawl command handling and reports migration failure as a clear non-zero startup error in `src/presentation/main.ts`
+- [x] T036 [US1] Verify the test-only database path is honored by acceptance subprocesses while normal CLI runs use `env-paths` in `src/infrastructure/persistence/sqlite/sqlite-path.ts` and `tests/acceptance/steps/usage.steps.ts`
+- [x] T037 [US1] Verify migration SQL and metadata are present in the packed package contents and local migration scripts work without running acceptance tests; update `package.json` and `specs/005-usage-db-persistence/quickstart.md` if needed
+- [x] T038 Run `npm run quality` and `npm run build`, inspect acceptance tests and scripts without executing them, record results, and pause for final review. Acceptance execution is out of scope for this feature.
 
 ## Dependencies & Execution Order
 
@@ -162,3 +162,31 @@ Complete Phase 1, then Phase 2, then US1 persistence. Pause for review after eac
 - Normal DB path is per-user via `env-paths('hn-crawler')`; tests override the path to a temporary file shared by separate subprocess invocations.
 - Unit tests use `it should when` naming and table-driven cases; assert outputs and significant mock calls/arguments.
 - Keep obsolete in-memory usage repository tests only if the adapter remains used elsewhere; delete them if no longer relevant once SQLite composition is wired.
+
+## Appended Refinement Tasks
+
+The following tasks are appended after the original feature task set. They do not replace or remove any original milestone or task. Each refinement is a separate review milestone.
+
+### Phase 7: Canonical Applied Filter Separator
+
+**Purpose**: Represent multiple applied filter labels using commas in the domain value object and all newly persisted records.
+
+- [x] T039 [P] Add or update table-driven tests for comma-separated sort and title-filter labels, no-title cases, and `fromString` round trips in `tests/unit/domain/vo/applied-filters.vo.test.ts`
+- [x] T040 Update integration, repository, CLI, acceptance fixtures, and any canonical filter expectations from pipe-separated to comma-separated values across `tests/unit/application/usecases/decorators/`, `tests/unit/infrastructure/persistence/sqlite/`, `tests/unit/presentation/cli/`, and `tests/acceptance/`
+- [x] T041 Change the `AppliedFilters` canonical join separator to comma in `src/domain/vo/applied-filters.vo.ts`; preserve stored values as-is and retain table escaping for literal pipe delimiters in `src/presentation/cli/usage.ts`
+- [x] T042 Run focused applied-filter tests, `npm run quality`, and `npm run build`; pause for review
+
+**Checkpoint**: New applied-filter values use commas, all related expectations reflect that contract, and the non-acceptance gates pass.
+
+### Phase 8: Usage Query Inbound Port and Use Case
+
+**Purpose**: Keep the usage CLI command dependent on an application inbound port/use case rather than the persistence output port.
+
+- [ ] T043 [P] Add table-driven `it should when` unit tests for the usage query use case, including returned records, repository invocation, and propagated read failures in `tests/unit/application/usecases/usage-query.usecase.test.ts`
+- [ ] T044 Define the usage query inbound port in `src/application/ports/in/usage-query.port.ts`, with a read operation returning `Usage[] | Promise<Usage[]>`
+- [ ] T045 Implement `src/application/usecases/usage-query.usecase.ts` to depend on `UsageRepositoryPort`, delegate reads, and implement the inbound usage query port
+- [ ] T046 Update `src/presentation/cli/usage.ts` and its unit tests to depend on a fake inbound usage query port, not `UsageRepositoryPort`; preserve table output and non-zero read failure behavior
+- [ ] T047 Wire the usage query use case in `src/presentation/main.ts` while retaining concrete repository construction in the composition root
+- [ ] T048 Run focused use-case and CLI tests, `npm run quality`, and `npm run build`; pause for review
+
+**Checkpoint**: The usage command depends only on the inbound application port and the use case reads through the outbound repository port.

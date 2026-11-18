@@ -97,6 +97,30 @@ Every milestone should leave the codebase green under formatting, lint, typechec
 5. **ASCII usage table and composition root**: Replace JSON output with the aligned table and escape delimiters/newlines while preserving displayed values. Wire one SQLite client/repository, run migrations before command dispatch, configure the test database path, and preserve crawl best-effort semantics. Test table rows/widths/empty output and failures. Run all non-acceptance quality gates/build; pause for review.
 6. **Acceptance readiness and final non-acceptance gates**: Review the authored two-invocation acceptance scenario and verify environment wiring by static/code inspection only. Do not run acceptance tests. Run `npm run quality` and `npm run build`; record outcomes and pause for review.
 
+### Appended Refinement Milestones
+
+These refinements follow the completed persistence milestones above. They are append-only additions to the feature plan, and each ends with a green non-acceptance quality gate and a user review pause.
+
+7. **Comma separator for applied filters**: Change the canonical `AppliedFilters` value separator from `|` to `,`. Update unit, infrastructure, usage display, and tracked-crawler tests that assert or persist the canonical representation. Preserve escaping for table delimiters and line breaks as appropriate to the new separator. Run `npm run quality` and `npm run build`; pause for review.
+8. **Usage query application boundary**: Add an inbound usage-query port under `src/application/ports/in/` and a usage query use case under `src/application/usecases/`. The use case depends on `UsageRepositoryPort` and returns usage records; the usage CLI command depends only on the inbound port. Wire the use case in `src/presentation/main.ts`. Add use-case unit tests and update CLI tests to assert the use-case call and table output. Run `npm run quality` and `npm run build`; pause for review.
+
+## Appended Refinement Design
+
+### Applied filter value representation
+
+- `AppliedFilters` remains the domain value object and continues to hide its canonical string representation behind its builder and `toString()`.
+- When sorting and an optional title-word rule are both present, their labels are joined with a comma (`sort:number_of_comments:desc,sort:title_words:gt:5`). When no title-word rule exists, only the sort label is emitted.
+- `AppliedFilters.fromString` preserves stored values as-is. Existing persisted pipe-separated records are not migrated or rewritten by this refinement; new records use commas and old records render as stored.
+- Update unit and integration fixtures/assertions that reference the prior pipe delimiter. The usage table continues escaping literal `|` characters because they delimit table columns.
+
+### Usage query use case and ports
+
+- Add an inbound port, tentatively `src/application/ports/in/usage-query.port.ts`, exposing the read operation needed by presentation (`getAll(): Usage[] | Promise<Usage[]>`).
+- Add `src/application/usecases/usage-query.usecase.ts`, implementing the inbound port and receiving `UsageRepositoryPort` through its constructor. It delegates the read to `getAll()` and propagates repository errors so the CLI error contract remains in effect.
+- Change `createUsageCommand` to accept the inbound usage-query port. The presentation layer must not import or depend on `UsageRepositoryPort`.
+- Instantiate the use case in `src/presentation/main.ts` and inject it into the usage command; repository construction remains in the composition root.
+- Test the use case with a fake repository and test the CLI with a fake inbound port, checking results, error propagation, and invocation arguments.
+
 ## Failure and Lifecycle Decisions
 
 - A usage write failure is swallowed by the existing tracked-crawler decorator and cannot change crawl result/error/exit behavior.

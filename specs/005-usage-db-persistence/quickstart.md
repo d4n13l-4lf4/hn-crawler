@@ -23,4 +23,18 @@ Unit and integration tests use temporary database files and verify schema migrat
 
 The acceptance scenario uses the test-only database path override to point two independent CLI invocations at the same temporary database. The first invocation records usage by running `crawl`; the second invokes `usage` and verifies the record is shown. The normal database location remains the `hn-crawler` user data directory.
 
+CI requires the repository Actions variable `HN_CRAWLER_ACCEPTANCE_URL` to be set to a deterministic page URL. For local use, put the same variable in `.env.local` and run:
+
+```bash
+HN_CRAWLER_ACCEPTANCE_URL=https://example.test/news npm run test:acceptance:local
+```
+
+Or, to load the variable from `.env.local` with dotenvx:
+
+```bash
+npm run test:acceptance:local:env
+```
+
+These commands are documented for later acceptance validation and were not run as part of this feature.
+
 See [usage CLI contract](contracts/usage-cli.md) and [data model](data-model.md).

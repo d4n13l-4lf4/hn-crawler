@@ -43,10 +43,10 @@ describe('Usage command unit test', () => {
       ],
       expectedOutput: [
         'Usage data',
-        'ID                                   | Request Timestamp | Applied Filters                                     | Duration (ms)',
-        '-------------------------------------|-------------------|-----------------------------------------------------|--------------',
-        `${UUID} |         123123123 | sort:number_of_comments:desc\\|sort:title_words:gt:5 |           122`,
-        '018f0f4b-7b7c-7abc-8def-0123456789ac |         123123124 | sort:number_of_points:desc                          |            10',
+        'ID                                   | Request Timestamp | Applied Filters                                    | Duration (ms)',
+        '-------------------------------------|-------------------|----------------------------------------------------|--------------',
+        `${UUID} |         123123123 | sort:number_of_comments:desc,sort:title_words:gt:5 |           122`,
+        '018f0f4b-7b7c-7abc-8def-0123456789ac |         123123124 | sort:number_of_points:desc                         |            10',
       ].join('\n'),
     },
   ])(

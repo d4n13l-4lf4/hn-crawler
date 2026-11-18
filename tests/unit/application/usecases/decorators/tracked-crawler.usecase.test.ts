@@ -31,7 +31,7 @@ describe('TrackedCrawlerUseCase unit test', () => {
         titleWords: { operator: 'gt', value: 5 },
       },
       result: entries,
-      expectedFilters: 'sort:number_of_comments:desc|sort:title_words:gt:5',
+      expectedFilters: 'sort:number_of_comments:desc,sort:title_words:gt:5',
       timestamps: [1000, 1004],
       durations: [50, 54],
     },

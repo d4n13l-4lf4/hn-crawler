@@ -21,7 +21,7 @@ export class AppliedFilters {
     return new AppliedFilters(
       [sortLabel, titleLabel]
         .filter((label): label is string => label !== undefined)
-        .join('|')
+        .join(',')
     );
   }
 
