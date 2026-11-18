@@ -1,4 +1,3 @@
-
 name: Acceptance Tests
 
 on:
@@ -81,5 +80,17 @@ jobs:
           which hn-crawler
           hn-crawler --help
 
+      - name: Validate acceptance URL configuration
+        env:
+          HN_CRAWLER_ACCEPTANCE_URL: ${{ vars.HN_CRAWLER_ACCEPTANCE_URL }}
+        run: |
+          if [ -z "$HN_CRAWLER_ACCEPTANCE_URL" ]; then
+            echo "Repository Actions variable HN_CRAWLER_ACCEPTANCE_URL must be set to a deterministic crawl page URL."
+            exit 1
+          fi
+
       - name: Run acceptance tests
         run: npm run test:acceptance
+        env:
+          HN_CRAWLER_ACCEPTANCE_URL: ${{ vars.HN_CRAWLER_ACCEPTANCE_URL }}
+          HN_CRAWLER_BETA: 'true'
