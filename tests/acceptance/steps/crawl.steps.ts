@@ -22,6 +22,12 @@ When(
   }
 );
 
+When('I run the crawl command with an invalid URL in beta mode', function () {
+  this.result = runCli(['crawl', '--url', 'https://'], {
+    HN_CRAWLER_BETA: 'true',
+  });
+});
+
 When(
   'I run {string} in production mode',
   function (this: { result?: CommandResult }, command: string) {

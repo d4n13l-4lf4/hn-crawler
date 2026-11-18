@@ -3,49 +3,76 @@ import { Numeric } from '@/domain/vo/numeric';
 
 type NumericTestCase = {
   should: string;
-  rawValue: unknown;
-  expectedValue: number;
+  when: string;
+  input: unknown;
+  expected: number;
 };
 
 describe('Numeric value object unit test', () => {
   const testCases: NumericTestCase[] = [
-    { should: 'preserve an integer', rawValue: 12, expectedValue: 12 },
+    {
+      should: 'preserve an integer',
+      when: 'the raw value is a non-negative number',
+      input: 12,
+      expected: 12,
+    },
     {
       should: 'parse a digit sequence from text',
-      rawValue: '795 points',
-      expectedValue: 795,
+      when: 'the raw value contains a points count',
+      input: '795 points',
+      expected: 795,
     },
     {
       should: 'parse a digit sequence after text',
-      rawValue: '  211 comments',
-      expectedValue: 211,
+      when: 'the raw value contains a comments count',
+      input: '  211 comments',
+      expected: 211,
     },
     {
       should: 'use the first digit sequence',
-      rawValue: '12 points, 3 bonus',
-      expectedValue: 12,
-    },
-    { should: 'default a negative number', rawValue: -4, expectedValue: 0 },
-    {
-      should: 'default an unmatched value',
-      rawValue: 'no score',
-      expectedValue: 0,
+      when: 'the raw text contains more than one digit sequence',
+      input: '12 points, 3 bonus',
+      expected: 12,
     },
     {
-      should: 'default a missing value',
-      rawValue: undefined,
-      expectedValue: 0,
+      should: 'default to zero',
+      when: 'the raw number is negative',
+      input: -4,
+      expected: 0,
     },
-    { should: 'default NaN', rawValue: Number.NaN, expectedValue: 0 },
     {
-      should: 'default infinity',
-      rawValue: Number.POSITIVE_INFINITY,
-      expectedValue: 0,
+      should: 'default to zero',
+      when: 'the raw text contains no digits',
+      input: 'no score',
+      expected: 0,
     },
-    { should: 'default a non-numeric value', rawValue: {}, expectedValue: 0 },
+    {
+      should: 'default to zero',
+      when: 'the raw value is missing',
+      input: undefined,
+      expected: 0,
+    },
+    {
+      should: 'default to zero',
+      when: 'the raw number is NaN',
+      input: Number.NaN,
+      expected: 0,
+    },
+    {
+      should: 'default to zero',
+      when: 'the raw number is infinite',
+      input: Number.POSITIVE_INFINITY,
+      expected: 0,
+    },
+    {
+      should: 'default to zero',
+      when: 'the raw value is not a number or string',
+      input: {},
+      expected: 0,
+    },
   ];
 
-  it.each(testCases)('should $should', ({ rawValue, expectedValue }) => {
-    expect(new Numeric(rawValue).value).toBe(expectedValue);
+  it.each(testCases)('should $should when $when', ({ input, expected }) => {
+    expect(new Numeric(input).value).toBe(expected);
   });
 });

@@ -11,7 +11,8 @@ const sampleHtml = readFileSync(
 
 type ParserTestCase = {
   should: string;
-  html: string;
+  when: string;
+  input: string;
   expected: HNEntry[];
 };
 
@@ -19,7 +20,8 @@ describe('Hacker News parser unit test', () => {
   const testCases: ParserTestCase[] = [
     {
       should: 'parse the first entry with its title, points, and comments',
-      html: sampleHtml,
+      when: 'the page contains the Hacker News example resource',
+      input: sampleHtml,
       expected: [
         new HNEntry(
           1,
@@ -31,26 +33,34 @@ describe('Hacker News parser unit test', () => {
     },
     {
       should: 'use empty title and zero counts when entry text is missing',
-      html: '<table><tr class="athing submission"><td class="title"></td></tr></table>',
+      when: 'a story row has no readable title or metadata',
+      input:
+        '<table><tr class="athing submission"><td class="title"></td></tr></table>',
       expected: [new HNEntry(1, '', 0, 0)],
     },
     {
       should: 'use zero counts when integer values cannot be parsed',
-      html: '<table><tr class="athing submission"><td class="title"><span class="titleline"><a>Story</a></span></td></tr><tr><td class="subtext"><span class="score">many points</span><a href="item?id=1">many comments</a></td></tr></table>',
+      when: 'score and comments metadata contain no digit sequences',
+      input:
+        '<table><tr class="athing submission"><td class="title"><span class="titleline"><a>Story</a></span></td></tr><tr><td class="subtext"><span class="score">many points</span><a href="item?id=1">many comments</a></td></tr></table>',
       expected: [new HNEntry(1, 'Story', 0, 0)],
     },
     {
       should: 'return no entries when the page has no story rows',
-      html: '<html><body><p>No stories</p></body></html>',
+      when: 'the page contains no story rows',
+      input: '<html><body><p>No stories</p></body></html>',
       expected: [],
     },
   ];
 
-  it.each(testCases)('should $should', async ({ html, expected }) => {
-    const result: HNEntry[] = [];
-    for await (const entry of parseHnEntries(html)) result.push(entry);
-    expect(result.slice(0, expected.length)).toEqual(expected);
-  });
+  it.each(testCases)(
+    'should $should when $when',
+    async ({ input, expected }) => {
+      const result: HNEntry[] = [];
+      for await (const entry of parseHnEntries(input)) result.push(entry);
+      expect(result.slice(0, expected.length)).toEqual(expected);
+    }
+  );
 
   it('should yield all sample entries in source order with one-based ranks', async () => {
     const result: HNEntry[] = [];

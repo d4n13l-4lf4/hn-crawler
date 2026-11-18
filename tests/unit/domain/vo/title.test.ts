@@ -3,32 +3,46 @@ import { Title } from '@/domain/vo/title';
 
 type TitleTestCase = {
   should: string;
-  rawValue: unknown;
-  expectedValue: string;
+  when: string;
+  input: unknown;
+  expected: string;
 };
 
 describe('Title value object unit test', () => {
   const testCases: TitleTestCase[] = [
     {
       should: 'normalize whitespace in the supplied title',
-      rawValue: '  My news  ',
-      expectedValue: 'My news',
+      when: 'the raw title contains leading and trailing whitespace',
+      input: '  My news  ',
+      expected: 'My news',
     },
     {
       should: 'collapse internal whitespace',
-      rawValue: 'My\n  news',
-      expectedValue: 'My news',
+      when: 'the raw title contains repeated whitespace',
+      input: 'My\n  news',
+      expected: 'My news',
     },
-    { should: 'default an empty title', rawValue: '', expectedValue: '' },
+    {
+      should: 'return an empty title',
+      when: 'the raw title is empty',
+      input: '',
+      expected: '',
+    },
     {
       should: 'default a missing title',
-      rawValue: undefined,
-      expectedValue: '',
+      when: 'the raw title is missing',
+      input: undefined,
+      expected: '',
     },
-    { should: 'default a non-string title', rawValue: 42, expectedValue: '' },
+    {
+      should: 'default a non-string title',
+      when: 'the raw title is not a string',
+      input: 42,
+      expected: '',
+    },
   ];
 
-  it.each(testCases)('should $should', ({ rawValue, expectedValue }) => {
-    expect(new Title(rawValue).value).toBe(expectedValue);
+  it.each(testCases)('should $should when $when', ({ input, expected }) => {
+    expect(new Title(input).value).toBe(expected);
   });
 });

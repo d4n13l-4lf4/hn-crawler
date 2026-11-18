@@ -5,32 +5,54 @@ import { Title } from '@/domain/vo/title';
 
 type HNEntryTestCase = {
   should: string;
-  rank: number;
-  title: string;
-  points: number;
-  comments: number;
+  when: string;
+  input: {
+    rank: number;
+    title: string;
+    points: number;
+    comments: number;
+  };
+  expected: {
+    rank: number;
+    title: string;
+    points: number;
+    number_of_comments: number;
+  };
 };
 
 describe('HNEntry Unit Test', () => {
   const testCases: HNEntryTestCase[] = [
     {
       should: 'store rank, title, points, and comment count',
-      rank: 1,
-      title: 'My news',
-      points: 795,
-      comments: 211,
+      when: 'the entry has the first Hacker News story values',
+      input: { rank: 1, title: 'My news', points: 795, comments: 211 },
+      expected: {
+        rank: 1,
+        title: 'My news',
+        points: 795,
+        number_of_comments: 211,
+      },
     },
     {
       should: 'allow an empty title and zero counts',
-      rank: 14,
-      title: '',
-      points: 0,
-      comments: 0,
+      when: 'the entry has missing title and count values',
+      input: { rank: 14, title: '', points: 0, comments: 0 },
+      expected: {
+        rank: 14,
+        title: '',
+        points: 0,
+        number_of_comments: 0,
+      },
     },
   ];
 
-  it.each(testCases)('should $should', ({ rank, title, points, comments }) => {
-    const entry = new HNEntry(rank, title, points, comments);
+  it.each(testCases)('should $should when $when', ({ input, expected }) => {
+    const entry = new HNEntry(
+      input.rank,
+      input.title,
+      input.points,
+      input.comments
+    );
 
     expect(entry.rank).toBeInstanceOf(Numeric);
     expect(entry.title).toBeInstanceOf(Title);
@@ -41,6 +63,6 @@ describe('HNEntry Unit Test', () => {
       title: entry.title.value,
       points: entry.points.value,
       number_of_comments: entry.number_of_comments.value,
-    }).toEqual({ rank, title, points, number_of_comments: comments });
+    }).toEqual(expected);
   });
 });

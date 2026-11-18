@@ -17,8 +17,7 @@ Feature: Crawl Hacker News stories
     And the crawl exit code should be 0
 
   Scenario: Report a crawl failure
-    Given the configured acceptance crawl URL is available
-    When I run "hn-crawler crawl --url https://" in beta mode
+    When I run the crawl command with an invalid URL in beta mode
     Then I should see "An error occurred while running the crawler. Please try again." in the error output
     And the crawl exit code should be non-zero
 

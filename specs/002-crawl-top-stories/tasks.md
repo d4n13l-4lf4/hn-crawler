@@ -169,3 +169,7 @@ US1 is the MVP because it preserves the user's primary crawl flow and implements
 - `[P]` is reserved for independent edits in separate files.
 - Table-driven tests should follow the project style using `should` wording and assert both outcomes and relevant mock calls/arguments.
 - Acceptance-related implementation/configuration can be reviewed without running acceptance tests.
+
+## Phase 6: Convergence
+
+- [x] T033 Update `tests/acceptance/features/crawl.feature` and `tests/acceptance/steps/crawl.steps.ts` so the crawl-failure scenario uses a defined step that invokes the CLI with an invalid beta URL and captures its error output and non-zero status per US2/AC4 (partial)
