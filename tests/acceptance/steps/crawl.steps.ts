@@ -15,92 +15,73 @@ Given('the configured acceptance crawl URL is available', function () {
 When(
   'I run the crawl command with the configured URL in beta mode',
   function () {
-    this.result = runCli(['crawl', '--url', getAcceptanceUrl()], {
-      HN_CRAWLER_BETA: 'true',
-    });
+    this.result = runCli(['crawl', '--url', getAcceptanceUrl()]);
   }
 );
 
 When(
   'I run the crawl command with the configured URL and ranking {string} in beta mode',
   function (this: { result?: CommandResult }, ranking: string) {
-    this.result = runCli(
-      [
-        'crawl',
-        '--url',
-        getAcceptanceUrl(),
-        '--title-words',
-        'le:10000',
-        ranking === 'comments' ? '--top-comments' : '--top-points',
-      ],
-      { HN_CRAWLER_BETA: 'true' }
-    );
+    this.result = runCli([
+      'crawl',
+      '--url',
+      getAcceptanceUrl(),
+      '--title-words',
+      'le:10000',
+      ranking === 'comments' ? '--top-comments' : '--top-points',
+    ]);
   }
 );
 
 When(
   'I run the crawl command with default options and the configured URL in beta mode',
   function () {
-    this.result = runCli(['crawl', '--url', getAcceptanceUrl()], {
-      HN_CRAWLER_BETA: 'true',
-    });
+    this.result = runCli(['crawl', '--url', getAcceptanceUrl()]);
   }
 );
 
 When(
   'I run the crawl command with title filter {string} and ranking {string} using the configured URL in beta mode',
   function (this: { result?: CommandResult }, filter: string, ranking: string) {
-    this.result = runCli(
-      [
-        'crawl',
-        '--url',
-        getAcceptanceUrl(),
-        '--title-words',
-        filter,
-        ranking === 'comments' ? '--top-comments' : '--top-points',
-      ],
-      { HN_CRAWLER_BETA: 'true' }
-    );
+    this.result = runCli([
+      'crawl',
+      '--url',
+      getAcceptanceUrl(),
+      '--title-words',
+      filter,
+      ranking === 'comments' ? '--top-comments' : '--top-points',
+    ]);
   }
 );
 
 When(
   'I run the crawl command with ranking {string} and the configured URL in beta mode',
   function (this: { result?: CommandResult }, ranking: string) {
-    this.result = runCli(
-      [
-        'crawl',
-        '--url',
-        getAcceptanceUrl(),
-        ranking === 'comments' ? '--top-comments' : '--top-points',
-      ],
-      { HN_CRAWLER_BETA: 'true' }
-    );
+    this.result = runCli([
+      'crawl',
+      '--url',
+      getAcceptanceUrl(),
+      ranking === 'comments' ? '--top-comments' : '--top-points',
+    ]);
   }
 );
 
 When(
   'I run the crawl command with title filter {string} in beta mode',
   function (this: { result?: CommandResult }, filter: string) {
-    this.result = runCli(['crawl', '--title-words', filter], {
-      HN_CRAWLER_BETA: 'true',
-    });
+    this.result = runCli(['crawl', '--title-words', filter]);
   }
 );
 
 When(
   'I run the crawl command with conflicting ranking options in beta mode',
   function () {
-    this.result = runCli(['crawl', '--top-comments', '--top-points'], {
-      HN_CRAWLER_BETA: 'true',
-    });
+    this.result = runCli(['crawl', '--top-comments', '--top-points']);
   }
 );
 
 When('I run the crawl command with an invalid URL in beta mode', function () {
-  this.result = runCli(['crawl', '--url', 'https://'], {
-    HN_CRAWLER_BETA: 'true',
-  });
+  this.result = runCli(['crawl', '--url', 'https://']);
 });
 
 When(
@@ -242,7 +223,10 @@ function getAcceptanceUrl(): string {
   return url;
 }
 
-function runCli(args: string[], env: Record<string, string>): CommandResult {
+function runCli(
+  args: string[],
+  env: Record<string, string> = {}
+): CommandResult {
   const result: SpawnSyncReturns<string> = spawnSync('hn-crawler', args, {
     encoding: 'utf8',
     env: { ...process.env, ...env },
