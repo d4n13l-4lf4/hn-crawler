@@ -13,8 +13,16 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       include: ['src/**/*.ts'],
-      exclude: ['dist/', 'node_modules/', 'src/presentation/main.ts'],
+      exclude: [
+        'dist/',
+        'node_modules/',
+        'src/presentation/main.ts',
+        'src/**/*.d.ts',
+        'src/**/ports/**/*.ts',
+        'src/**/*.type.ts'
+      ],
       thresholds: {
+        perFile: true,
         lines: 100,
         functions: 100,
         branches: 100,

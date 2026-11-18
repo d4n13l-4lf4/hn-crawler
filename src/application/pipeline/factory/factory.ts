@@ -1,7 +1,7 @@
 import { filterTitleWords } from '@/application/pipeline/steps/filter-title-words.step';
 import { topK } from '@/application/pipeline/operators/top-k';
 import { pipeAsync } from '@/application/pipeline/orchestrator/async.pipe';
-import type { AsyncOperator } from '@/application/pipeline/pipeline.types';
+import type { AsyncOperator } from '@/application/pipeline/pipeline.type';
 import type { HNEntry } from '@/domain/entities/hn-entry.entity';
 import type { TitleWordRule } from '@/domain/policies/entry-filter.policy';
 
