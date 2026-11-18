@@ -37,7 +37,10 @@ jobs:
           BETA_VERSION="${BASE_VERSION}-beta.${RUN_NUMBER}-${RUN_ATTEMPT}-sha${SHORT_SHA}"
           npm version "$BETA_VERSION" --no-git-tag-version
           echo "beta_version=$BETA_VERSION" >> "$GITHUB_OUTPUT"
-
+      - name: Build package
+        run: npm run build
+      - name: Verify package contents
+        run: npm pack --dry-run
       - name: Publish beta version
         run: |
           npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
