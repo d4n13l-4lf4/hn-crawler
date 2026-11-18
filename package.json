@@ -6,6 +6,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "engines": {
+    "node": ">=26.0.0"
+  },
   "bin": {
     "hn-crawler": "dist/presentation/main.js"
   },
@@ -15,6 +18,7 @@
   "files": [
     "dist",
     "README.md",
+    "LICENSE",
     "drizzle/migrations",
     "!dist/**/*.map",
     "!dist/**/*.d.ts"
