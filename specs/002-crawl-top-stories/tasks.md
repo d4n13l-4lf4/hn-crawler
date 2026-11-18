@@ -72,19 +72,19 @@ description: 'Task list for Crawl Top Stories refinements'
 
 **Tests first**
 
-- [X] T014 [P] [US1] Add table-driven tests in `tests/unit/domain/vo/title.test.ts` for raw title values and empty/invalid inputs defaulting to `''`
-- [X] T015 [P] [US1] Add table-driven tests in `tests/unit/domain/vo/numeric.test.ts` for digit parsing, no match, invalid input, and NaN defaulting to `0`
-- [X] T016 [US1] Update `tests/unit/domain/entities/hn-entry.entity.test.ts` to assert `Title` and `Numeric` value object fields/accessors and primitive values
-- [X] T017 [US1] Update `tests/unit/infrastructure/web/hn-crawler.parser.test.ts` to assert best-effort source extraction, first fixture entry values, row order, and zero/empty defaults through value objects
-- [X] T018 [US1] Update `tests/unit/presentation/cli/crawl.test.ts` to assert serialized JSON contains primitive `rank`, `title`, `points`, and `number_of_comments` values only
+- [x] T014 [P] [US1] Add table-driven tests in `tests/unit/domain/vo/title.test.ts` for raw title values and empty/invalid inputs defaulting to `''`
+- [x] T015 [P] [US1] Add table-driven tests in `tests/unit/domain/vo/numeric.test.ts` for digit parsing, no match, invalid input, and NaN defaulting to `0`
+- [x] T016 [US1] Update `tests/unit/domain/entities/hn-entry.entity.test.ts` to assert `Title` and `Numeric` value object fields/accessors and primitive values
+- [x] T017 [US1] Update `tests/unit/infrastructure/web/hn-crawler.parser.test.ts` to assert best-effort source extraction, first fixture entry values, row order, and zero/empty defaults through value objects
+- [x] T018 [US1] Update `tests/unit/presentation/cli/crawl.test.ts` to assert serialized JSON contains primitive `rank`, `title`, `points`, and `number_of_comments` values only
 
 **Implementation**
 
-- [X] T019 [US1] Add dependency-free `src/domain/vo/title.ts` accepting raw string input and defaulting to `''`
-- [X] T020 [US1] Add dependency-free `src/domain/vo/numeric.ts` accepting raw number/text input, using a precompiled `/\d+/` matcher where needed, and defaulting unmatched/invalid/NaN input to `0`
-- [X] T021 [US1] Update `src/domain/entities/hn-entry.entity.ts` to use `Title` and `Numeric` for title, rank, points, and number of comments while preserving stable primitive accessors for presentation serialization
-- [X] T022 [US1] Refactor `src/infrastructure/web/hn-crawler.parser.ts` to capture title/score/comment text best-effort, keep separate score and comment matchers, pass captured values to the value objects, and remove `normalizeText`/`parseInteger`
-- [X] T023 [US1] Run focused VO/entity/parser/CLI unit tests, build, and all non-acceptance quality gates
+- [x] T019 [US1] Add dependency-free `src/domain/vo/title.ts` accepting raw string input and defaulting to `''`
+- [x] T020 [US1] Add dependency-free `src/domain/vo/numeric.ts` accepting raw number/text input, using a precompiled `/\d+/` matcher where needed, and defaulting unmatched/invalid/NaN input to `0`
+- [x] T021 [US1] Update `src/domain/entities/hn-entry.entity.ts` to use `Title` and `Numeric` for title, rank, points, and number of comments while preserving stable primitive accessors for presentation serialization
+- [x] T022 [US1] Refactor `src/infrastructure/web/hn-crawler.parser.ts` to capture title/score/comment text best-effort, keep separate score and comment matchers, pass captured values to the value objects, and remove `normalizeText`/`parseInteger`
+- [x] T023 [US1] Run focused VO/entity/parser/CLI unit tests, build, and all non-acceptance quality gates
 
 **Checkpoint**: Review VO domain behavior, parser responsibility, output serialization, and green non-acceptance gates; stop for user confirmation before Milestone 6.
 
@@ -108,10 +108,10 @@ description: 'Task list for Crawl Top Stories refinements'
 
 **Purpose**: Keep acceptance tasks pending and ensure the remaining checks comply with the user's requested workflow.
 
-- [ ] T029 [US2] Review and finalize `tests/acceptance/steps/crawl.steps.ts` only after the user reviews the acceptance harness; leave this task unchecked pending user comments
-- [ ] T030 [US1] Run final build and non-acceptance quality gates after all approved implementation milestones; do not invoke Cucumber or either acceptance npm script
-- [ ] T031 [US2] Leave acceptance execution pending explicit user direction and keep acceptance execution unchecked in `specs/002-crawl-top-stories/tasks.md`
-- [ ] T032 Confirm `specs/002-crawl-top-stories/plan.md`, `specs/002-crawl-top-stories/quickstart.md`, and `specs/002-crawl-top-stories/tasks.md` consistently record completed/deferred work
+- [ ] T029 [US2] Await user review/comments on `tests/acceptance/features/crawl.feature` and `tests/acceptance/steps/crawl.steps.ts`; finalize only if requested
+- [x] T030 [US1] Run final build and non-acceptance quality gates after all approved implementation milestones; do not invoke Cucumber or either acceptance npm script
+- [x] T031 [US2] Record acceptance test execution as deferred for this feature in `specs/002-crawl-top-stories/tasks.md`; do not run the suite locally
+- [x] T032 Confirm `specs/002-crawl-top-stories/plan.md`, `specs/002-crawl-top-stories/quickstart.md`, and `specs/002-crawl-top-stories/tasks.md` consistently record completed/deferred work
 
 **Final Checkpoint**: Report the acceptance tasks still open. Acceptance tests are not run locally for this feature.
 
@@ -121,7 +121,7 @@ description: 'Task list for Crawl Top Stories refinements'
 
 - Setup is already complete; T001 records the existing fixture reference.
 - Foundational reconciliation (T002–T003) precedes implementation work.
-- The user's review checkpoints dictate execution order across the two spec stories: Milestone 1 (US2), then Milestones 2–5 (US1), then Milestone 6 (cross-cutting). Pause after each checkpoint for user confirmation.
+- The user's review checkpoints dictate execution order: acceptance URL/CI wiring (US2) was completed first, followed by config injection, HTTP cause chaining, import aliasing, and value objects (US1). Pause after each checkpoint for user confirmation.
 - Final polish depends on the approved implementation milestones. Acceptance execution is excluded until separately authorized.
 
 ### User Story Dependencies
@@ -156,13 +156,12 @@ US1 is the MVP because it preserves the user's primary crawl flow and implements
 
 ### Incremental Delivery
 
-1. Reconcile the missing/deferred acceptance tasks and verify documentation; pause for review.
-2. Complete beta acceptance URL and CI variable wiring; pause for review without executing acceptance.
-3. Complete configured default URL injection; pause for review.
-4. Complete HTTP error cause chaining; pause for review.
-5. Apply the import alias; pause for review.
-6. Implement value objects, parser boundary, and serialization; pause for review.
-7. Run non-acceptance validation and leave acceptance tests pending.
+1. Complete beta acceptance URL and CI variable wiring; pause for review without executing acceptance.
+2. Complete configured default URL injection; pause for review.
+3. Complete HTTP error cause chaining; pause for review.
+4. Apply the import alias; pause for review.
+5. Implement value objects, parser boundary, and serialization; pause for review.
+6. Run non-acceptance validation, record acceptance execution as deferred, and await any user comments on the acceptance harness.
 
 ## Notes
 
