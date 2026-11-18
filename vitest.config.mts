@@ -19,7 +19,7 @@ export default defineConfig({
         'src/presentation/main.ts',
         'src/**/*.d.ts',
         'src/**/ports/**/*.ts',
-        'src/**/*.type.ts'
+        'src/**/*.type.ts',
       ],
       thresholds: {
         perFile: true,
