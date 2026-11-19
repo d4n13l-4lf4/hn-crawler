@@ -10,10 +10,10 @@ Feature: Crawl Hacker News stories
     And the crawl output should be ordered by comments descending
     And the crawl exit code should be 0
 
-  Scenario: Crawl without options preserves source order and all titles
+  Scenario: Crawl without options returns all available entries without ranking
     Given the configured acceptance crawl URL is available
     When I run the crawl command with default options and the configured URL in beta mode
-    Then the crawl output should contain all available entries in source order
+    Then the crawl output should contain all available entries without a ranking assertion
     And every output entry should contain exactly the established story fields
     And the crawl exit code should be 0
 

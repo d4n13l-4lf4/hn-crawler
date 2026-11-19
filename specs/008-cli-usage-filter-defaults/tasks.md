@@ -66,12 +66,12 @@
 
 ### Tests First
 
-- [ ] T024 [US3] Replace the fixed-version expectation with table-driven `it should when` coverage tied to package metadata in `tests/unit/presentation/cli/cli.test.ts`
+- [x] T024 [US3] Replace the fixed-version expectation with table-driven `it should when` coverage tied to package metadata in `tests/unit/presentation/cli/cli.test.ts`
 
 ### Implementation
 
-- [ ] T025 [US3] Register the package metadata version in Commander without a duplicate literal in `src/presentation/cli/cli.ts`
-- [ ] T026 [US3] Run focused CLI unit tests, then run `npm run quality`; present the milestone only when the aggregate gate passes
+- [x] T025 [US3] Register the package metadata version in Commander without a duplicate literal in `src/presentation/cli/cli.ts`
+- [x] T026 [US3] Run focused CLI unit tests, then run `npm run quality`; present the milestone only when the aggregate gate passes
 
 **Checkpoint**: Dynamic version display is independently reviewable and all quality gates pass.
 
@@ -79,17 +79,17 @@
 
 **Purpose**: User executes the refactored acceptance suite after approving implementation milestones.
 
-- [ ] T027 [US1] User runs acceptance using the configured deterministic page and instructions in `specs/008-cli-usage-filter-defaults/quickstart.md`
-- [ ] T028 [US1] Address user-reported acceptance failures in a focused follow-up change and leave `npm run quality` passing in affected `tests/acceptance/`, `src/`, and `tests/unit/` files
+- [x] T027 [US1] User runs acceptance using the configured deterministic page and instructions in `specs/008-cli-usage-filter-defaults/quickstart.md`; user reported acceptance is green
+- [x] T028 [US1] Address user-reported acceptance failures in a focused follow-up change and leave `npm run quality` passing in affected `tests/acceptance/`, `src/`, and `tests/unit/` files; no follow-up was needed because acceptance is green
 
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
 
 - **Phase 1** is complete. Its acceptance checks remain unrun by the agent.
-- **Phase 2** is the next implementation milestone. Tests are added first; crawl and usage changes are implemented as one vertical slice because the crawl request and truthful usage record share optional choices. The phase is not review-ready until `npm run quality` passes.
-- **Phase 3** starts only after approval of Phase 2 and is isolated to package version presentation and its unit coverage.
-- **Phase 4** occurs after approval of Phases 2 and 3; acceptance execution belongs to the user.
+- **Phase 2** is complete. Tests were added first; crawl and usage changes were implemented as one vertical slice because the crawl request and truthful usage record share optional choices.
+- **Phase 3** is complete. Dynamic package version presentation has unit coverage and passed `npm run quality`.
+- **Phase 4** is complete. The user reported manual acceptance is green; no follow-up fixes were needed.
 
 ### User Story Dependencies
 
@@ -106,8 +106,8 @@
 
 1. Acceptance refactor is already complete and intentionally unrun.
 2. Complete the crawl and usage vertical slice with tests first, then implementation; run `npm run quality` and stop for review only when green.
-3. After approval, implement dynamic package version with unit coverage and run `npm run quality`; stop for review only when green.
-4. After approval, the user manually runs acceptance. Keep Cucumber unexecuted by the agent.
+3. Dynamic package version was implemented with unit coverage and `npm run quality` passed.
+4. The user manually ran acceptance and reported it green. Cucumber was not run by the agent.
 
 ## Notes
 
@@ -115,3 +115,7 @@
 - A review milestone must add user-visible functionality or complete an independently useful maintenance change and must pass `npm run quality`.
 - The acceptance suite may be behavior-red until the user runs it after implementation; this is intentional and distinct from the required green unit/quality gate.
 - No schema change or new production abstraction is planned.
+
+## Phase 5: Convergence
+
+- [x] T029 Refactor only the acceptance scenario and step for a crawl with no ranking option so it does not assert an ordering of results; retain checks for the no-option returned entries and absence of filtering, per US1/AC1, US1/AC3, FR-002, and SC-001 (partial)

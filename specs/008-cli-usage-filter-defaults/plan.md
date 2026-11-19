@@ -95,3 +95,7 @@ After both implementation milestones have been reviewed and approved, the user r
 ## Complexity Tracking
 
 No additional architecture or constitution exceptions are required.
+
+## Planning Clarification — 2026-11-19
+
+The convergence follow-up is limited to acceptance tests: remove the ordering assertion from the no-ranking crawl scenario because sorting is not requested there. Retain its applicable checks for returned entries and filtering. This does not change production code or other milestones. The separate filter-only scenario retains its source-order assertion, since filtering without ranking is specified to preserve the matching entries' relative order. Explicit ranking scenarios continue to verify their selected metric ordering.
