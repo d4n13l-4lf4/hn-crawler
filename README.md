@@ -22,7 +22,7 @@ The front page of Hacker News is a goldmine, but a noisy one. `hn-crawler` is a 
 
 1. **Crawls** the top Hacker News stories and prints clean JSON.
 2. **Filters** them by title word count (`gt:N` or `le:N`) and **ranks** them by points or comments.
-3. **Reports usage**: every request is logged with a timestamp, the filters applied and how long it took.
+3. **Reports usage**: every crawl is logged with a timestamp, the selected operations and how long it took.
 
 ---
 
@@ -64,7 +64,7 @@ Let's tell a small story. You want to know **which long-winded titles start the 
 
 ### Step 1: Crawl the first 30 entries
 
-Send the spider out. With no flags, `crawl` fetches the first 30 entries and prints them as JSON, sorted by number of comments (descending). The `rank` field is the entry's position on the front page.
+Send the spider out. With no flags, `crawl` fetches up to the first 30 entries and prints them as JSON without filtering or ranking. The `rank` field is each entry's position on the front page.
 
 ```bash
 hn-crawler crawl
@@ -75,22 +75,16 @@ Sample output (first 3 of 30 entries shown):
 ```json
 [
   {
-    "rank": 2,
-    "title": "Rust 2.0 is not happening",
-    "points": 389,
-    "number_of_comments": 301
+    "rank": 3,
+    "title": "Why I stopped using microservices",
+    "points": 301,
+    "number_of_comments": 187
   },
   {
     "rank": 5,
     "title": "Ask HN: How do you manage side projects?",
     "points": 198,
     "number_of_comments": 262
-  },
-  {
-    "rank": 3,
-    "title": "Why I stopped using microservices",
-    "points": 301,
-    "number_of_comments": 187
   }
 ]
 ```
@@ -169,7 +163,7 @@ hn-crawler crawl --title-words le:5 --top-points
 ]
 ```
 
-The two filters are complementary: `gt:5` and `le:5` together cover every entry, with none in both lists.
+The two title-word rules are complementary: `gt:5` and `le:5` together cover every entry, with none in both lists.
 
 ### Step 4: Check the usage data
 
@@ -180,16 +174,16 @@ hn-crawler usage
 ```
 
 ```text
-ID                                   | Request Date and Time     | Applied Filters                                        | Duration (ms)
--------------------------------------|---------------------------|--------------------------------------------------------|--------------
-01a1efee-f1d6-7f30-b989-c03e4e02c6ec | 2026-11-18 19:32:56 (CET) | sort:number_of_comments:desc,sort:title_words:le:10000 |           249
-01a1efee-f32f-75d6-92db-dcd225769067 | 2026-11-18 19:32:56 (CET) | sort:number_of_comments:desc,sort:title_words:gt:5     |            74
-01a1efee-f5e6-75cb-ab5b-3a8fed5667d6 | 2026-11-18 19:32:57 (CET) | sort:number_of_points:desc,sort:title_words:le:5       |            75
+ID                                   | Request Date and Time     | Applied Filters                                      | Duration (ms)
+-------------------------------------+---------------------------+------------------------------------------------------+--------------
+01a1efee-f1d6-7f30-b989-c03e4e02c6ec | 2026-11-18 19:32:56 (CET) | none                                                 | 249
+01a1efee-f32f-75d6-92db-dcd225769067 | 2026-11-18 19:32:56 (CET) | sort:number_of_comments:desc,filter:title_words:gt:5 | 74
+01a1efee-f5e6-75cb-ab5b-3a8fed5667d6 | 2026-11-18 19:32:57 (CET) | sort:number_of_points:desc,filter:title_words:le:5   | 75
 ```
 
 Reading the table:
 
-- **Row 1** is your plain `crawl`. No word filter was given, so the tool applied its defaults: sort by comments, and a title word limit of `le:10000`, which keeps everything.
+- **Row 1** is your plain `crawl`. No filtering or ranking was selected, so the applied operations are `none`.
 - **Row 2** is the `gt:5` + comments request from step 2.
 - **Row 3** is the `le:5` + points request from step 3.
 
@@ -224,7 +218,7 @@ A CLI tool to scrape and analyze Hacker News entries
 
 ### `hn-crawler crawl`
 
-Crawl the top Hacker News stories, optionally filtering and sorting them. The result is printed to stdout as a JSON array.
+Crawl up to the first 30 Hacker News stories. Title filtering and ranking are optional; the result is printed to stdout as a JSON array.
 
 ```bash
 hn-crawler crawl [options]
@@ -237,7 +231,7 @@ hn-crawler crawl [options]
 | `--title-words <rule>` | Filter by title word count: `gt:N` or `le:N` |
 | `-h, --help`           | Display help for command                     |
 
-**Defaults:** with no flags, results are sorted by number of comments (descending) and no title filter is applied.
+With no crawl options, the command returns the first 30 available entries without filtering or ranking. With only a title-word rule, matching entries retain their source order. With only a ranking option, all retrieved entries are ranked by the selected metric. When both are specified, filtering happens before ranking.
 
 **Title word rules**
 
@@ -245,6 +239,8 @@ hn-crawler crawl [options]
 | ------ | -------------------------------- | -------------------- |
 | `gt:N` | more than N words                | `--title-words gt:5` |
 | `le:N` | N words or fewer                 | `--title-words le:4` |
+
+`N` must be an integer from 1 through 10,000.
 
 **Output fields**
 
@@ -263,6 +259,8 @@ hn-crawler crawl --top-points
 hn-crawler crawl --title-words gt:5 --top-comments
 hn-crawler crawl --title-words le:4
 ```
+
+The crawl usage record describes selected operations as `sort:number_of_comments:desc`, `sort:number_of_points:desc`, or `filter:title_words:<rule>`. When neither filtering nor ranking is selected, it records `none`.
 
 Real output of the last command:
 
@@ -311,12 +309,12 @@ hn-crawler usage
 
 **Output columns**
 
-| Column                  | Description                                                                           |
-| ----------------------- | ------------------------------------------------------------------------------------- |
-| `ID`                    | Unique identifier of the request                                                      |
-| `Request Date and Time` | When the request was made, as a local date and time, e.g. `2026-11-18 19:32:56 (CET)` |
-| `Applied Filters`       | Comma-separated filters, e.g. `sort:number_of_points:desc,sort:title_words:le:5`      |
-| `Duration (ms)`         | How long the request took                                                             |
+| Column                  | Description                                                                                                                      |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `ID`                    | Unique identifier of the request                                                                                                 |
+| `Request Date and Time` | When the request was made, as a local date and time, e.g. `2026-11-18 19:32:56 (CET)`                                            |
+| `Applied Filters`       | Selected operations, e.g. `sort:number_of_points:desc,filter:title_words:le:5`; `none` when no filtering or ranking was selected |
+| `Duration (ms)`         | How long the request took                                                                                                        |
 
 ---
 
