@@ -31,6 +31,19 @@ describe('SqliteUsageRepository', () => {
     );
   const first = makeUsage('ab', 100);
   const second = makeUsage('ac', 100);
+  const noFilters = AppliedFilters.builder().build();
+  const noFilterUsage = new Usage(
+    '018f0f4b-7b7c-7abc-8def-0123456789ad',
+    101,
+    noFilters,
+    10
+  );
+  const titleFilterUsage = new Usage(
+    '018f0f4b-7b7c-7abc-8def-0123456789ae',
+    102,
+    AppliedFilters.builder().titleWords({ operator: 'le', value: 5 }).build(),
+    11
+  );
 
   function createRepository(retentionLimit = 100): SqliteUsageRepository {
     directory ??= mkdtempSync(join(tmpdir(), 'hn-crawler-repository-'));
@@ -50,6 +63,12 @@ describe('SqliteUsageRepository', () => {
       should: 'return rows in insertion order when timestamps are equal',
       records: [first, second],
       expected: [first, second],
+    },
+    {
+      should:
+        'restore none and filter-only descriptions without schema changes',
+      records: [noFilterUsage, titleFilterUsage],
+      expected: [noFilterUsage, titleFilterUsage],
     },
   ];
 

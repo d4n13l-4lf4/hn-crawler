@@ -9,6 +9,7 @@ const FILTERS = AppliedFilters.builder()
   .sortBy('comments')
   .titleWords({ operator: 'gt', value: 5 })
   .build();
+const NO_FILTERS = AppliedFilters.builder().build();
 
 const ORIGINAL_TIME_ZONE = process.env.TZ;
 
@@ -55,13 +56,20 @@ describe('Usage command unit test', () => {
           AppliedFilters.builder().sortBy('points').build(),
           10
         ),
+        makeUsage(
+          '018f0f4b-7b7c-7abc-8def-0123456789ad',
+          123123125,
+          NO_FILTERS,
+          8
+        ),
       ],
       expectedOutput: [
         'Usage data',
-        'ID                                   | Request Date and Time     | Applied Filters                                    | Duration (ms)',
-        '-------------------------------------|---------------------------|----------------------------------------------------|--------------',
-        `${UUID} | 1970-01-02 10:12:03 (UTC) | sort:number_of_comments:desc,sort:title_words:gt:5 |           122`,
-        '018f0f4b-7b7c-7abc-8def-0123456789ac | 1970-01-02 10:12:03 (UTC) | sort:number_of_points:desc                         |            10',
+        'ID                                   | Request Date and Time     | Applied Filters                                      | Duration (ms)',
+        '-------------------------------------|---------------------------|------------------------------------------------------|--------------',
+        `${UUID} | 1970-01-02 10:12:03 (UTC) | sort:number_of_comments:desc,filter:title_words:gt:5 |           122`,
+        '018f0f4b-7b7c-7abc-8def-0123456789ac | 1970-01-02 10:12:03 (UTC) | sort:number_of_points:desc                           |            10',
+        '018f0f4b-7b7c-7abc-8def-0123456789ad | 1970-01-02 10:12:03 (UTC) | none                                                 |             8',
       ].join('\n'),
     },
   ])(

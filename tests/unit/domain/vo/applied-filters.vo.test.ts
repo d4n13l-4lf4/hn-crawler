@@ -4,7 +4,7 @@ import { AppliedFilters } from '@/domain/vo/applied-filters.vo';
 type AppliedFiltersTestCase = {
   should: string;
   when: string;
-  sortBy: 'comments' | 'points';
+  sortBy?: 'comments' | 'points';
   titleWords?: { operator: 'gt' | 'le'; value: number };
   expected: string;
 };
@@ -24,6 +24,13 @@ describe('AppliedFilters value object unit test', () => {
       expected: 'sort:number_of_points:desc',
     },
     {
+      should:
+        'map comment ranking to its stable label through optional choices',
+      when: 'comments are provided to the optional choices factory',
+      sortBy: 'comments',
+      expected: 'sort:number_of_comments:desc',
+    },
+    {
       should: 'omit a title label',
       when: 'no title filter is applied',
       sortBy: 'points',
@@ -34,22 +41,32 @@ describe('AppliedFilters value object unit test', () => {
       when: 'a gt title rule is applied',
       sortBy: 'comments',
       titleWords: { operator: 'gt', value: 5 },
-      expected: 'sort:number_of_comments:desc,sort:title_words:gt:5',
+      expected: 'sort:number_of_comments:desc,filter:title_words:gt:5',
     },
     {
       should: 'append a less-than-or-equal title rule after sorting',
       when: 'a le title rule is applied',
       sortBy: 'points',
       titleWords: { operator: 'le', value: 5 },
-      expected: 'sort:number_of_points:desc,sort:title_words:le:5',
+      expected: 'sort:number_of_points:desc,filter:title_words:le:5',
+    },
+    {
+      should: 'represent the absence of selected operations',
+      when: 'neither ranking nor title filtering is applied',
+      expected: 'none',
+    },
+    {
+      should: 'describe a title rule without adding a ranking label',
+      when: 'only title filtering is applied',
+      titleWords: { operator: 'le', value: 5 },
+      expected: 'filter:title_words:le:5',
     },
   ];
 
   it.each(testCases)('should $should when $when', (testCase) => {
-    const filters = AppliedFilters.builder()
-      .sortBy(testCase.sortBy)
-      .titleWords(testCase.titleWords)
-      .build();
+    const builder = AppliedFilters.builder();
+    if (testCase.sortBy) builder.sortBy(testCase.sortBy);
+    const filters = builder.titleWords(testCase.titleWords).build();
 
     expect(filters.toString()).toBe(testCase.expected);
   });
@@ -60,12 +77,6 @@ describe('AppliedFilters value object unit test', () => {
 
     expect(AppliedFilters.fromString(persistedFilters).toString()).toBe(
       persistedFilters
-    );
-  });
-
-  it('should require a sort choice when building applied filters', () => {
-    expect(() => AppliedFilters.builder().build()).toThrow(
-      'An applied sort is required.'
     );
   });
 });

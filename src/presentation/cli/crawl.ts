@@ -45,7 +45,11 @@ export function createCrawlCommand(
         const titleWords = parseTitleWords(options.titleWords);
         const entries = await crawler.execute({
           url: options.url ?? config.newsCombinatorUrl,
-          sortBy: options.topPoints ? 'points' : 'comments',
+          sortBy: options.topPoints
+            ? 'points'
+            : options.topComments
+              ? 'comments'
+              : undefined,
           titleWords,
         });
         console.log(
@@ -78,7 +82,7 @@ export function createCrawlCommand(
 class CliArgumentError extends Error {}
 
 function parseTitleWords(value?: string): TitleWordRule | undefined {
-  if (value === undefined) return { operator: 'gt', value: 5 };
+  if (value === undefined) return undefined;
 
   const match = /^(gt|le):(\d+)$/.exec(value);
   if (!match) {
