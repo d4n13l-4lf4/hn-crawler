@@ -18,16 +18,17 @@
 ### Conventions
 
 - Unit tests are table-driven and titled with the `it should ...` syntax.
-- Ports are faked in use-case tests. Network access is never used: the parser and adapters run against the static HTML in `tests/fixtures`.
-- Acceptance tests point the CLI at a fixture page served locally through the scrape subcommand's URL parameter, so results are deterministic and independent of the live site.
+- Ports are faked in use-case tests. Parser and adapter unit tests use the static HTML resource in `tests/resources/hacker-news.html`; tests do not need to access the live site.
+- Acceptance tests use the externally configured `HN_CRAWLER_ACCEPTANCE_URL` and the beta-only `--url` option. The URL must provide a deterministic page; the test steps do not start a local fixture server.
+- Acceptance tests require `HN_CRAWLER_ACCEPTANCE_URL` and `HN_CRAWLER_BETA=true`. Usage scenarios use a temporary database path through `HN_CRAWLER_DB_PATH`. In CI, acceptance runs after successful beta publication against the installed beta package.
 
 ## Coverage
 
-100% (Vitest coverage v8) across unit tests, excluding the composition root (`src/presentation/main.ts`).
+Vitest uses the V8 coverage provider and enforces 100% per-file and aggregate coverage for statements, branches, functions, and lines. Coverage excludes `src/presentation/main.ts`, declaration files, port files, and `*.type.ts` files.
 
 ## Quality gates
 
-Every gate must pass before a commit (pre-commit hook) and before a PR can merge (`ci` workflow).
+The pre-commit hook runs `npm run quality`. Acceptance tests run separately and are not part of that hook or the aggregate quality script. The CI workflow runs `npm run quality` for pull requests.
 
 | #   | Gate                      | Tool                             |
 | --- | ------------------------- | -------------------------------- |
@@ -38,4 +39,8 @@ Every gate must pass before a commit (pre-commit hook) and before a PR can merge
 
 ## Local commands
 
-`package.json` exposes one script per gate (`format:check`, `lint`, `typecheck`, `test:coverage`), one for acceptance tests (`test:acceptance`) and one aggregate (`quality`) that runs all gates.
+- `npm run test:unit` — run unit tests without coverage.
+- `npm run test:coverage` — run unit tests with coverage thresholds.
+- `npm run test:acceptance` — run Cucumber against the configured acceptance URL.
+- `npm run test:acceptance:local` — build and install the local package, then run acceptance tests.
+- `npm run quality` — run formatting, format check, lint, typecheck, and unit tests with coverage.
