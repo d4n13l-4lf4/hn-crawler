@@ -88,6 +88,10 @@ This requirement has no acceptance scenario, as requested. It is covered by func
 - **FR-010**: Ranking, when explicitly requested, MUST reorder only the retrieved first 30 entries in descending order by the selected metric and MUST return no more than 30 entries.
 - **FR-011**: When a ranking option is supplied without a title-word filter, the command MUST rank all retrieved entries without applying a title-word filter.
 - **FR-012**: When a title-word filter is supplied without a ranking option, the command MUST preserve the source order of matching entries.
+- **FR-009**: Usage descriptions MUST continue to identify selected ranking with the existing `sort:<metric>:desc` label, while title-word rules use the `filter:title_words:<comparator>:<limit>` label; a crawl with neither selection MUST use `none`.
+- **FR-010**: Ranking, when explicitly requested, MUST reorder only the retrieved first 30 entries in descending order by the selected metric and MUST return no more than 30 entries.
+- **FR-011**: When a ranking option is supplied without a title-word filter, the command MUST rank all retrieved entries without applying a title-word filter.
+- **FR-012**: When a title-word filter is supplied without a ranking option, the command MUST preserve the source order of matching entries.
 
 ### Key Entities
 

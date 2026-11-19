@@ -4,161 +4,114 @@
 
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/cli-command.md, quickstart.md
 
-**Testing**: TDD is required. Acceptance scenarios and step definitions are refactored first and may fail against the current implementation by design; do not run them. Unit tests are table-driven and use `it should when` wording. Run focused unit tests and applicable non-acceptance quality gates for each implementation milestone. The user runs acceptance manually after all milestones. No acceptance scenario is added for version display.
+**Testing**: Test-first unit work is required. Unit cases are table-driven and use `it should when` wording. Acceptance scenarios and steps are already refactored, may fail against current production code, and must not be run by the agent. Each implementation milestone ends with a passing `npm run quality` gate before user review. The user runs acceptance manually after implementation. No acceptance scenario is added for version reporting.
 
-**Organization**: Tasks are grouped by user story and ordered by the requested incremental review milestones. Pause for user review after each milestone before proceeding.
+**Organization**: Tasks are ordered by review milestone. Stop for user review after each completed milestone and do not proceed until the user confirms.
 
 ## Format: `[ID] [P?] [Story] Description`
 
-- `[P]` marks tasks that can be completed in parallel without editing the same files or depending on incomplete tasks.
-- `[US#]` maps a task to its user story.
-- Every task names the relevant file path.
+- `[P]` marks work that can proceed in parallel without file conflicts or incomplete prerequisites.
+- `[US#]` identifies the user story.
+- Every task names concrete project paths.
 
-## Phase 1: Acceptance Scenarios and Step Definitions (Review Milestone 1)
+## Phase 1: Acceptance Refactor (Completed Review Milestone 1)
 
-**Purpose**: Refactor black-box acceptance coverage first. These checks are expected to fail against current production behavior; do not run them in this milestone.
+**Purpose**: Define the new black-box behavior before production changes. These acceptance checks may fail until implementation is complete and were intentionally not run.
 
-- [X] T001 [US1] Replace the old no-option default-filter scenario with scenarios asserting source-order output, up-to-30 behavior, fewer-than-30 behavior, and usage marker `none` in `tests/acceptance/features/crawl.feature` and `tests/acceptance/features/usage.feature`
-- [X] T002 [US1] Add acceptance scenarios for filter-only source-order output and ranking-only output in `tests/acceptance/features/crawl.feature`
-- [X] T003 [US2] Update acceptance expectations for title-word usage descriptions to `filter:title_words:<comparator>:<limit>` while retaining `sort:<metric>:desc` for explicit ranking in `tests/acceptance/features/usage.feature`
-- [X] T004 [US1] Add or adapt acceptance step definitions to capture no-option crawl output and assert source-order preservation in `tests/acceptance/steps/crawl.steps.ts`
-- [X] T005 [US1] Add or adapt acceptance steps to share a temporary database between crawl and usage checks and assert `none` in `tests/acceptance/steps/usage.steps.ts`
+- [x] T001 [US1] Replace the old no-option default-filter scenario with source-order, first-30, fewer-than-30, and `none` usage expectations in `tests/acceptance/features/crawl.feature` and `tests/acceptance/features/usage.feature`
+- [x] T002 [US1] Add acceptance scenarios for filter-only source-order output and ranking-only behavior in `tests/acceptance/features/crawl.feature`
+- [x] T003 [US2] Update applied-filter expectations to use `filter:title_words:<comparator>:<limit>` while retaining selected ranking `sort:` labels in `tests/acceptance/features/usage.feature`
+- [x] T004 [US1] Add steps for asserting source-order crawl output in `tests/acceptance/steps/crawl.steps.ts`
+- [x] T005 [US1] Add steps for checking persisted `none` and revised filter descriptions in `tests/acceptance/steps/usage.steps.ts`
 
-**Checkpoint**: Review the edited acceptance features and steps. Do not run Cucumber; expected failures against current behavior are intentional.
+**Checkpoint**: Complete. Acceptance edits are in the worktree; Cucumber remains unrun.
 
-## Phase 2: User Story 1 - No-Option Crawl Preserves Source Order (Priority: P1)
+## Phase 2: User Stories 1 and 2 - Complete Crawl and Usage Vertical Slice (Remaining Review Milestone 2)
 
-**Goal**: A crawl without filter or ranking options returns up to the first 30 entries unchanged and records `none`.
+**Goal**: Implement no-option and partial-option crawl semantics together with truthful usage recording and display. This whole phase is one reviewable, green increment; do not split its dependent behavior into separate reviews.
 
-**Independent Test**: Unit tests prove no-option requests pass the first 30 entries through unchanged and usage mapping produces `none`; manual acceptance later verifies output and persisted usage.
-
-### Tests First
-
-- [ ] T006 [US1] Add table-driven `it should when` cases for no-option request normalization and explicit option combinations in `tests/unit/presentation/cli/crawl.test.ts`
-- [ ] T007 [US1] Add table-driven `it should when` cases for no-operation, filter-only, ranking-only, and combined pipeline behavior in `tests/unit/application/pipeline/factory/factory.test.ts`
-- [ ] T008 [US1] Add table-driven `it should when` cases proving first-30 source selection and passthrough when no operation is selected in `tests/unit/application/usecases/crawler.usecase.test.ts`
-
-### Implementation
-
-- [ ] T009 [US1] Make `sortBy` optional in `CrawlRequest` and `PipelineFactory` configuration in `src/application/ports/in/crawler.port.ts`
-- [ ] T010 [US1] Update crawl option normalization to omit absent filter and ranking choices in `src/presentation/cli/crawl.ts`
-- [ ] T011 [US1] Compose only selected operations and pass entries through in source order when none are selected in `src/application/pipeline/factory/factory.ts`
-- [ ] T012 [US1] Ensure the use case applies the updated optional pipeline configuration while limiting source retrieval to the first 30 entries in `src/application/usecases/crawler.usecase.ts`
-- [ ] T013 [US1] Run the focused crawl command, pipeline factory, and crawler use-case unit tests; resolve failures before presenting the milestone
-
-**Checkpoint**: Present the P1 behavior and tests for review with focused unit tests green.
-
-## Phase 3: User Story 2 - Accurate Applied-Filter Usage (Priority: P2)
-
-**Goal**: Usage displays `none` without operations, keeps existing sort labels for selected ranking, and uses `filter:` for title rules.
-
-**Independent Test**: Unit tests verify descriptions for none, sort-only, filter-only, and combined choices; persistence tests verify strings round-trip unchanged. Manual acceptance later checks displayed usage.
+**Independent Test**: Unit tests cover no operations, filter-only, ranking-only, and combined behavior; verify usage strings, table display, and SQLite round-trip. `npm run quality` passes. Acceptance is reserved for user-run final validation.
 
 ### Tests First
 
-- [ ] T014 [US2] Add table-driven `it should when` mapping cases for none, ranking-only, filter-only, and combined usage descriptions in `tests/unit/application/mappers/applied-filters.mapper.test.ts`
-- [ ] T015 [US2] Add table-driven `it should when` value-object cases for the `none`, `sort:`, and `filter:` descriptions in `tests/unit/domain/vo/applied-filters.vo.test.ts`
-- [ ] T016 [US2] Add or adjust SQLite repository cases for round-tripping `none` and revised filter labels in `tests/unit/infrastructure/persistence/sqlite/repositories/usage.repository.test.ts`
+- [x] T006 [P] [US1] Update `tests/unit/application/usecases/crawler.usecase.test.ts` with table-driven `it should when` cases for the bounded first-30 candidate set and unchanged source input when no operations are selected
+- [x] T007 [P] [US1] Update `tests/unit/application/pipeline/factory/factory.test.ts` with table-driven `it should when` cases for passthrough, filter-only source order, ranking-only, and filter-then-ranking behavior
+- [x] T008 [P] [US1] Update `tests/unit/presentation/cli/crawl.test.ts` with table-driven `it should when` cases for omitted options, filter-only, ranking-only, and combined option normalization
+- [x] T009 [P] [US2] Update `tests/unit/domain/vo/applied-filters.vo.test.ts` with table-driven `it should when` cases for `none`, ranking labels, filter labels, and combined labels
+- [x] T010 [P] [US2] Update `tests/unit/application/mappers/applied-filters.mapper.test.ts` with table-driven `it should when` cases mapping all optional request combinations
+- [x] T011 [P] [US2] Update tracked-crawler and SQLite repository unit cases for truthful request mapping and persisted strings in `tests/unit/application/usecases/decorators/tracked-crawler.usecase.test.ts` and `tests/unit/infrastructure/persistence/sqlite/repositories/usage.repository.test.ts`
+- [x] T012 [US2] Verify usage display presents `none` and revised descriptions unchanged in `tests/unit/presentation/cli/usage.test.ts`
 
 ### Implementation
 
-- [ ] T017 [US2] Update `AppliedFilters` to allow no operations, emit `none`, retain ranking `sort:` labels, and use `filter:title_words:` for title rules in `src/domain/vo/applied-filters.vo.ts`
-- [ ] T018 [US2] Map optional request choices to the applied-filter value in `src/application/mappers/applied-filters.mapper.ts`
-- [ ] T019 [US2] Ensure tracked crawl usage is built from the request choices without inserting implicit defaults in `src/application/usecases/decorators/tracked-crawler.usecase.ts`
-- [ ] T020 [US2] Run focused applied-filter mapper, value-object, tracked-crawler, usage CLI, and SQLite repository unit tests; resolve failures before presenting the milestone
+- [x] T013 [US1] Make ranking optional in `CrawlRequest` and `PipelineFactory` contracts in `src/application/ports/in/crawler.port.ts`
+- [x] T014 [US1] Normalize only explicitly supplied ranking and title-word flags in `src/presentation/cli/crawl.ts`
+- [x] T015 [US1] Compose only selected filter/ranking steps and preserve source order when ranking is absent in `src/application/pipeline/factory/factory.ts`
+- [x] T016 [US1] Pass the selected optional choices through the bounded crawl use case in `src/application/usecases/crawler.usecase.ts`
+- [x] T017 [US2] Allow absent ranking/filter choices and format `none`, ranking `sort:` labels, and title `filter:` labels in `src/domain/vo/applied-filters.vo.ts`
+- [x] T018 [US2] Map optional request choices to applied usage descriptions in `src/application/mappers/applied-filters.mapper.ts`
+- [x] T019 [US2] Ensure usage tracking records the actual request without injecting defaults in `src/application/usecases/decorators/tracked-crawler.usecase.ts`
+- [x] T020 [US2] Confirm SQLite persists and restores the applied description as text without a schema migration in `src/infrastructure/persistence/sqlite/repositories/usage.repository.ts`
+- [x] T021 [US1] Remove obsolete expectations for implicit `gt:5`/comments defaults from the affected crawl command and pipeline unit tests in `tests/unit/presentation/cli/crawl.test.ts` and `tests/unit/application/pipeline/factory/factory.test.ts`
+- [x] T022 [US1] Run focused crawl, pipeline, tracked-usage, mapper, value-object, usage-display, and SQLite repository unit tests in `tests/unit/`; fix all failures within the vertical slice
+- [x] T023 [US1] Run `npm run quality` and resolve all failures before presenting the milestone
 
-**Checkpoint**: Present usage values and persistence behavior for review with focused unit tests green.
+**Checkpoint**: The no-option/partial-option crawl behavior and matching usage behavior work together; the complete quality gate passes. Present for review only after T023 passes.
 
-## Phase 4: User Story 3 - CLI Displays Package Version (Priority: P3)
+## Phase 3: User Story 3 - Dynamic Package Version (Remaining Review Milestone 3)
 
-**Goal**: The CLI version output follows the package metadata without a separately maintained literal.
+**Goal**: The CLI version comes from package metadata and has unit coverage only.
 
-**Independent Test**: Unit tests verify the version registered by `createCli` matches the package version; no acceptance scenario is added.
+**Independent Test**: `tests/unit/presentation/cli/cli.test.ts` verifies the CLI version matches the current package metadata; no acceptance scenario is added. `npm run quality` passes.
 
 ### Tests First
 
-- [ ] T021 [US3] Replace the fixed-version assertion with table-driven `it should when` coverage tied to package metadata in `tests/unit/presentation/cli/cli.test.ts`
+- [ ] T024 [US3] Replace the fixed-version expectation with table-driven `it should when` coverage tied to package metadata in `tests/unit/presentation/cli/cli.test.ts`
 
 ### Implementation
 
-- [ ] T022 [US3] Source the Commander version from package metadata in `src/presentation/cli/cli.ts` without adding a duplicate version constant
-- [ ] T023 [US3] Run focused CLI unit tests and confirm version behavior has no acceptance scenario
+- [ ] T025 [US3] Register the package metadata version in Commander without a duplicate literal in `src/presentation/cli/cli.ts`
+- [ ] T026 [US3] Run focused CLI unit tests, then run `npm run quality`; present the milestone only when the aggregate gate passes
 
-**Checkpoint**: Present the package-version change for review with focused unit tests green.
+**Checkpoint**: Dynamic version display is independently reviewable and all quality gates pass.
 
-## Phase 5: Integration and Quality Gates
+## Phase 4: User-Run Manual Acceptance
 
-**Purpose**: Remove obsolete assumptions, confirm full unit coverage, and prepare the user-run acceptance suite.
+**Purpose**: User executes the refactored acceptance suite after approving implementation milestones.
 
-- [ ] T024 [P] Remove superseded default-filter/default-ranking expectations from affected unit tests and descriptions in `tests/unit/presentation/cli/crawl.test.ts`, `tests/unit/application/pipeline/factory/factory.test.ts`, and `tests/unit/application/mappers/applied-filters.mapper.test.ts`
-- [ ] T025 [P] Confirm the usage table displays `AppliedFilters.toString()` output unchanged for `none` and revised labels in `tests/unit/presentation/cli/usage.test.ts`
-- [ ] T026 Run full unit coverage, formatting check, lint, and typecheck using the scripts documented in `docs/QA.md`; resolve all failures before final review
-- [ ] T027 Review `specs/008-cli-usage-filter-defaults/quickstart.md` against the completed code and update it if manual acceptance setup or expected results changed
-- [ ] T028 Present the final implementation milestone and remind the user that acceptance scenarios are intentionally unrun and ready for their manual execution
-
-**Checkpoint**: All non-acceptance quality gates pass; user reviews before manually running acceptance.
-
-## Phase 6: User-Run Manual Acceptance
-
-**Purpose**: The user executes the intentionally refactored acceptance suite after approving all implementation milestones.
-
-- [ ] T029 [US1] User runs the acceptance suite against the configured deterministic page using the instructions in `specs/008-cli-usage-filter-defaults/quickstart.md`
-- [ ] T030 [US1] Review any user-reported acceptance failures and create a follow-up implementation milestone in the relevant `tests/acceptance/` and `src/` files
+- [ ] T027 [US1] User runs acceptance using the configured deterministic page and instructions in `specs/008-cli-usage-filter-defaults/quickstart.md`
+- [ ] T028 [US1] Address user-reported acceptance failures in a focused follow-up change and leave `npm run quality` passing in affected `tests/acceptance/`, `src/`, and `tests/unit/` files
 
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
 
-- **Phase 1**: First; edits acceptance expectations and steps only, and intentionally may leave those checks failing against current production behavior.
-- **Phase 2 (US1)**: Begins after user review of Phase 1; implements crawl request and pipeline semantics.
-- **Phase 3 (US2)**: Depends on Phase 2 request semantics; makes applied-filter descriptions and persistence consistent with actual choices.
-- **Phase 4 (US3)**: Independent in code but scheduled after US1 and US2 to preserve the requested small review cadence.
-- **Phase 5**: Depends on Phases 2–4.
-- **Phase 6**: User-run only after implementation review and Phase 5.
+- **Phase 1** is complete. Its acceptance checks remain unrun by the agent.
+- **Phase 2** is the next implementation milestone. Tests are added first; crawl and usage changes are implemented as one vertical slice because the crawl request and truthful usage record share optional choices. The phase is not review-ready until `npm run quality` passes.
+- **Phase 3** starts only after approval of Phase 2 and is isolated to package version presentation and its unit coverage.
+- **Phase 4** occurs after approval of Phases 2 and 3; acceptance execution belongs to the user.
 
 ### User Story Dependencies
 
-- **US1 (P1)**: Acceptance edits first, then crawl option, use-case, and pipeline updates.
-- **US2 (P2)**: Depends on US1's optional request semantics so usage maps actual selected operations.
-- **US3 (P3)**: Independent of crawl and usage behavior, but kept as its own review milestone.
+- **US1 (P1)** and **US2 (P2)** are coupled in Phase 2: `none` is only truthful when crawl normalization, pipeline execution, usage mapping, persistence, and display agree.
+- **US3 (P3)** is independent and scheduled as its own later review milestone.
 
 ### Parallel Opportunities
 
-- T001 and T002 concern the same feature file and should be done together despite separate requirement traceability.
-- T004 and T005 touch separate step files and can be parallelized after the feature grammar in T001–T003 is agreed.
-- T006–T008 touch separate unit files and can be authored in parallel before implementation, then run together.
-- T014–T016 touch separate unit files and can be authored in parallel before the domain implementation.
-- T021 can be prepared independently but should remain in its own review milestone.
-- T024 and T025 touch separate test files and can be done in parallel before final gates.
-
-## Parallel Example: User Story 1
-
-```text
-Task: T006 update tests/unit/presentation/cli/crawl.test.ts
-Task: T007 update tests/unit/application/pipeline/factory/factory.test.ts
-Task: T008 update tests/unit/application/usecases/crawler.usecase.test.ts
-```
-
-The acceptance tasks T001–T005 must precede implementation and the acceptance suite remains unrun until the user reaches Phase 6.
+- T006–T011 touch different unit files and can be authored in parallel before production changes, subject to the user’s single-milestone review boundary.
+- T013–T020 are dependent implementation changes and should be performed sequentially where types or behavior flow between layers.
+- T024 and T025 are sequential TDD steps in one file and must remain ordered.
 
 ## Implementation Strategy
 
-### MVP First
-
-The P1 no-option crawl is the first functional milestone after acceptance artifacts are reviewed. Keep its unit suite green before moving on to usage formatting and package version work.
-
-### Incremental Delivery
-
-1. Refactor acceptance scenarios/steps and stop for review; expected mismatch with current code is intentional.
-2. Implement no-option crawl behavior test-first; run unit tests and stop for review.
-3. Implement usage descriptions and persistence round-trip test-first; run unit tests and stop for review.
-4. Implement dynamic package version test-first; run unit tests and stop for review.
-5. Run full non-acceptance quality gates and present final implementation for review.
-6. User manually runs acceptance after approving implementation.
+1. Acceptance refactor is already complete and intentionally unrun.
+2. Complete the crawl and usage vertical slice with tests first, then implementation; run `npm run quality` and stop for review only when green.
+3. After approval, implement dynamic package version with unit coverage and run `npm run quality`; stop for review only when green.
+4. After approval, the user manually runs acceptance. Keep Cucumber unexecuted by the agent.
 
 ## Notes
 
-- Each implementation milestone begins with failing unit tests and ends with the focused unit suite and relevant non-acceptance quality gates green.
-- User approval is required before advancing to the next milestone; do not batch all milestones into one implementation pass.
-- Do not execute Cucumber acceptance tests; the user will run them manually at the end.
-- The version requirement has unit coverage only and no acceptance scenario.
+- Never stop at a type-incompatible intermediate API change. Complete the dependent usage mapping/value-object changes in the same milestone.
+- A review milestone must add user-visible functionality or complete an independently useful maintenance change and must pass `npm run quality`.
+- The acceptance suite may be behavior-red until the user runs it after implementation; this is intentional and distinct from the required green unit/quality gate.
+- No schema change or new production abstraction is planned.

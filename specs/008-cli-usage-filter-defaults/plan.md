@@ -6,41 +6,41 @@
 
 ## Summary
 
-Update crawl option handling so a no-option crawl returns the first 30 entries in source order, while explicitly supplied title filtering and ranking are applied independently. Usage records will represent no operations as `none`, retain the existing `sort:` ranking labels, and use `filter:title_words:<comparator>:<limit>` for title rules. The CLI version will be read from package metadata rather than a fixed literal. Implementation proceeds in user-reviewed milestones: acceptance definitions first (not executed until the end), then unit tests from the crawl use case through pipeline, usage mapping/domain, presentation, and persistence, followed by implementation changes that restore green unit/quality gates. Unit cases use table-driven `it should when` wording. The version requirement has no acceptance scenario.
+The acceptance scenarios and step definitions for the new behavior are already refactored. Remaining implementation is divided into two green milestones. First, deliver complete crawl option behavior and matching usage recording/display together: no options preserves first-30 source order and records `none`; filter-only preserves source order; ranking-only ranks all retrieved entries; combined applies filter then ranking; applied descriptions use `sort:` for ranking and `filter:` for title rules. This vertical slice includes CLI normalization, application pipeline/request, usage value mapping, and SQLite round-trip if needed so the aggregate quality gate passes before review. Second, source the CLI version from package metadata and verify it with unit tests only. The user runs acceptance manually after implementation review; do not run Cucumber. Unit tests are test-first, table-driven, and use `it should when` wording.
 
 ## Technical Context
 
-**Language/Version**: TypeScript, strict mode; Node 26 LTS
+**Language/Version**: TypeScript strict mode; Node 26 LTS
 
-**Primary Dependencies**: Commander; existing project dependencies only
+**Primary Dependencies**: Commander and existing project dependencies only
 
-**Storage**: Existing SQLite usage store; no schema change expected because applied filters are already stored as text
+**Storage**: Existing SQLite usage store; applied descriptions remain text, so no schema change is expected
 
-**Testing**: Vitest unit tests with 100% coverage; Cucumber acceptance scenarios edited first and run manually by the user at the end
+**Testing**: Vitest unit tests with 100% coverage; Cucumber acceptance was refactored in milestone 1 and is intentionally not run by the agent
 
 **Target Platform**: Node.js CLI
 
 **Project Type**: Standalone CLI
 
-**Performance Goals**: Process at most the first 30 retrieved entries with existing pipeline behavior
+**Performance Goals**: Retrieve no more than the first 30 entries; process only that bounded candidate set
 
-**Constraints**: Preserve hexagonal dependency rule; acceptance scenarios and steps are refactored first and may fail against the current implementation by design; do not run acceptance until the user runs it after implementation; no acceptance scenario for version behavior; implementation milestones leave unit tests, formatting, lint, and type checking green before proceeding
+**Constraints**: Respect hexagonal dependency direction; every implementation review milestone must finish with `npm run quality` passing; acceptance is run manually by the user after implementation; version has no acceptance scenario
 
-**Scale/Scope**: Crawl, usage description, package version reporting; no new storage fields, dependencies, or architecture layers
+**Scale/Scope**: Crawl operation selection, usage description persistence/display, and package version reporting; no new dependencies, layers, or usage schema fields
 
 ## Constitution Check
 
-- **Hexagonal architecture**: Pass. CLI option normalization stays in presentation, pipeline behavior stays in application, usage value representation stays in domain, and SQLite remains an infrastructure adapter.
-- **Test-first development**: Pass with staged test work. Acceptance scenarios and steps are authored/refactored first; they are expected to fail against current behavior and are intentionally not run until final manual verification. Unit tests are then added table-first, failing before implementation within each implementation milestone; implementation milestones leave the unit suite and non-acceptance quality gates green.
-- **Pipes and filters**: Pass. Optional filter and ranking steps remain composable; no-option and filter-only paths preserve source order by omitting the ranking operator.
-- **Simplicity / YAGNI**: Pass. No new layers or dependencies; the existing applied-filter string representation remains persisted as text.
-- **Deterministic domain rules**: Pass after updating the specification to state independent filter/ranking options, source-order preservation where ranking is absent, and first-30 candidate behavior.
+- **Hexagonal architecture**: Pass. CLI parsing remains presentation, the use case and pipeline remain application, applied-filter value semantics remain domain, and SQLite remains infrastructure.
+- **Test-first development**: Pass. For each implementation milestone, add/adjust unit tests first, confirm the relevant new tests fail, implement behavior, then run `npm run quality` before review. Acceptance files were authored first and intentionally not run; user execution remains deferred to the end.
+- **Pipes and filters**: Pass. Apply only selected filter and ranking operators; absent operations preserve source order.
+- **Simplicity / YAGNI**: Pass. Keep existing adapters and text storage; do not add abstractions, dependencies, or schema migrations without evidence they are needed.
+- **Deterministic domain rules**: Pass. The spec defines source order, ranking ties, missing metric behavior, and the first-30 candidate set.
 
 No constitution violations identified.
 
 ## Project Structure
 
-### Documentation (this feature)
+### Documentation
 
 ```text
 specs/008-cli-usage-filter-defaults/
@@ -48,9 +48,8 @@ specs/008-cli-usage-filter-defaults/
 ├── research.md
 ├── data-model.md
 ├── quickstart.md
-├── contracts/
-│   └── cli-command.md
-└── tasks.md              # Generated by $speckit-tasks
+├── contracts/cli-command.md
+└── tasks.md
 ```
 
 ### Source Code
@@ -70,25 +69,29 @@ src/
 tests/
 ├── acceptance/features/{crawl,usage}.feature
 ├── acceptance/steps/{crawl,usage}.steps.ts
-└── unit/                         # Mirror affected source modules
+└── unit/                         # Mirrors affected source modules
 ```
 
-**Structure Decision**: Extend the current single-project structure and edit only the existing crawl, usage, package-version, and corresponding test files. Acceptance feature/step edits are the first implementation artifact; unit tests are added in dependency order before corresponding production changes.
+**Structure Decision**: Use existing modules. Do not add a new layer or folder. Acceptance changes already exist. Remaining crawl and usage code is one vertical slice because splitting these changes leaves behavior mismatched and causes the quality gate to fail.
 
 ## Incremental Delivery and Review Milestones
 
-Each milestone is a separate user review point. Do not continue into the next milestone until the user approves. Milestone 1 intentionally leaves acceptance scenarios/steps ahead of the implementation; those acceptance checks may fail and are not run by the agent. For each later implementation milestone, add failing unit tests first, implement the smallest behavior slice, then run focused unit tests and relevant non-acceptance quality gates so those gates are green before presenting it. Do not run the Cucumber acceptance suite; the user will run it manually after all implementation milestones. The version correction is verified only through unit tests and is excluded from acceptance scenarios.
+### Completed milestone 1: Acceptance refactor
 
-1. **Acceptance scenarios and step definitions**: Update crawl scenarios for the no-option source-order behavior, filter-only source-order behavior, ranking-only behavior, and revised usage labels; add coverage that usage shows `none` for a no-option crawl and distinguishes `filter:` from `sort:`. Amend acceptance steps as needed. These checks may fail against the current implementation by design. Do not run acceptance tests. Review point after feature and step changes are complete.
-2. **Crawl request and use case**: Add table-driven unit tests using `it should when` wording for optional ranking/filter choices and candidate handling. Update request/port types and use-case tests so first-30 entries pass through unchanged when neither operation is selected. Keep the unit suite green.
-3. **Pipeline behavior**: Add table-driven unit cases for no operation, filter only, ranking only, and combined filter/ranking. Implement optional pipeline steps so filter-only preserves source order and ranking-only sorts all candidates. Keep the unit suite green.
-4. **Applied-filter mapping and domain value**: Add table-driven tests for `none`, sort-only, filter-only, and combined descriptions. Implement optional sort representation and `filter:title_words` labels; preserve stored strings and ensure the usage formatter displays values unchanged. Keep unit coverage green.
-5. **CLI option normalization and dynamic version**: Add table-driven `it should when` unit tests for omitted and explicit options, then normalize options without implicit defaults. Replace fixed version configuration with package metadata version. Unit-test version registration without adding acceptance coverage. Keep unit and quality gates green.
-6. **Persistence/acceptance review**: Add or adjust unit tests for SQLite round-tripping of `none` and revised strings if existing coverage does not already prove it. Remove obsolete code/tests that encode superseded defaults. Run focused and full non-acceptance quality gates. Present the final code milestone for review.
-7. **Manual acceptance run by user**: After all implementation milestones are approved, the user runs the acceptance suite against their configured deterministic URL. Resolve any failures in a subsequent reviewable milestone.
+The crawl/usage acceptance features and step definitions were updated first. They may fail against the current implementation by design. Cucumber was not run. This milestone is complete and recorded in tasks T001–T005.
 
-A milestone can combine trivial edits that cannot sensibly be reviewed alone, but must still leave the codebase green before the review prompt. No schema migration is planned because the stored usage description remains a text value.
+### Remaining milestone 2: Complete crawl and usage behavior together
+
+This milestone must land all interdependent behavior before review. Start with table-driven unit tests and verify the new expectations fail. Implement optional ranking/filter request choices; no-option and filter-only paths preserve source order; ranking-only ranks all first-30 candidates; combined mode filters then ranks. In the same milestone, make usage mapping represent no operations as `none`, preserve existing ranking labels, change title labels to `filter:title_words`, and verify display/persistence. Remove tests and implementation assumptions made obsolete by the changed defaults. Finish by running the full `npm run quality` aggregate gate. Do not present the milestone while any part of that gate fails.
+
+### Remaining milestone 3: Dynamic package version
+
+Add table-driven unit coverage for `createCli` that verifies version output follows the package metadata, then update the CLI version registration to use that metadata. Do not add or run an acceptance scenario for version behavior. Run `npm run quality` and present only when it passes.
+
+### Final user-run acceptance
+
+After both implementation milestones have been reviewed and approved, the user runs the acceptance suite with the configured deterministic URL. The agent does not execute Cucumber. Any user-reported failure becomes a focused follow-up milestone that must leave `npm run quality` green.
 
 ## Complexity Tracking
 
-No constitution exceptions or additional architectural complexity are required.
+No additional architecture or constitution exceptions are required.

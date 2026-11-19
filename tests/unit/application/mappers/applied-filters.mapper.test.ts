@@ -12,14 +12,14 @@ type AppliedFiltersMapperTestCase = {
 describe('AppliedFilters mapper unit test', () => {
   const testCases: AppliedFiltersMapperTestCase[] = [
     {
-      should: 'map default comments ranking and title filter',
-      when: 'the normalized request contains the command defaults',
+      should: 'map comments ranking and title filtering',
+      when: 'the request explicitly selects both operations',
       request: {
         url: 'https://example.test',
         sortBy: 'comments',
         titleWords: { operator: 'gt', value: 5 },
       },
-      expected: 'sort:number_of_comments:desc,sort:title_words:gt:5',
+      expected: 'sort:number_of_comments:desc,filter:title_words:gt:5',
     },
     {
       should: 'map points ranking without a title filter',
@@ -28,14 +28,13 @@ describe('AppliedFilters mapper unit test', () => {
       expected: 'sort:number_of_points:desc',
     },
     {
-      should: 'map a title filter with comments ranking',
-      when: 'the request specifies only a title rule',
+      should: 'map only a title filter',
+      when: 'the request has no ranking choice',
       request: {
         url: 'https://example.test',
-        sortBy: 'comments',
         titleWords: { operator: 'le', value: 5 },
       },
-      expected: 'sort:number_of_comments:desc,sort:title_words:le:5',
+      expected: 'filter:title_words:le:5',
     },
     {
       should: 'preserve an explicit points and title combination',
@@ -45,7 +44,13 @@ describe('AppliedFilters mapper unit test', () => {
         sortBy: 'points',
         titleWords: { operator: 'gt', value: 12 },
       },
-      expected: 'sort:number_of_points:desc,sort:title_words:gt:12',
+      expected: 'sort:number_of_points:desc,filter:title_words:gt:12',
+    },
+    {
+      should: 'map no selected operations to none',
+      when: 'the request includes only its source URL',
+      request: { url: 'https://example.test' },
+      expected: 'none',
     },
   ];
 
