@@ -18,11 +18,11 @@
 
 **Purpose**: Refactor black-box acceptance coverage first. These checks are expected to fail against current production behavior; do not run them in this milestone.
 
-- [ ] T001 [US1] Replace the old no-option default-filter scenario with scenarios asserting source-order output, up-to-30 behavior, fewer-than-30 behavior, and usage marker `none` in `tests/acceptance/features/crawl.feature` and `tests/acceptance/features/usage.feature`
-- [ ] T002 [US1] Add acceptance scenarios for filter-only source-order output and ranking-only output in `tests/acceptance/features/crawl.feature`
-- [ ] T003 [US2] Update acceptance expectations for title-word usage descriptions to `filter:title_words:<comparator>:<limit>` while retaining `sort:<metric>:desc` for explicit ranking in `tests/acceptance/features/usage.feature`
-- [ ] T004 [US1] Add or adapt acceptance step definitions to capture no-option crawl output and assert source-order preservation in `tests/acceptance/steps/crawl.steps.ts`
-- [ ] T005 [US1] Add or adapt acceptance steps to share a temporary database between crawl and usage checks and assert `none` in `tests/acceptance/steps/usage.steps.ts`
+- [X] T001 [US1] Replace the old no-option default-filter scenario with scenarios asserting source-order output, up-to-30 behavior, fewer-than-30 behavior, and usage marker `none` in `tests/acceptance/features/crawl.feature` and `tests/acceptance/features/usage.feature`
+- [X] T002 [US1] Add acceptance scenarios for filter-only source-order output and ranking-only output in `tests/acceptance/features/crawl.feature`
+- [X] T003 [US2] Update acceptance expectations for title-word usage descriptions to `filter:title_words:<comparator>:<limit>` while retaining `sort:<metric>:desc` for explicit ranking in `tests/acceptance/features/usage.feature`
+- [X] T004 [US1] Add or adapt acceptance step definitions to capture no-option crawl output and assert source-order preservation in `tests/acceptance/steps/crawl.steps.ts`
+- [X] T005 [US1] Add or adapt acceptance steps to share a temporary database between crawl and usage checks and assert `none` in `tests/acceptance/steps/usage.steps.ts`
 
 **Checkpoint**: Review the edited acceptance features and steps. Do not run Cucumber; expected failures against current behavior are intentional.
 

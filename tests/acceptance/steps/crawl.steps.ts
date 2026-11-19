@@ -41,6 +41,19 @@ When(
 );
 
 When(
+  'I run the crawl command with title filter {string} and the configured URL in beta mode',
+  function (this: { result?: CommandResult }, filter: string) {
+    this.result = runCli([
+      'crawl',
+      '--url',
+      getAcceptanceUrl(),
+      '--title-words',
+      filter,
+    ]);
+  }
+);
+
+When(
   'I run the crawl command with title filter {string} and ranking {string} using the configured URL in beta mode',
   function (this: { result?: CommandResult }, filter: string, ranking: string) {
     this.result = runCli([
@@ -136,6 +149,33 @@ Then(
   'the crawl output should be ordered by points descending',
   function (this: { result?: CommandResult }) {
     assertDescending(parseOutput(this.result).stdout, 'points');
+  }
+);
+
+Then(
+  'the crawl output should preserve source order',
+  function (this: { result?: CommandResult }) {
+    const entries = parseOutput(this.result).stdout;
+    for (let index = 1; index < entries.length; index += 1) {
+      assert.ok(
+        Number(entries[index - 1].rank) < Number(entries[index].rank),
+        'Expected results to retain increasing Hacker News rank'
+      );
+    }
+  }
+);
+
+Then(
+  'the crawl output should contain all available entries in source order',
+  function (this: { result?: CommandResult }) {
+    const entries = parseOutput(this.result).stdout;
+    assert.ok(entries.length <= 30);
+    for (let index = 1; index < entries.length; index += 1) {
+      assert.ok(
+        Number(entries[index - 1].rank) < Number(entries[index].rank),
+        'Expected all retrieved results to retain increasing Hacker News rank'
+      );
+    }
   }
 );
 

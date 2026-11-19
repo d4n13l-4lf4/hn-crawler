@@ -18,7 +18,7 @@
 - Q: Should a ranking-only crawl return all available first-30 entries ordered by the selected metric, with no title filter? → A: Yes; rank all retrieved entries.
 - Q: For explicit `--title-words` without a ranking flag, should entries stay in page order or use the previous implicit comments ranking? → A: Keep page order; apply only the supplied filter.
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Inspect Unmodified Crawl Results (Priority: P1)
 
@@ -72,7 +72,7 @@ This requirement has no acceptance scenario, as requested. It is covered by func
 - The package version is changed between releases; the version command must reflect the current package metadata without a separate hard-coded version update.
 - Acceptance coverage for applied-filter strings must be refactored to assert the revised `filter` prefix.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -95,7 +95,7 @@ This requirement has no acceptance scenario, as requested. It is covered by func
 - **Title-word filter description**: A human-readable description of the comparator and word-count limit using the `filter:title_words:<comparator>:<limit>` form.
 - **Package version**: The release version declared by the CLI package and shown to the user by the version command.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

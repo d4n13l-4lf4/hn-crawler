@@ -47,6 +47,28 @@ When(
 );
 
 When(
+  'I run the crawl command with title filter {string} and ranking {string} using the configured URL in beta mode with the temporary usage database',
+  function (this: UsageWorld, filter: string, ranking: string) {
+    this.result = runCli(
+      [
+        'crawl',
+        '--url',
+        getAcceptanceUrl(),
+        '--title-words',
+        filter,
+        ranking === 'comments' ? '--top-comments' : '--top-points',
+      ],
+      testDbEnvironment(this)
+    );
+    assert.equal(
+      this.result.status,
+      0,
+      `Expected crawl to succeed; stderr: ${this.result.stderr}`
+    );
+  }
+);
+
+When(
   'I run the usage command using the same temporary usage database',
   function (this: UsageWorld) {
     this.result = runCli(['usage'], testDbEnvironment(this));
@@ -94,8 +116,17 @@ Then(
     assert.match(output, /Request Date and Time/);
     assert.match(output, /Applied Filters/);
     assert.match(output, /Duration \(ms\)/);
-    assert.match(output, /sort:number_of_comments:desc/);
     assertLocalizedTimestamp(output);
+  }
+);
+
+Then(
+  'the applied filter is displayed as {string}',
+  function (this: UsageWorld, expected: string) {
+    assert.ok(
+      (this.result?.stdout ?? '').includes(expected),
+      `Expected usage output to include ${JSON.stringify(expected)}, got ${this.result?.stdout}`
+    );
   }
 );
 
