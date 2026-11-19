@@ -94,7 +94,7 @@ describe('Crawl command unit test', () => {
     async ({ entries, expectedOutput, args = [], expectedRequest }) => {
       const crawler = createCrawler(entries);
       const log = vi.spyOn(console, 'log').mockImplementation(() => {});
-      const command = createCrawlCommand(crawler, true);
+      const command = createCrawlCommand(crawler);
 
       await command.parseAsync(['node', 'hn-crawler', 'crawl', ...args], {
         from: 'user',
@@ -112,7 +112,7 @@ describe('Crawl command unit test', () => {
     const crawler = { execute: vi.fn().mockRejectedValue(failure) };
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
     const previousExitCode = process.exitCode;
-    const command = createCrawlCommand(crawler, true);
+    const command = createCrawlCommand(crawler);
 
     await command.parseAsync(['node', 'hn-crawler', 'crawl'], { from: 'user' });
 
@@ -128,36 +128,9 @@ describe('Crawl command unit test', () => {
     error.mockRestore();
   });
 
-  it.each([
-    { should: 'expose the URL option in beta', beta: true, hasUrl: true },
-    { should: 'omit the URL option in production', beta: false, hasUrl: false },
-  ])('should $should', ({ beta, hasUrl }) => {
-    const command = createCrawlCommand(createCrawler(), beta);
-    expect(command.options.some((option) => option.long === '--url')).toBe(
-      hasUrl
-    );
-  });
-
-  it('should pass the beta URL to the crawler', async () => {
+  it('should pass the configured URL from config', async () => {
     const crawler = createCrawler();
-    const command = createCrawlCommand(crawler, true);
-    vi.spyOn(console, 'log').mockImplementation(() => {});
-
-    await command.parseAsync(
-      ['node', 'hn-crawler', 'crawl', '--url', 'http://127.0.0.1:4321'],
-      { from: 'user' }
-    );
-
-    expect(crawler.execute).toHaveBeenCalledOnce();
-    expect(crawler.execute).toHaveBeenCalledWith({
-      url: 'http://127.0.0.1:4321',
-    });
-    vi.restoreAllMocks();
-  });
-
-  it('should pass the configured URL when the beta URL option is omitted', async () => {
-    const crawler = createCrawler();
-    const command = createCrawlCommand(crawler, true);
+    const command = createCrawlCommand(crawler);
     vi.spyOn(console, 'log').mockImplementation(() => {});
 
     await command.parseAsync(['node', 'hn-crawler', 'crawl'], {
@@ -174,7 +147,7 @@ describe('Crawl command unit test', () => {
   it('should serialize only the primitive value object fields', async () => {
     const crawler = createCrawler([new HNEntry(1, 'My news', 1, 2)]);
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
-    const command = createCrawlCommand(crawler, true);
+    const command = createCrawlCommand(crawler);
 
     await command.parseAsync(['node', 'hn-crawler', 'crawl'], {
       from: 'user',
@@ -228,7 +201,7 @@ describe('Crawl command unit test', () => {
       const crawler = createCrawler();
       const error = vi.spyOn(console, 'error').mockImplementation(() => {});
       const previousExitCode = process.exitCode;
-      const command = createCrawlCommand(crawler, true);
+      const command = createCrawlCommand(crawler);
 
       await command.parseAsync(['node', 'hn-crawler', 'crawl', ...args], {
         from: 'user',

@@ -24,7 +24,7 @@
 
 **Purpose**: Establish a green baseline before any refactoring begins.
 
-- [ ] T001 Establish baseline quality gate: run `npm run quality` (defined in package.json) to confirm the codebase starts in a green state before the refactor
+- [x] T001 Establish baseline quality gate: run `npm run quality` (defined in package.json) to confirm the codebase starts in a green state before the refactor
 
 ---
 
@@ -34,7 +34,7 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T002 [P] Confirm axios and cheerio dependencies are available (axios ^1.21.1 already installed per package.json and node_modules)
+- [x] T002 [P] Confirm axios and cheerio dependencies are available (axios ^1.21.1 already installed per package.json and node_modules)
 
 **Checkpoint**: Foundation ready — user story implementation can now begin
 
@@ -50,26 +50,26 @@
 
 > **NOTE: These acceptance tests are refactored first per user instruction, but NOT run by the agent. The user runs them manually at the end of the whole implementation.**
 
-- [ ] T003 [US1] Refactor tests/acceptance/features/crawl.feature: remove "in beta mode" phrasing and `--url` from all scenario step text; remove the three scenarios whose sole purpose was verifying `--url` ("Beta URL option selects the configured page", "Production help does not expose the URL option", "Production rejects the beta-only URL option"); reframe the invalid-URL scenario to not rely on `--url`
-- [ ] T004 [US1] Refactor tests/acceptance/features/usage.feature: remove "in beta mode" phrasing and `--url` from scenario step text
-- [ ] T005 [US1] Refactor tests/acceptance/steps/crawl.steps.ts: rename `getAcceptanceUrl()` to read `HN_CRAWLER_WEB_PAGE_BASE_URL`; remove `--url` from all `runCli` calls; remove the "production mode" step (`HN_CRAWLER_BETA: ''`); remove beta-mode phrasing from step definitions
-- [ ] T006 [US1] Refactor tests/acceptance/steps/usage.steps.ts: rename `getAcceptanceUrl()` to read `HN_CRAWLER_WEB_PAGE_BASE_URL`; remove `--url` from `runCli` calls; remove `HN_CRAWLER_BETA: 'true'` from `runCli` env; remove beta-mode phrasing from step definitions
+- [x] T003 [US1] Refactor tests/acceptance/features/crawl.feature: remove "in beta mode" phrasing and `--url` from all scenario step text; remove the three scenarios whose sole purpose was verifying `--url` ("Beta URL option selects the configured page", "Production help does not expose the URL option", "Production rejects the beta-only URL option"); reframe the invalid-URL scenario to not rely on `--url`
+- [x] T004 [US1] Refactor tests/acceptance/features/usage.feature: remove "in beta mode" phrasing and `--url` from scenario step text
+- [x] T005 [US1] Refactor tests/acceptance/steps/crawl.steps.ts: rename `getAcceptanceUrl()` to read `HN_CRAWLER_WEB_PAGE_BASE_URL`; remove `--url` from all `runCli` calls; remove the "production mode" step (`HN_CRAWLER_BETA: ''`); remove beta-mode phrasing from step definitions
+- [x] T006 [US1] Refactor tests/acceptance/steps/usage.steps.ts: rename `getAcceptanceUrl()` to read `HN_CRAWLER_WEB_PAGE_BASE_URL`; remove `--url` from `runCli` calls; remove `HN_CRAWLER_BETA: 'true'` from `runCli` env; remove beta-mode phrasing from step definitions
 
 ### Tests for User Story 1 (TDD — write FIRST, confirm they FAIL before implementation)
 
-- [ ] T007 [US1] Write table-driven unit tests first in tests/unit/infrastructure/web/axios.test.ts covering: builder creates axios instance bound to baseURL, timeout applies, server errors (5xx) trigger retries up to maxRetries with retryDelay between attempts, non-server errors (4xx) are not retried (verify they FAIL before implementation)
-- [ ] T008 [US1] Write table-driven unit tests first in tests/unit/infrastructure/web/hn-http.client.test.ts covering: `fetchPage(url)` returns text body for successful request, status errors throw with `HTTP ${status}: ${statusText}`, network errors wrap with cause, constructor receives axios instance as private property (verify they FAIL before implementation)
-- [ ] T009 [US1] Write unit tests first in tests/unit/infrastructure/web/hn-web.adapter.test.ts covering: adapter instantiates HnHttpClient internally, delegates entry iteration to it, `fetchEntries()` takes no URL argument (verify they FAIL before implementation)
+- [x] T007 [US1] Write table-driven unit tests first in tests/unit/infrastructure/web/axios.test.ts covering: builder creates axios instance bound to baseURL, timeout applies, server errors (5xx) trigger retries up to maxRetries with retryDelay between attempts, non-server errors (4xx) are not retried (verify they FAIL before implementation)
+- [x] T008 [US1] Write table-driven unit tests first in tests/unit/infrastructure/web/hn-http.client.test.ts covering: `fetchPage(url)` returns text body for successful request, status errors throw with `HTTP ${status}: ${statusText}`, network errors wrap with cause, constructor receives axios instance as private property (verify they FAIL before implementation)
+- [x] T009 [US1] Write unit tests first in tests/unit/infrastructure/web/hn-web.adapter.test.ts covering: adapter instantiates HnHttpClient internally, delegates entry iteration to it, `fetchEntries()` takes no URL argument (verify they FAIL before implementation)
 
 ### Implementation for User Story 1 (Milestones 1–4)
 
-- [ ] T010 [US1] Add `httpTimeout` (15000ms), `httpMaxRetries` (3), `httpRetryDelay` (3000ms) to src/config/config.ts; `newsCombinatorUrl` resolves to `HN_CRAWLER_WEB_PAGE_BASE_URL` env var or default `https://news.ycombinator.com/`
-- [ ] T011 [US1] Create src/infrastructure/web/axios.ts with builder function `createAxiosHttpClient({ baseURL, timeout, maxRetries, retryDelay })` that configures and returns an axios instance bound to `baseURL` with timeout and server-error-only retry interceptor
-- [ ] T012 [US1] Convert src/infrastructure/web/hn-http.client.ts from `fetchPage(url)` standalone function to `HnHttpClient` class: constructor receives configured axios instance as constructor argument (private property); exposes `fetchPage(url: string): Promise<string>` with same signature/behavior as before (status error → throw, network error → wrap with cause, return text)
-- [ ] T013 [US1] Update src/infrastructure/web/hn-web.adapter.ts to construct/use `HnHttpClient` instead of the `{ fetch }` object; adapter no longer handles page URL (URL bound to axios instance at composition root); `fetchEntries()` takes no URL argument
-- [ ] T014 [US1] Remove `HN_CRAWLER_BETA` feature flag and `--url` option from src/presentation/cli/crawl.ts
-- [ ] T015 [US1] Update src/presentation/main.ts to build axios instance via builder with `baseURL` from `config.newsCombinatorUrl`, create `HnHttpClient`, and inject it into `HnWebAdapter`
-- [ ] T016 [US1] Run `npm run quality` (defined in package.json) — confirm all tests pass and coverage remains 100%
+- [x] T010 [US1] Add `httpTimeout` (15000ms), `httpMaxRetries` (3), `httpRetryDelay` (3000ms) to src/config/config.ts; `newsCombinatorUrl` resolves to `HN_CRAWLER_WEB_PAGE_BASE_URL` env var or default `https://news.ycombinator.com/`
+- [x] T011 [US1] Create src/infrastructure/web/axios.ts with builder function `createAxiosHttpClient({ baseURL, timeout, maxRetries, retryDelay })` that configures and returns an axios instance bound to `baseURL` with timeout and server-error-only retry interceptor
+- [x] T012 [US1] Convert src/infrastructure/web/hn-http.client.ts from `fetchPage(url)` standalone function to `HnHttpClient` class: constructor receives configured axios instance as constructor argument (private property); exposes `fetchPage(url: string): Promise<string>` with same signature/behavior as before (status error → throw, network error → wrap with cause, return text)
+- [x] T013 [US1] Update src/infrastructure/web/hn-web.adapter.ts to construct/use `HnHttpClient` instead of the `{ fetch }` object; adapter no longer handles page URL (URL bound to axios instance at composition root); `fetchEntries()` takes no URL argument
+- [x] T014 [US1] Remove `HN_CRAWLER_BETA` feature flag and `--url` option from src/presentation/cli/crawl.ts
+- [x] T015 [US1] Update src/presentation/main.ts to build axios instance via builder with `baseURL` from `config.newsCombinatorUrl`, create `HnHttpClient`, and inject it into `HnWebAdapter`
+- [x] T016 [US1] Run `npm run quality` (defined in package.json) — confirm all tests pass and coverage remains 100%
 
 **Checkpoint**: At this point, User Story 1 is fully functional and testable independently; `npm run quality` must be green before review
 
@@ -83,14 +83,14 @@
 
 ### Tests for User Story 2 (TDD — write FIRST, confirm they FAIL before implementation)
 
-- [ ] T017 [P] [US2] Add table-driven test cases in tests/unit/infrastructure/web/axios.test.ts covering: timeout aborts request beyond configured limit, server error (5xx) retries up to maxRetries with retryDelay pause, non-server error (4xx) is not retried (verify they FAIL before implementation)
+- [x] T017 [P] [US2] Add table-driven test cases in tests/unit/infrastructure/web/axios.test.ts covering: timeout aborts request beyond configured limit, server error (5xx) retries up to maxRetries with retryDelay pause, non-server error (4xx) is not retried (verify they FAIL before implementation)
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] Verify server-error retry interceptor in src/infrastructure/web/axios.ts retries only 5xx responses up to maxRetries with retryDelay between attempts
-- [ ] T019 [US2] Verify timeout configuration in src/infrastructure/web/axios.ts aborts requests exceeding timeout
-- [ ] T020 [US2] Verify non-server errors (4xx) are not retried in src/infrastructure/web/axios.ts
-- [ ] T021 [US2] Run `npm run quality` (defined in package.json) — confirm all tests pass and coverage remains 100%
+- [x] T018 [US2] Verify server-error retry interceptor in src/infrastructure/web/axios.ts retries only 5xx responses up to maxRetries with retryDelay between attempts
+- [x] T019 [US2] Verify timeout configuration in src/infrastructure/web/axios.ts aborts requests exceeding timeout
+- [x] T020 [US2] Verify non-server errors (4xx) are not retried in src/infrastructure/web/axios.ts
+- [x] T021 [US2] Run `npm run quality` (defined in package.json) — confirm all tests pass and coverage remains 100%
 
 **Checkpoint**: At this point, User Stories 1 AND 2 both work independently; `npm run quality` must be green before review
 
@@ -100,10 +100,10 @@
 
 **Purpose**: Remove obsolete code and confirm the final green state.
 
-- [ ] T022 [P] Remove the obsolete standalone `fetchPage` function and any now-unused imports from src/infrastructure/web/hn-http.client.ts
-- [ ] T023 [P] Confirm no references to `HN_CRAWLER_ACCEPTANCE_URL`, `HN_CRAWLER_BETA`, or `--url` remain across src/ and tests/
-- [ ] T024 [P] Delete any unused files rendered obsolete by the refactor across src/ and tests/ (none expected; verify none exist)
-- [ ] T025 Run final `npm run quality` gate (defined in package.json: format, format:check, lint, typecheck, test:coverage) — must be fully green
+- [x] T022 [P] Remove the obsolete standalone `fetchPage` function and any now-unused imports from src/infrastructure/web/hn-http.client.ts
+- [x] T023 [P] Confirm no references to `HN_CRAWLER_ACCEPTANCE_URL`, `HN_CRAWLER_BETA`, or `--url` remain across src/ and tests/
+- [x] T024 [P] Delete any unused files rendered obsolete by the refactor across src/ and tests/ (none expected; verify none exist)
+- [x] T025 Run final `npm run quality` gate (defined in package.json: format, format:check, lint, typecheck, test:coverage) — must be fully green
 
 ---
 

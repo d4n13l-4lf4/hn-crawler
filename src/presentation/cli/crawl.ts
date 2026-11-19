@@ -8,10 +8,7 @@ const CRAWL_ERROR =
 const MAX_TITLE_WORDS_ERROR =
   'The maximum value for the title words filter is 10000. Please use a value between 1 and 10000 (e.g., gt:100).';
 
-export function createCrawlCommand(
-  crawler: CrawlerPort,
-  betaEnabled = process.env.HN_CRAWLER_BETA === 'true'
-): Command {
+export function createCrawlCommand(crawler: CrawlerPort): Command {
   const command = new Command('crawl').description(
     'Crawl the top Hacker News stories'
   );
@@ -24,16 +21,11 @@ export function createCrawlCommand(
       'Filter by title word count (gt:N or le:N)'
     );
 
-  if (betaEnabled) {
-    command.option('--url <url>', 'URL of the page to crawl');
-  }
-
   command.action(
     async (options: {
       topComments?: boolean;
       topPoints?: boolean;
       titleWords?: string;
-      url?: string;
     }) => {
       try {
         if (options.topComments && options.topPoints) {
@@ -44,7 +36,7 @@ export function createCrawlCommand(
 
         const titleWords = parseTitleWords(options.titleWords);
         const entries = await crawler.execute({
-          url: options.url ?? config.newsCombinatorUrl,
+          url: config.newsCombinatorUrl,
           sortBy: options.topPoints
             ? 'points'
             : options.topComments

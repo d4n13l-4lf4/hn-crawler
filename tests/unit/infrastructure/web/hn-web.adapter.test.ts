@@ -11,30 +11,21 @@ const sampleHtml = readFileSync(
 
 type AdapterTestCase = {
   should: string;
-  url: string | undefined;
-  expectedUrl: string;
 };
 
 describe('HN web adapter unit test', () => {
   const testCases: AdapterTestCase[] = [
     {
-      should: 'use the default Hacker News URL',
-      url: undefined,
-      expectedUrl: 'https://news.ycombinator.com/',
-    },
-    {
-      should: 'pass a provided URL through unchanged',
-      url: 'http://127.0.0.1:4321/news',
-      expectedUrl: 'http://127.0.0.1:4321/news',
+      should: 'use the default Hacker News URL from configuration',
     },
   ];
 
-  it.each(testCases)('should $should', async ({ url, expectedUrl }) => {
-    const fetch = vi.fn().mockResolvedValue(sampleHtml);
-    const adapter = new HnWebAdapter({ fetch });
+  it.each(testCases)('should $should', async () => {
+    const fetchPage = vi.fn().mockResolvedValue(sampleHtml);
+    const adapter = new HnWebAdapter({ fetchPage } as never);
     const result: HNEntry[] = [];
 
-    for await (const entry of adapter.fetchEntries(url)) result.push(entry);
+    for await (const entry of adapter.fetchEntries()) result.push(entry);
 
     expect(result).toHaveLength(30);
     expect(result[0]).toEqual(
@@ -45,18 +36,16 @@ describe('HN web adapter unit test', () => {
         211
       )
     );
-    expect(fetch).toHaveBeenCalledOnce();
-    expect(fetch).toHaveBeenCalledWith(expectedUrl);
+    expect(fetchPage).toHaveBeenCalledOnce();
   });
 
   it('should propagate HTTP client errors without replacing them', async () => {
     const failure = new TypeError('network unavailable');
-    const fetch = vi.fn().mockRejectedValue(failure);
-    const adapter = new HnWebAdapter({ fetch });
+    const fetchPage = vi.fn().mockRejectedValue(failure);
+    const adapter = new HnWebAdapter({ fetchPage } as never);
 
     await expect(collect(adapter.fetchEntries())).rejects.toBe(failure);
-    expect(fetch).toHaveBeenCalledOnce();
-    expect(fetch).toHaveBeenCalledWith('https://news.ycombinator.com/');
+    expect(fetchPage).toHaveBeenCalledOnce();
   });
 });
 

@@ -28,7 +28,7 @@ Replace the native `fetch`-based HTTP client with a resilient axios-based HTTP c
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 - **Hexagonal architecture**: Pass. The HTTP client (`HnHttpClient`) is an infrastructure adapter concern. It imports axios and domain value objects only. `hn-web.adapter.ts` remains the infrastructure adapter implementing `EntrySourcePort`, now delegating to `HnHttpClient`. The application layer, domain, and `EntrySourcePort` interface are untouched. Concrete adapters are instantiated only in the composition root (`src/presentation/main.ts`).
 - **Test-first development**: Pass. For each implementation milestone, add/adjust unit tests first, confirm new tests fail, implement behavior, then run `npm run quality` before review. Acceptance tests are not implemented or run for this feature per the spec.

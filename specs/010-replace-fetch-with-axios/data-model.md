@@ -12,17 +12,18 @@ No new domain entities are introduced. The feature touches infrastructure concer
 
 The following resilience settings are added to the application configuration, produced by `createConfig()`:
 
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| `httpTimeout` | number (ms) | 15000 | Maximum time allowed for an HTTP request before it is aborted and handled as an error |
-| `httpMaxRetries` | number | 3 | Maximum number of automatic retries on server-error responses |
-| `httpRetryDelay` | number (ms) | 3000 | Pause between consecutive retry attempts |
+| Setting          | Type        | Default | Description                                                                           |
+| ---------------- | ----------- | ------- | ------------------------------------------------------------------------------------- |
+| `httpTimeout`    | number (ms) | 15000   | Maximum time allowed for an HTTP request before it is aborted and handled as an error |
+| `httpMaxRetries` | number      | 3       | Maximum number of automatic retries on server-error responses                         |
+| `httpRetryDelay` | number (ms) | 3000    | Pause between consecutive retry attempts                                              |
 
 `newsCombinatorUrl` resolves to the `HN_CRAWLER_WEB_PAGE_BASE_URL` env var when set, otherwise the default `https://news.ycombinator.com/`. All values are parameterizable and have sensible defaults matching the specification (15 seconds, 3 retries, 3 seconds).
 
 ## HTTP Client Output
 
 The `HnHttpClient.fetchPage(url)` method returns a `Promise<string>` — the raw HTML body of the fetched page, resolved against the axios instance's bound `baseURL`. It throws on:
+
 - Non-ok HTTP statuses (server errors and client errors alike), with message `HTTP ${status}: ${statusText}`.
 - Network failures, wrapping the original error as the cause with message `Failed to fetch page from ${url}`.
 

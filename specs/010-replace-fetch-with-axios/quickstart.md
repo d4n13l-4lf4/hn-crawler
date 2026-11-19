@@ -21,6 +21,7 @@ Document runnable validation scenarios that prove the HTTP client refactor prese
 **Prerequisites**: None beyond installed dependencies.
 
 **Commands**:
+
 ```bash
 npm run test:coverage
 ```
@@ -34,6 +35,7 @@ npm run test:coverage
 **Prerequisites**: Scenario 1 passing.
 
 **Commands**:
+
 ```bash
 npm run quality
 ```
@@ -47,6 +49,7 @@ npm run quality
 **Prerequisites**: None beyond installed dependencies.
 
 **Commands**:
+
 ```bash
 npm run typecheck
 ```
@@ -58,6 +61,7 @@ npm run typecheck
 **Prerequisites**: Build completed (`npm run build`), `HN_CRAWLER_WEB_PAGE_BASE_URL` set to a deterministic page (replacing `HN_CRAWLER_ACCEPTANCE_URL`), `HN_CRAWLER_DB_PATH` set to a temporary database path. The `HN_CRAWLER_BETA` flag and `--url` option are removed.
 
 **Commands**:
+
 ```bash
 HN_CRAWLER_WEB_PAGE_BASE_URL=<deterministic-url> HN_CRAWLER_DB_PATH=<temp-db> hn-crawler crawl
 HN_CRAWLER_WEB_PAGE_BASE_URL=<deterministic-url> HN_CRAWLER_DB_PATH=<temp-db> hn-crawler usage
