@@ -66,7 +66,7 @@ When('I run the crawl command with conflicting ranking options', function () {
 });
 
 When('I run the crawl command with an invalid URL', function () {
-  this.result = runCli(['crawl'], { 'HN_CRAWLER_WEB_PAGE_BASE_URL': 'fake' });
+  this.result = runCli(['crawl'], { HN_CRAWLER_WEB_PAGE_BASE_URL: 'fake' });
 });
 
 Then(
