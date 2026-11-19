@@ -3,7 +3,7 @@ import type { TitleWordRule } from '@/domain/policies/entry-filter.policy';
 
 export interface CrawlRequest {
   url: string;
-  sortBy: 'comments' | 'points';
+  sortBy?: 'comments' | 'points';
   titleWords?: TitleWordRule;
 }
 
@@ -13,7 +13,7 @@ export type EntryPipeline = (
 
 export interface PipelineFactory {
   create(config: {
-    sortBy: 'comments' | 'points';
+    sortBy?: 'comments' | 'points';
     titleWords?: TitleWordRule;
   }): EntryPipeline;
 }

@@ -6,12 +6,13 @@ import { config } from '@/config/config';
 
 type CrawlCommandTestCase = {
   should: string;
+  when: string;
   entries: HNEntry[];
   expectedOutput: string;
   args?: string[];
   expectedRequest?: {
     url: string;
-    sortBy: 'comments' | 'points';
+    sortBy?: 'comments' | 'points';
     titleWords?: { operator: 'gt' | 'le'; value: number };
   };
 };
@@ -24,49 +25,59 @@ describe('Crawl command unit test', () => {
   const testCases: CrawlCommandTestCase[] = [
     {
       should: 'display entries as a JSON array with the output fields',
+      when: 'no crawl options are supplied',
       entries: [new HNEntry(1, 'My news', 1, 2)],
       expectedOutput:
         '[\n  {\n    "rank": 1,\n    "title": "My news",\n    "points": 1,\n    "number_of_comments": 2\n  }\n]',
       expectedRequest: {
         url: config.newsCombinatorUrl,
-        sortBy: 'comments',
-        titleWords: { operator: 'gt', value: 5 },
       },
     },
     {
       should: 'display an empty JSON array when there are no entries',
+      when: 'no crawl options are supplied and there are no source entries',
       entries: [],
       expectedOutput: '[]',
       expectedRequest: {
         url: config.newsCombinatorUrl,
-        sortBy: 'comments',
-        titleWords: { operator: 'gt', value: 5 },
       },
     },
     {
       should: 'apply the points ranking when requested',
+      when: 'the points ranking option is supplied',
       entries: [],
       expectedOutput: '[]',
       args: ['--top-points'],
       expectedRequest: {
         url: config.newsCombinatorUrl,
         sortBy: 'points',
-        titleWords: { operator: 'gt', value: 5 },
       },
     },
     {
-      should: 'apply the title filter and comments ranking when requested',
+      should: 'apply the comments ranking when requested',
+      when: 'the comments ranking option is supplied',
+      entries: [],
+      expectedOutput: '[]',
+      args: ['--top-comments'],
+      expectedRequest: {
+        url: config.newsCombinatorUrl,
+        sortBy: 'comments',
+      },
+    },
+    {
+      should: 'apply only the title filter when requested',
+      when: 'the title filter is supplied without a ranking option',
       entries: [],
       expectedOutput: '[]',
       args: ['--title-words', 'le:2'],
       expectedRequest: {
         url: config.newsCombinatorUrl,
-        sortBy: 'comments',
         titleWords: { operator: 'le', value: 2 },
       },
     },
     {
       should: 'apply any filter and ranking combination',
+      when: 'the title filter and points ranking are supplied',
       entries: [],
       expectedOutput: '[]',
       args: ['--title-words', 'gt:9', '--top-points'],
@@ -79,7 +90,7 @@ describe('Crawl command unit test', () => {
   ];
 
   it.each(testCases)(
-    'should $should',
+    'should $should when $when',
     async ({ entries, expectedOutput, args = [], expectedRequest }) => {
       const crawler = createCrawler(entries);
       const log = vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -112,8 +123,6 @@ describe('Crawl command unit test', () => {
     expect(crawler.execute).toHaveBeenCalledOnce();
     expect(crawler.execute).toHaveBeenCalledWith({
       url: config.newsCombinatorUrl,
-      sortBy: 'comments',
-      titleWords: { operator: 'gt', value: 5 },
     });
     process.exitCode = previousExitCode;
     error.mockRestore();
@@ -142,8 +151,6 @@ describe('Crawl command unit test', () => {
     expect(crawler.execute).toHaveBeenCalledOnce();
     expect(crawler.execute).toHaveBeenCalledWith({
       url: 'http://127.0.0.1:4321',
-      sortBy: 'comments',
-      titleWords: { operator: 'gt', value: 5 },
     });
     vi.restoreAllMocks();
   });
@@ -160,8 +167,6 @@ describe('Crawl command unit test', () => {
     expect(crawler.execute).toHaveBeenCalledOnce();
     expect(crawler.execute).toHaveBeenCalledWith({
       url: config.newsCombinatorUrl,
-      sortBy: 'comments',
-      titleWords: { operator: 'gt', value: 5 },
     });
     vi.restoreAllMocks();
   });

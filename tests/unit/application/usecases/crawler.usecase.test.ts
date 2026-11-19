@@ -9,6 +9,7 @@ import { drain } from '../../../helpers/async';
 
 type CrawlerUseCaseTestCase = {
   should: string;
+  when: string;
   sourceEntries: HNEntry[];
   expectedPipelineInput: HNEntry[];
   pipelineResult: HNEntry[];
@@ -31,6 +32,7 @@ describe('CrawlerUseCase Unit Test', () => {
   const testCases: CrawlerUseCaseTestCase[] = [
     {
       should: 'return the entries produced by the configured pipeline',
+      when: 'filtering and ranking were requested',
       sourceEntries,
       expectedPipelineInput: sourceEntries,
       pipelineResult: filteredEntries,
@@ -43,6 +45,7 @@ describe('CrawlerUseCase Unit Test', () => {
     },
     {
       should: 'return an empty list when the pipeline has no matches',
+      when: 'the requested title rule excludes every entry',
       sourceEntries,
       expectedPipelineInput: sourceEntries,
       pipelineResult: [],
@@ -56,7 +59,7 @@ describe('CrawlerUseCase Unit Test', () => {
   ];
 
   it.each(testCases)(
-    'should $should',
+    'should $should when $when',
     async ({
       sourceEntries,
       expectedPipelineInput,

@@ -9,20 +9,22 @@ export class AppliedFilters {
     return new AppliedFiltersBuilder();
   }
 
-  static fromChoices(sort: SortBy, titleRule?: TitleWordRule): AppliedFilters {
-    const sortLabel =
+  static fromOptionalChoices(
+    sort?: SortBy,
+    titleRule?: TitleWordRule
+  ): AppliedFilters {
+    const labels = [
       sort === 'comments'
         ? 'sort:number_of_comments:desc'
-        : 'sort:number_of_points:desc';
-    const titleLabel = titleRule
-      ? `sort:title_words:${titleRule.operator}:${titleRule.value}`
-      : undefined;
+        : sort === 'points'
+          ? 'sort:number_of_points:desc'
+          : undefined,
+      titleRule
+        ? `filter:title_words:${titleRule.operator}:${titleRule.value}`
+        : undefined,
+    ].filter((label): label is string => label !== undefined);
 
-    return new AppliedFilters(
-      [sortLabel, titleLabel]
-        .filter((label): label is string => label !== undefined)
-        .join(',')
-    );
+    return new AppliedFilters(labels.join(',') || 'none');
   }
 
   static fromString(value: string): AppliedFilters {
@@ -49,7 +51,6 @@ export class AppliedFiltersBuilder {
   }
 
   build(): AppliedFilters {
-    if (!this.sort) throw new Error('An applied sort is required.');
-    return AppliedFilters.fromChoices(this.sort, this.titleRule);
+    return AppliedFilters.fromOptionalChoices(this.sort, this.titleRule);
   }
 }

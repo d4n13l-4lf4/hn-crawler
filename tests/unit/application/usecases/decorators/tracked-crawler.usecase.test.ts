@@ -23,26 +23,35 @@ describe('TrackedCrawlerUseCase unit test', () => {
   const entries = [new HNEntry(1, 'First', 10, 5)];
   const requests: TrackedCrawlerTestCase[] = [
     {
-      should: 'return the crawler result and record effective defaults',
-      when: 'the crawler succeeds with the default options',
+      should: 'return the crawler result and record selected operations',
+      when: 'the crawler succeeds with explicit filter and ranking options',
       request: {
         url: 'https://example.test',
         sortBy: 'comments',
         titleWords: { operator: 'gt', value: 5 },
       },
       result: entries,
-      expectedFilters: 'sort:number_of_comments:desc,sort:title_words:gt:5',
+      expectedFilters: 'sort:number_of_comments:desc,filter:title_words:gt:5',
       timestamps: [1000, 1004],
       durations: [50, 54],
     },
     {
-      should: 'return the crawler result and omit absent title filters',
+      should: 'return the crawler result and record ranking only',
       when: 'the crawler succeeds with points ranking only',
       request: { url: 'https://example.test', sortBy: 'points' },
       result: [],
       expectedFilters: 'sort:number_of_points:desc',
       timestamps: [2000, 2000],
       durations: [80, 80],
+    },
+    {
+      should: 'return the crawler result and record none',
+      when: 'the crawler succeeds with no filter or ranking options',
+      request: { url: 'https://example.test' },
+      result: entries,
+      expectedFilters: 'none',
+      timestamps: [3000, 3000],
+      durations: [90, 95],
     },
   ];
 
