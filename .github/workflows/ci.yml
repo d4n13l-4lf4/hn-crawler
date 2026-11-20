@@ -25,3 +25,8 @@ jobs:
 
       - name: Run quality gates
         run: npm run quality
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v8.5.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
