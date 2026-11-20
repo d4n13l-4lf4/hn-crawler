@@ -12,20 +12,15 @@ Given('the configured acceptance crawl URL is available', function () {
   getAcceptanceUrl();
 });
 
-When(
-  'I run the crawl command with the configured URL in beta mode',
-  function () {
-    this.result = runCli(['crawl', '--url', getAcceptanceUrl()]);
-  }
-);
+When('I run the crawl command', function () {
+  this.result = runCli(['crawl']);
+});
 
 When(
-  'I run the crawl command with the configured URL and ranking {string} in beta mode',
+  'I run the crawl command with ranking {string}',
   function (this: { result?: CommandResult }, ranking: string) {
     this.result = runCli([
       'crawl',
-      '--url',
-      getAcceptanceUrl(),
       '--title-words',
       'le:10000',
       ranking === 'comments' ? '--top-comments' : '--top-points',
@@ -33,78 +28,46 @@ When(
   }
 );
 
-When(
-  'I run the crawl command with default options and the configured URL in beta mode',
-  function () {
-    this.result = runCli(['crawl', '--url', getAcceptanceUrl()]);
-  }
-);
+When('I run the crawl command with default options', function () {
+  this.result = runCli(['crawl']);
+});
 
 When(
-  'I run the crawl command with title filter {string} and the configured URL in beta mode',
-  function (this: { result?: CommandResult }, filter: string) {
-    this.result = runCli([
-      'crawl',
-      '--url',
-      getAcceptanceUrl(),
-      '--title-words',
-      filter,
-    ]);
-  }
-);
-
-When(
-  'I run the crawl command with title filter {string} and ranking {string} using the configured URL in beta mode',
-  function (this: { result?: CommandResult }, filter: string, ranking: string) {
-    this.result = runCli([
-      'crawl',
-      '--url',
-      getAcceptanceUrl(),
-      '--title-words',
-      filter,
-      ranking === 'comments' ? '--top-comments' : '--top-points',
-    ]);
-  }
-);
-
-When(
-  'I run the crawl command with ranking {string} and the configured URL in beta mode',
-  function (this: { result?: CommandResult }, ranking: string) {
-    this.result = runCli([
-      'crawl',
-      '--url',
-      getAcceptanceUrl(),
-      ranking === 'comments' ? '--top-comments' : '--top-points',
-    ]);
-  }
-);
-
-When(
-  'I run the crawl command with title filter {string} in beta mode',
+  'I run the crawl command with title filter {string}',
   function (this: { result?: CommandResult }, filter: string) {
     this.result = runCli(['crawl', '--title-words', filter]);
   }
 );
 
 When(
-  'I run the crawl command with conflicting ranking options in beta mode',
-  function () {
-    this.result = runCli(['crawl', '--top-comments', '--top-points']);
+  'I run the crawl command with title filter {string} and ranking {string}',
+  function (this: { result?: CommandResult }, filter: string, ranking: string) {
+    this.result = runCli([
+      'crawl',
+      '--title-words',
+      filter,
+      ranking === 'comments' ? '--top-comments' : '--top-points',
+    ]);
   }
 );
-
-When('I run the crawl command with an invalid URL in beta mode', function () {
-  this.result = runCli(['crawl', '--url', 'https://']);
-});
 
 When(
-  'I run {string} in production mode',
-  function (this: { result?: CommandResult }, command: string) {
-    this.result = runCli(command.split(' ').slice(1), {
-      HN_CRAWLER_BETA: '',
-    });
+  'I run the crawl command with ranking {string} and no title filter',
+  function (this: { result?: CommandResult }, ranking: string) {
+    this.result = runCli([
+      'crawl',
+      ranking === 'comments' ? '--top-comments' : '--top-points',
+    ]);
   }
 );
+
+When('I run the crawl command with conflicting ranking options', function () {
+  this.result = runCli(['crawl', '--top-comments', '--top-points']);
+});
+
+When('I run the crawl command with an invalid URL', function () {
+  this.result = runCli(['crawl'], { HN_CRAWLER_WEB_PAGE_BASE_URL: 'fake' });
+});
 
 Then(
   'the crawl output is a JSON array with at most 30 entries',
@@ -239,10 +202,10 @@ Then(
 );
 
 function getAcceptanceUrl(): string {
-  const url = process.env.HN_CRAWLER_ACCEPTANCE_URL?.trim();
+  const url = process.env.HN_CRAWLER_WEB_PAGE_BASE_URL?.trim();
   assert.ok(
     url,
-    'HN_CRAWLER_ACCEPTANCE_URL must be set to a deterministic page URL before running acceptance tests.'
+    'HN_CRAWLER_WEB_PAGE_BASE_URL must be set to a deterministic page URL before running acceptance tests.'
   );
   return url;
 }

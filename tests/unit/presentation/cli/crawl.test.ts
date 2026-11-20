@@ -11,7 +11,7 @@ type CrawlCommandTestCase = {
   expectedOutput: string;
   args?: string[];
   expectedRequest?: {
-    url: string;
+    maxEntries: number;
     sortBy?: 'comments' | 'points';
     titleWords?: { operator: 'gt' | 'le'; value: number };
   };
@@ -30,7 +30,7 @@ describe('Crawl command unit test', () => {
       expectedOutput:
         '[\n  {\n    "rank": 1,\n    "title": "My news",\n    "points": 1,\n    "number_of_comments": 2\n  }\n]',
       expectedRequest: {
-        url: config.newsCombinatorUrl,
+        maxEntries: config.maxEntriesToFetch,
       },
     },
     {
@@ -39,7 +39,7 @@ describe('Crawl command unit test', () => {
       entries: [],
       expectedOutput: '[]',
       expectedRequest: {
-        url: config.newsCombinatorUrl,
+        maxEntries: config.maxEntriesToFetch,
       },
     },
     {
@@ -49,7 +49,7 @@ describe('Crawl command unit test', () => {
       expectedOutput: '[]',
       args: ['--top-points'],
       expectedRequest: {
-        url: config.newsCombinatorUrl,
+        maxEntries: config.maxEntriesToFetch,
         sortBy: 'points',
       },
     },
@@ -60,7 +60,7 @@ describe('Crawl command unit test', () => {
       expectedOutput: '[]',
       args: ['--top-comments'],
       expectedRequest: {
-        url: config.newsCombinatorUrl,
+        maxEntries: config.maxEntriesToFetch,
         sortBy: 'comments',
       },
     },
@@ -71,7 +71,7 @@ describe('Crawl command unit test', () => {
       expectedOutput: '[]',
       args: ['--title-words', 'le:2'],
       expectedRequest: {
-        url: config.newsCombinatorUrl,
+        maxEntries: config.maxEntriesToFetch,
         titleWords: { operator: 'le', value: 2 },
       },
     },
@@ -82,7 +82,7 @@ describe('Crawl command unit test', () => {
       expectedOutput: '[]',
       args: ['--title-words', 'gt:9', '--top-points'],
       expectedRequest: {
-        url: config.newsCombinatorUrl,
+        maxEntries: config.maxEntriesToFetch,
         sortBy: 'points',
         titleWords: { operator: 'gt', value: 9 },
       },
@@ -94,7 +94,7 @@ describe('Crawl command unit test', () => {
     async ({ entries, expectedOutput, args = [], expectedRequest }) => {
       const crawler = createCrawler(entries);
       const log = vi.spyOn(console, 'log').mockImplementation(() => {});
-      const command = createCrawlCommand(crawler, true);
+      const command = createCrawlCommand(crawler);
 
       await command.parseAsync(['node', 'hn-crawler', 'crawl', ...args], {
         from: 'user',
@@ -112,7 +112,7 @@ describe('Crawl command unit test', () => {
     const crawler = { execute: vi.fn().mockRejectedValue(failure) };
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
     const previousExitCode = process.exitCode;
-    const command = createCrawlCommand(crawler, true);
+    const command = createCrawlCommand(crawler);
 
     await command.parseAsync(['node', 'hn-crawler', 'crawl'], { from: 'user' });
 
@@ -122,42 +122,15 @@ describe('Crawl command unit test', () => {
     expect(process.exitCode).toBe(1);
     expect(crawler.execute).toHaveBeenCalledOnce();
     expect(crawler.execute).toHaveBeenCalledWith({
-      url: config.newsCombinatorUrl,
+      maxEntries: config.maxEntriesToFetch,
     });
     process.exitCode = previousExitCode;
     error.mockRestore();
   });
 
-  it.each([
-    { should: 'expose the URL option in beta', beta: true, hasUrl: true },
-    { should: 'omit the URL option in production', beta: false, hasUrl: false },
-  ])('should $should', ({ beta, hasUrl }) => {
-    const command = createCrawlCommand(createCrawler(), beta);
-    expect(command.options.some((option) => option.long === '--url')).toBe(
-      hasUrl
-    );
-  });
-
-  it('should pass the beta URL to the crawler', async () => {
+  it('should pass the configured URL from config', async () => {
     const crawler = createCrawler();
-    const command = createCrawlCommand(crawler, true);
-    vi.spyOn(console, 'log').mockImplementation(() => {});
-
-    await command.parseAsync(
-      ['node', 'hn-crawler', 'crawl', '--url', 'http://127.0.0.1:4321'],
-      { from: 'user' }
-    );
-
-    expect(crawler.execute).toHaveBeenCalledOnce();
-    expect(crawler.execute).toHaveBeenCalledWith({
-      url: 'http://127.0.0.1:4321',
-    });
-    vi.restoreAllMocks();
-  });
-
-  it('should pass the configured URL when the beta URL option is omitted', async () => {
-    const crawler = createCrawler();
-    const command = createCrawlCommand(crawler, true);
+    const command = createCrawlCommand(crawler);
     vi.spyOn(console, 'log').mockImplementation(() => {});
 
     await command.parseAsync(['node', 'hn-crawler', 'crawl'], {
@@ -166,7 +139,7 @@ describe('Crawl command unit test', () => {
 
     expect(crawler.execute).toHaveBeenCalledOnce();
     expect(crawler.execute).toHaveBeenCalledWith({
-      url: config.newsCombinatorUrl,
+      maxEntries: config.maxEntriesToFetch,
     });
     vi.restoreAllMocks();
   });
@@ -174,7 +147,7 @@ describe('Crawl command unit test', () => {
   it('should serialize only the primitive value object fields', async () => {
     const crawler = createCrawler([new HNEntry(1, 'My news', 1, 2)]);
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
-    const command = createCrawlCommand(crawler, true);
+    const command = createCrawlCommand(crawler);
 
     await command.parseAsync(['node', 'hn-crawler', 'crawl'], {
       from: 'user',
@@ -228,7 +201,7 @@ describe('Crawl command unit test', () => {
       const crawler = createCrawler();
       const error = vi.spyOn(console, 'error').mockImplementation(() => {});
       const previousExitCode = process.exitCode;
-      const command = createCrawlCommand(crawler, true);
+      const command = createCrawlCommand(crawler);
 
       await command.parseAsync(['node', 'hn-crawler', 'crawl', ...args], {
         from: 'user',

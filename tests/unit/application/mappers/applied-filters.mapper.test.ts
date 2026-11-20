@@ -15,7 +15,7 @@ describe('AppliedFilters mapper unit test', () => {
       should: 'map comments ranking and title filtering',
       when: 'the request explicitly selects both operations',
       request: {
-        url: 'https://example.test',
+        maxEntries: 30,
         sortBy: 'comments',
         titleWords: { operator: 'gt', value: 5 },
       },
@@ -24,14 +24,14 @@ describe('AppliedFilters mapper unit test', () => {
     {
       should: 'map points ranking without a title filter',
       when: 'the request ranks by points only',
-      request: { url: 'https://example.test', sortBy: 'points' },
+      request: { maxEntries: 30, sortBy: 'points' },
       expected: 'sort:number_of_points:desc',
     },
     {
       should: 'map only a title filter',
       when: 'the request has no ranking choice',
       request: {
-        url: 'https://example.test',
+        maxEntries: 30,
         titleWords: { operator: 'le', value: 5 },
       },
       expected: 'filter:title_words:le:5',
@@ -40,7 +40,7 @@ describe('AppliedFilters mapper unit test', () => {
       should: 'preserve an explicit points and title combination',
       when: 'the request specifies both options',
       request: {
-        url: 'https://example.test',
+        maxEntries: 30,
         sortBy: 'points',
         titleWords: { operator: 'gt', value: 12 },
       },
@@ -49,7 +49,7 @@ describe('AppliedFilters mapper unit test', () => {
     {
       should: 'map no selected operations to none',
       when: 'the request includes only its source URL',
-      request: { url: 'https://example.test' },
+      request: { maxEntries: 30 },
       expected: 'none',
     },
   ];

@@ -37,7 +37,7 @@ describe('CrawlerUseCase Unit Test', () => {
       expectedPipelineInput: sourceEntries,
       pipelineResult: filteredEntries,
       request: {
-        url: 'https://example.com/news',
+        maxEntries: 30,
         sortBy: 'points',
         titleWords: { operator: 'gt', value: 5 },
       },
@@ -50,7 +50,7 @@ describe('CrawlerUseCase Unit Test', () => {
       expectedPipelineInput: sourceEntries,
       pipelineResult: [],
       request: {
-        url: 'https://example.com/news',
+        maxEntries: 30,
         sortBy: 'comments',
         titleWords: { operator: 'le', value: 5 },
       },
@@ -79,7 +79,7 @@ describe('CrawlerUseCase Unit Test', () => {
 
       expect(result).toEqual(expectedEntries);
       expect(fetchEntries).toHaveBeenCalledOnce();
-      expect(fetchEntries).toHaveBeenCalledWith(request.url);
+      expect(fetchEntries).toHaveBeenCalledWith(request.maxEntries);
       expect(create).toHaveBeenCalledOnce();
       expect(create).toHaveBeenCalledWith({
         sortBy: request.sortBy,
@@ -91,7 +91,7 @@ describe('CrawlerUseCase Unit Test', () => {
     }
   );
 
-  it('should limit the source to the first 30 entries before applying the pipeline', async () => {
+  it('should pass every source entry to the pipeline without imposing its own entry count limit', async () => {
     async function* manyEntries(): AsyncGenerator<HNEntry> {
       for (let rank = 1; rank <= 35; rank += 1) {
         yield new HNEntry(rank, `Story ${rank}`, rank, rank);
@@ -112,35 +112,41 @@ describe('CrawlerUseCase Unit Test', () => {
     const useCase = new CrawlerUseCase({ fetchEntries }, { create });
 
     const result = await useCase.execute({
-      url: 'https://news.ycombinator.com/',
+      maxEntries: 30,
       sortBy: 'comments',
     });
 
-    expect(result).toHaveLength(30);
-    expect(result[0].rank.value).toBe(1);
-    expect(result[29].rank.value).toBe(30);
-    expect(received).toHaveLength(30);
+    expect(result).toHaveLength(35);
+    expect(received).toHaveLength(35);
     expect(create).toHaveBeenCalledOnce();
     expect(create).toHaveBeenCalledWith({
       sortBy: 'comments',
       titleWords: undefined,
     });
     expect(fetchEntries).toHaveBeenCalledOnce();
-    expect(fetchEntries).toHaveBeenCalledWith('https://news.ycombinator.com/');
+    expect(fetchEntries).toHaveBeenCalledWith(30);
   });
 
   it('should propagate an entry-source error', async () => {
-    const fetchEntries = vi.fn(async function* () {
+    async function* failingSource(): AsyncGenerator<HNEntry> {
       throw new Error('source failed');
+    }
+    const fetchEntries = vi.fn(() => failingSource());
+    const applyPipeline = vi.fn(async function* (
+      source: AsyncIterable<HNEntry>
+    ) {
+      for await (const entry of source) {
+        yield entry;
+      }
     });
-    const create = vi.fn(() => async function* () {});
+    const create = vi.fn(() => applyPipeline);
     const useCase = new CrawlerUseCase({ fetchEntries }, { create });
 
     await expect(
-      useCase.execute({ url: 'https://example.com', sortBy: 'comments' })
+      useCase.execute({ maxEntries: 30, sortBy: 'comments' })
     ).rejects.toThrow('source failed');
     expect(fetchEntries).toHaveBeenCalledOnce();
-    expect(create).not.toHaveBeenCalled();
+    expect(create).toHaveBeenCalledOnce();
   });
 
   it('should propagate a pipeline error', async () => {
@@ -152,7 +158,7 @@ describe('CrawlerUseCase Unit Test', () => {
     const useCase = new CrawlerUseCase({ fetchEntries }, { create });
 
     await expect(
-      useCase.execute({ url: 'https://example.com', sortBy: 'comments' })
+      useCase.execute({ maxEntries: 30, sortBy: 'comments' })
     ).rejects.toThrow('pipeline failed');
     expect(fetchEntries).toHaveBeenCalledOnce();
     expect(create).toHaveBeenCalledOnce();

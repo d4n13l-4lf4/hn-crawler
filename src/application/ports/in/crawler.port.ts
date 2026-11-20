@@ -2,7 +2,7 @@ import { HNEntry } from '@/domain/entities/hn-entry.entity';
 import type { TitleWordRule } from '@/domain/policies/entry-filter.policy';
 
 export interface CrawlRequest {
-  url: string;
+  maxEntries: number;
   sortBy?: 'comments' | 'points';
   titleWords?: TitleWordRule;
 }
