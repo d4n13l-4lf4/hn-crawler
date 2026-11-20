@@ -34,7 +34,7 @@ async function main(): Promise<void> {
       retryDelay: config.httpRetryDelay,
     });
     const httpClient = new HnHttpClient(axiosInstance);
-    const entrySource = new HnWebAdapter(httpClient);
+    const entrySource = new HnWebAdapter(httpClient, config.maxPagesToFetch);
     const crawler = new CrawlerUseCase(entrySource, pipelineFactory);
     const trackedCrawler = new TrackedCrawlerUseCase(crawler, usageRepository);
 

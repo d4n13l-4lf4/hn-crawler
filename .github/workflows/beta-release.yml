@@ -1,28 +1,55 @@
 name: Beta Release
 
 on:
-  pull_request:
-    branches: ['release/**']
-    types: [closed]
+  workflow_call:
+    inputs:
+      ref:
+        description: Git commit SHA to release
+        required: true
+        type: string
+      npm-wait-timeout:
+        description: Maximum time to wait for npm package availability (seconds)
+        required: false
+        type: number
+        default: 180
+      npm-wait-interval:
+        description: Time between npm availability checks (seconds)
+        required: false
+        type: number
+        default: 30
+    secrets:
+      NPM_TOKEN:
+        required: true
+    outputs:
+      beta-version:
+        description: Exact published beta package version
+        value: ${{ jobs.beta-release.outputs.beta_version }}
 
 jobs:
   beta-release:
-    if: github.event.pull_request.merged == true
+    name: Publish beta package
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         node-version: [26.x]
 
+    outputs:
+      beta_version: ${{ steps.version.outputs.beta_version }}
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout release commit
+        uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.ref }}
           fetch-depth: 0
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          cache: npm
+          registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
         run: npm ci
@@ -32,27 +59,51 @@ jobs:
         run: |
           BASE_VERSION=$(node -p "require('./package.json').version")
           SHORT_SHA=$(git rev-parse --short=7 HEAD)
-          RUN_NUMBER="${GITHUB_RUN_NUMBER}"
-          RUN_ATTEMPT="${GITHUB_RUN_ATTEMPT}"
-          BETA_VERSION="${BASE_VERSION}-beta.${RUN_NUMBER}-${RUN_ATTEMPT}-sha${SHORT_SHA}"
+
+          BETA_VERSION="${BASE_VERSION}-beta.${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}-sha${SHORT_SHA}"
+
           npm version "$BETA_VERSION" --no-git-tag-version
+
           echo "beta_version=$BETA_VERSION" >> "$GITHUB_OUTPUT"
+
+          echo "Beta version: $BETA_VERSION"
+
       - name: Build package
         run: npm run build
+
       - name: Verify package contents
         run: npm pack --dry-run
+
       - name: Publish beta version
-        run: |
-          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
-          npm publish --tag beta
+        run: npm publish --tag beta
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Write published version artifact
-        run: echo "${{ steps.version.outputs.beta_version }}" > beta-version.txt
+      - name: Wait for beta version availability
+        env:
+          BETA_VERSION: ${{ steps.version.outputs.beta_version }}
+          WAIT_TIMEOUT: ${{ inputs.npm-wait-timeout }}
+          WAIT_INTERVAL: ${{ inputs.npm-wait-interval }}
+        run: |
+          DEADLINE=$((SECONDS + WAIT_TIMEOUT))
 
-      - name: Upload version artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: beta-version
-          path: beta-version.txt
+          while true; do
+            PUBLISHED_VERSION=$(npm view \
+              "@d4n13l-4lf4/hn-crawler@$BETA_VERSION" \
+              version \
+              --registry=https://registry.npmjs.org/ \
+              2>/dev/null || true)
+
+            if [ "$PUBLISHED_VERSION" = "$BETA_VERSION" ]; then
+              echo "Beta version $BETA_VERSION is publicly available."
+              exit 0
+            fi
+
+            if [ "$SECONDS" -ge "$DEADLINE" ]; then
+              echo "::error::Beta version $BETA_VERSION was not available after ${WAIT_TIMEOUT}s."
+              exit 1
+            fi
+
+            echo "Beta version not available yet. Retrying in ${WAIT_INTERVAL}s."
+            sleep "$WAIT_INTERVAL"
+          done

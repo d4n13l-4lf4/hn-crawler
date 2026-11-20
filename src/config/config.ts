@@ -11,6 +11,13 @@ export function createConfig(environment: NodeJS.ProcessEnv = process.env) {
     environment.HN_CRAWLER_HTTP_RETRY_DELAY ?? 3000
   );
 
+  const maxEntriesToFetch = Number(
+    environment.HN_CRAWLER_MAX_ENTRIES_TO_FETCH ?? 30
+  );
+  const maxPagesToFetch = Number(
+    environment.HN_CRAWLER_MAX_PAGES_TO_FETCH ?? 10
+  );
+
   if (!Number.isSafeInteger(httpTimeout) || httpTimeout < 1) {
     throw new Error('HN_CRAWLER_HTTP_TIMEOUT must be a positive integer.');
   }
@@ -24,6 +31,16 @@ export function createConfig(environment: NodeJS.ProcessEnv = process.env) {
       'HN_CRAWLER_HTTP_RETRY_DELAY must be a non-negative integer.'
     );
   }
+  if (!Number.isSafeInteger(maxEntriesToFetch) || maxEntriesToFetch < 1) {
+    throw new Error(
+      'HN_CRAWLER_MAX_ENTRIES_TO_FETCH must be a positive integer.'
+    );
+  }
+  if (!Number.isSafeInteger(maxPagesToFetch) || maxPagesToFetch < 1) {
+    throw new Error(
+      'HN_CRAWLER_MAX_PAGES_TO_FETCH must be a positive integer.'
+    );
+  }
 
   return {
     newsCombinatorUrl:
@@ -32,6 +49,8 @@ export function createConfig(environment: NodeJS.ProcessEnv = process.env) {
     httpTimeout,
     httpMaxRetries,
     httpRetryDelay,
+    maxEntriesToFetch,
+    maxPagesToFetch,
     usageRetentionLimit,
     usageDatabasePath: environment.HN_CRAWLER_DB_PATH?.trim() || undefined,
   };

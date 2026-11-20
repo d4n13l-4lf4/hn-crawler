@@ -11,7 +11,7 @@ type CrawlCommandTestCase = {
   expectedOutput: string;
   args?: string[];
   expectedRequest?: {
-    url: string;
+    maxEntries: number;
     sortBy?: 'comments' | 'points';
     titleWords?: { operator: 'gt' | 'le'; value: number };
   };
@@ -30,7 +30,7 @@ describe('Crawl command unit test', () => {
       expectedOutput:
         '[\n  {\n    "rank": 1,\n    "title": "My news",\n    "points": 1,\n    "number_of_comments": 2\n  }\n]',
       expectedRequest: {
-        url: config.newsCombinatorUrl,
+        maxEntries: config.maxEntriesToFetch,
       },
     },
     {
@@ -39,7 +39,7 @@ describe('Crawl command unit test', () => {
       entries: [],
       expectedOutput: '[]',
       expectedRequest: {
-        url: config.newsCombinatorUrl,
+        maxEntries: config.maxEntriesToFetch,
       },
     },
     {
@@ -49,7 +49,7 @@ describe('Crawl command unit test', () => {
       expectedOutput: '[]',
       args: ['--top-points'],
       expectedRequest: {
-        url: config.newsCombinatorUrl,
+        maxEntries: config.maxEntriesToFetch,
         sortBy: 'points',
       },
     },
@@ -60,7 +60,7 @@ describe('Crawl command unit test', () => {
       expectedOutput: '[]',
       args: ['--top-comments'],
       expectedRequest: {
-        url: config.newsCombinatorUrl,
+        maxEntries: config.maxEntriesToFetch,
         sortBy: 'comments',
       },
     },
@@ -71,7 +71,7 @@ describe('Crawl command unit test', () => {
       expectedOutput: '[]',
       args: ['--title-words', 'le:2'],
       expectedRequest: {
-        url: config.newsCombinatorUrl,
+        maxEntries: config.maxEntriesToFetch,
         titleWords: { operator: 'le', value: 2 },
       },
     },
@@ -82,7 +82,7 @@ describe('Crawl command unit test', () => {
       expectedOutput: '[]',
       args: ['--title-words', 'gt:9', '--top-points'],
       expectedRequest: {
-        url: config.newsCombinatorUrl,
+        maxEntries: config.maxEntriesToFetch,
         sortBy: 'points',
         titleWords: { operator: 'gt', value: 9 },
       },
@@ -122,7 +122,7 @@ describe('Crawl command unit test', () => {
     expect(process.exitCode).toBe(1);
     expect(crawler.execute).toHaveBeenCalledOnce();
     expect(crawler.execute).toHaveBeenCalledWith({
-      url: config.newsCombinatorUrl,
+      maxEntries: config.maxEntriesToFetch,
     });
     process.exitCode = previousExitCode;
     error.mockRestore();
@@ -139,7 +139,7 @@ describe('Crawl command unit test', () => {
 
     expect(crawler.execute).toHaveBeenCalledOnce();
     expect(crawler.execute).toHaveBeenCalledWith({
-      url: config.newsCombinatorUrl,
+      maxEntries: config.maxEntriesToFetch,
     });
     vi.restoreAllMocks();
   });

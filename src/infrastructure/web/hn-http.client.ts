@@ -8,10 +8,10 @@ export class HnHttpClient {
     this.http = httpClient;
   }
 
-  async fetchPage(url: string): Promise<string> {
+  async fetchPage(pageNumber = 1): Promise<string> {
     let response: { data: string };
     try {
-      response = await this.http.get<string>(url);
+      response = await this.http.get<string>('', { params: { p: pageNumber } });
     } catch (error) {
       if (isAxiosError(error)) {
         const axiosError = error as AxiosError;
@@ -20,9 +20,9 @@ export class HnHttpClient {
             `HTTP ${axiosError.response.status}: ${axiosError.response.statusText}`
           );
         }
-        throw new Error(`Failed to fetch page from ${url}`, { cause: error });
+        throw new Error(`Failed to fetch page ${pageNumber}`, { cause: error });
       }
-      throw new Error(`Failed to fetch page from ${url}`, { cause: error });
+      throw new Error(`Failed to fetch page ${pageNumber}`, { cause: error });
     }
     return response.data;
   }

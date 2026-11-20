@@ -28,6 +28,54 @@ describe('Config unit test', () => {
 
   it.each([
     {
+      should: 'use the default max entries to fetch',
+      environment: {},
+      expected: 30,
+    },
+    {
+      should: 'use a configured max entries to fetch',
+      environment: { HN_CRAWLER_MAX_ENTRIES_TO_FETCH: '7' },
+      expected: 7,
+    },
+  ])(
+    'should $should when loading configuration',
+    ({ environment, expected }) => {
+      expect(createConfig(environment).maxEntriesToFetch).toBe(expected);
+    }
+  );
+
+  it('should reject an invalid max entries to fetch when loading configuration', () => {
+    expect(() =>
+      createConfig({ HN_CRAWLER_MAX_ENTRIES_TO_FETCH: '0' })
+    ).toThrow('HN_CRAWLER_MAX_ENTRIES_TO_FETCH must be a positive integer.');
+  });
+
+  it.each([
+    {
+      should: 'use the default max pages to fetch',
+      environment: {},
+      expected: 10,
+    },
+    {
+      should: 'use a configured max pages to fetch',
+      environment: { HN_CRAWLER_MAX_PAGES_TO_FETCH: '5' },
+      expected: 5,
+    },
+  ])(
+    'should $should when loading configuration',
+    ({ environment, expected }) => {
+      expect(createConfig(environment).maxPagesToFetch).toBe(expected);
+    }
+  );
+
+  it('should reject an invalid max pages to fetch when loading configuration', () => {
+    expect(() => createConfig({ HN_CRAWLER_MAX_PAGES_TO_FETCH: '0' })).toThrow(
+      'HN_CRAWLER_MAX_PAGES_TO_FETCH must be a positive integer.'
+    );
+  });
+
+  it.each([
+    {
       should: 'use the default http timeout',
       environment: {},
       expected: 15000,

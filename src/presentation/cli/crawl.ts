@@ -36,7 +36,7 @@ export function createCrawlCommand(crawler: CrawlerPort): Command {
 
         const titleWords = parseTitleWords(options.titleWords);
         const entries = await crawler.execute({
-          url: config.newsCombinatorUrl,
+          maxEntries: config.maxEntriesToFetch,
           sortBy: options.topPoints
             ? 'points'
             : options.topComments

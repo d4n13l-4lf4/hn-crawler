@@ -7,7 +7,7 @@ describe('HN HTTP client unit test', () => {
     should: string;
     when: string;
     axiosInstance: Record<string, unknown>;
-    url: string;
+    pageNumber: number;
     expected: string;
   }> = [
     {
@@ -16,7 +16,7 @@ describe('HN HTTP client unit test', () => {
       axiosInstance: {
         get: vi.fn().mockResolvedValue({ data: '<html>Hacker News</html>' }),
       },
-      url: 'https://news.ycombinator.com/',
+      pageNumber: 1,
       expected: '<html>Hacker News</html>',
     },
     {
@@ -25,17 +25,19 @@ describe('HN HTTP client unit test', () => {
       axiosInstance: {
         get: vi.fn().mockResolvedValue({ data: '' }),
       },
-      url: 'https://news.ycombinator.com/',
+      pageNumber: 1,
       expected: '',
     },
   ];
 
   it.each(testCases)(
     'should $should when $when',
-    async ({ axiosInstance, url, expected }) => {
+    async ({ axiosInstance, pageNumber, expected }) => {
       const client = new HnHttpClient(axiosInstance as never);
-      await expect(client.fetchPage(url)).resolves.toBe(expected);
-      expect(axiosInstance.get).toHaveBeenCalledWith(url);
+      await expect(client.fetchPage(pageNumber)).resolves.toBe(expected);
+      expect(axiosInstance.get).toHaveBeenCalledWith('', {
+        params: { p: pageNumber },
+      });
     }
   );
 
@@ -55,9 +57,9 @@ describe('HN HTTP client unit test', () => {
       };
       const client = new HnHttpClient(axiosInstance as never);
 
-      await expect(
-        client.fetchPage('https://news.ycombinator.com/')
-      ).rejects.toThrow(`HTTP ${status}: ${statusText}`);
+      await expect(client.fetchPage(1)).rejects.toThrow(
+        `HTTP ${status}: ${statusText}`
+      );
     }
   );
 
@@ -70,14 +72,14 @@ describe('HN HTTP client unit test', () => {
 
     let caughtError: unknown;
     try {
-      await client.fetchPage('https://news.ycombinator.com/');
+      await client.fetchPage(2);
     } catch (error) {
       caughtError = error;
     }
 
     expect(caughtError).toBeInstanceOf(Error);
     expect(caughtError).toMatchObject({
-      message: 'Failed to fetch page from https://news.ycombinator.com/',
+      message: 'Failed to fetch page 2',
       cause,
     });
   });
@@ -91,11 +93,7 @@ describe('HN HTTP client unit test', () => {
     };
     const client = new HnHttpClient(axiosInstance as never);
 
-    await expect(
-      client.fetchPage('https://news.ycombinator.com/')
-    ).rejects.toThrow(
-      'Failed to fetch page from https://news.ycombinator.com/'
-    );
+    await expect(client.fetchPage(3)).rejects.toThrow('Failed to fetch page 3');
   });
 
   it('should be constructed with an axios instance', () => {

@@ -1,0 +1,54 @@
+name: Release PR Gate
+
+on:
+  pull_request:
+    branches: ['release/**']
+    types: [closed]
+
+permissions:
+  contents: read
+
+jobs:
+  beta-release:
+    name: Publish beta package
+    if: github.event.pull_request.merged == true
+    uses: ./.github/workflows/beta-release.yml
+    with:
+      ref: ${{ github.event.pull_request.merge_commit_sha }}
+      npm-wait-timeout: 180
+      npm-wait-interval: 30
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  acceptance-tests:
+    name: Run acceptance tests
+    needs: beta-release
+    uses: ./.github/workflows/acceptance-tests.yml
+    with:
+      ref: ${{ github.event.pull_request.merge_commit_sha }}
+      beta-version: ${{ needs.beta-release.outputs.beta-version }}
+
+  release-pr-gate:
+    name: Release PR Gate
+    runs-on: ubuntu-latest
+    needs:
+      - beta-release
+      - acceptance-tests
+    if: always() && github.event.pull_request.merged == true
+
+    steps:
+      - name: Verify release pipeline result
+        env:
+          BETA_RELEASE_RESULT: ${{ needs.beta-release.result }}
+          ACCEPTANCE_TESTS_RESULT: ${{ needs.acceptance-tests.result }}
+        run: |
+          echo "Beta release result: $BETA_RELEASE_RESULT"
+          echo "Acceptance tests result: $ACCEPTANCE_TESTS_RESULT"
+
+          if [ "$BETA_RELEASE_RESULT" != "success" ] ||
+             [ "$ACCEPTANCE_TESTS_RESULT" != "success" ]; then
+            echo "::error::Release PR Gate failed."
+            exit 1
+          fi
+
+          echo "Release PR Gate passed."
