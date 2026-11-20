@@ -26,7 +26,7 @@
 
 ## Phase 3: User Story 1 - CLI keeps working identically with bundled production binary (Priority: P1) 🎯 MVP
 
-**Goal**: Refactor code to avoid breaking changes introduced by the esbuild production bundle at `dist/main.js`: (1) `cli.ts` displays version via `__APP_VERSION__` bundled variable instead of reading `package.json` via `__dirname`; (2) `sqlite-migrator.ts` locates `drizzle/migrations` via `import.meta.url` instead of `__dirname`. CLI output fields, ordering, error handling, and exit codes remain unchanged. No application behavior changes, no new user-facing options, no acceptance test modifications.
+**Goal**: Refactor code to avoid breaking changes introduced by the esbuild production bundle at `dist/main.js`: (1) `cli.ts` displays version via `__APP_VERSION__` bundled variable instead of reading `package.json` via `__dirname`; (2) `sqlite-migrator.ts` locates `drizzle/migrations` via `import.meta.url` instead of `__dirname`; (3) `drizzle-orm` v0.45.4 and `drizzle-kit` v0.31.11 are pinned to stable releases, with `sqlite.client.ts` using `drizzle-orm/better-sqlite3` (`Database` instance) instead of `drizzle-orm/node-sqlite` (string path), `sqlite-migrator.ts` using `drizzle-orm/better-sqlite3/migrator`, and `usage.repository.ts` explicitly typing the `transaction()` callback parameter. CLI output fields, ordering, error handling, and exit codes remain unchanged. No application behavior changes, no new user-facing options, no acceptance test modifications.
 
 **Independent Test**: Run the bundled production CLI (`dist/main.js`) and verify it produces identical command output, exit codes, and error handling as before for all existing crawl and usage subcommands.
 
@@ -42,8 +42,16 @@
 - [x] T006 [US1] Run `npm run quality` — must be fully green; config and code changes must not break format, lint, typecheck, or coverage
 - [x] T007 [P] [US1] Verify `npm run build` succeeds after the refactor (esbuild bundle generates `dist/main.js`)
 - [x] T008 [P] [US1] Delete any now-obsolete code or imports across `src/`; confirm no `__dirname` references remain in `cli.ts` or `sqlite-migrator.ts`
+- [x] T009 [P] [US1] Refactor `src/infrastructure/persistence/sqlite/sqlite.client.ts`: switch from `drizzle-orm/node-sqlite` (string path) to `drizzle-orm/better-sqlite3` (`Database` instance), resolving `Cannot find module 'drizzle-orm/node-sqlite'` errors
+- [x] T010 [P] [US1] Refactor `src/infrastructure/persistence/sqlite/sqlite-migrator.ts`: change migrator import from `drizzle-orm/node-sqlite/migrator` to `drizzle-orm/better-sqlite3/migrator`
+- [x] T011 [US1] Refactor `src/infrastructure/persistence/sqlite/repositories/usage.repository.ts`: explicitly type the `transaction()` callback parameter using `SQLiteTransaction` to satisfy stricter type checking in the stable release
+- [x] T012 [P] [US1] Refactor `tests/unit/infrastructure/persistence/sqlite/sqlite-migrator.test.ts`: update mock import path from `drizzle-orm/node-sqlite/migrator` to `drizzle-orm/better-sqlite3/migrator`
+- [x] T013 [P] [US1] Refactor `tests/unit/infrastructure/persistence/sqlite/repositories/usage.repository.test.ts`: mock `migrateSqlite` directly and create the `usage` table explicitly, since the stable drizzle migrator no longer auto-creates tables in test context
+- [x] T014 [P] [US1] Refactor `tests/unit/application/usecases/decorators/tracked-crawler.sqlite.test.ts`: mock `migrateSqlite` and `hasMigrationFiles` directly to isolate adapter behavior from drizzle internals
+- [x] T015 [US1] Run `npm run quality` — must be fully green; all quality gates pass with 100% coverage
+- [x] T016 [P] [US1] Verify `npm run build` succeeds after the drizzle-orm stable version pin refactor
 
-**Checkpoint**: At this point, User Story 1 is fully functional — bundled production CLI runs all existing commands with identical output, exit codes, and error handling; no runtime errors introduced by bundling.
+**Checkpoint**: At this point, User Story 1 is fully functional — bundled production CLI runs all existing commands with identical output, exit codes, and error handling; no runtime errors introduced by bundling; drizzle-orm and drizzle-kit pinned to stable releases (v0.45.4 and v0.31.11).
 
 ---
 
@@ -51,7 +59,7 @@
 
 **Purpose**: Final validation that affects the overall refactor.
 
-- [x] T009 [P] Run `quickstart.md` validation scenarios manually: `hn-crawler --version` shows correct version; migration files located from bundled binary (`dist/main.js`); all CLI subcommands function in the bundle; no functional behavior change
+- [x] T017 [P] Run `quickstart.md` validation scenarios manually: `hn-crawler --version` shows correct version; migration files located from bundled binary (`dist/main.js`); all CLI subcommands function in the bundle; no functional behavior change
 
 ---
 
@@ -69,18 +77,20 @@
 
 ### Within User Story 1
 
-- Tests (T002, T003) MUST be written and FAIL before implementation (T004, T005).
-- T004 and T005 are independent edits on different files and can be done in parallel once tests are written.
-- T006 (quality gate) depends on T002–T005 completion.
+- Tests (T002, T003) MUST be written and FAIL before implementation (T004–T011).
+- T004, T005, T009, T010 are independent edits on different files and can be done in parallel once tests are written.
+- T006 (quality gate) depends on T002–T005, T009–T011 completion.
 - T007 (build verification) depends on T006.
-- T008 (cleanup) depends on T004–T007.
-- T009 (quickstart validation) depends on T006.
+- T008 (cleanup) depends on T004–T007, T009–T010.
+- T016 (quality gate after drizzle-orm pin) depends on T009–T015 completion.
+- T017 (build verification after drizzle-orm pin) depends on T016.
+- T017 (quickstart validation) depends on T016.
 
 ### Parallel Opportunities
 
 - T002 and T003 ([P]): test refactors on different files with no cross-dependency.
-- T004 and T005 ([P]): implementation edits on different files (`cli.ts`, `sqlite-migrator.ts`) with no cross-dependency.
-- T007, T008, T009 ([P]): post-quality-gate validation tasks on different concerns.
+- T004, T005, T009, T010 ([P]): implementation edits on different files (`cli.ts`, `sqlite-migrator.ts`, `sqlite.client.ts`) with no cross-dependency.
+- T007, T008, T016 ([P]): post-quality-gate validation tasks on different concerns.
 
 ### Parallel Example: User Story 1
 
@@ -92,6 +102,8 @@ Task: "Refactor tests/unit/infrastructure/persistence/sqlite/sqlite-migrator.tes
 # Launch implementation together (once tests fail):
 Task: "Refactor src/presentation/cli/cli.ts: version via __APP_VERSION__ bundled variable"
 Task: "Refactor src/infrastructure/persistence/sqlite/sqlite-migrator.ts: migrations via import.meta.url"
+Task: "Refactor src/infrastructure/persistence/sqlite/sqlite.client.ts: drizzle-orm/better-sqlite3 builder"
+Task: "Refactor src/infrastructure/persistence/sqlite/sqlite-migrator.ts: drizzle-orm/better-sqlite3/migrator"
 
 # Launch post-quality-gate validation together:
 Task: "Verify npm run build succeeds"
@@ -106,7 +118,7 @@ Task: "Run quickstart.md validation scenarios manually"
 ### MVP First (User Story 1 Only)
 
 1. Complete Phase 1: Setup (quality baseline)
-2. Complete Phase 3: User Story 1 (the refactor; test-first: T002–T008)
+2. Complete Phase 3: User Story 1 (the refactor; test-first: T002–T016)
 3. **STOP and VALIDATE**: Run `npm run quality` fully green; verify `npm run build` succeeds; verify `hn-crawler --version` works from `dist/main.js`
 4. Complete Phase N: Polish (quickstart validation)
 

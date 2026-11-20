@@ -11,7 +11,7 @@ docs/
 AGENTS.md
 prompt.md
 .editorconfig
-cucumber.js
+cucumber.mjs
 eslint.config.js
 vitest.config.mts
 tsconfig.json

@@ -6,6 +6,7 @@ import type { createSqliteClient } from '@/infrastructure/persistence/sqlite/sql
 import { usage } from '@/infrastructure/persistence/sqlite/schema/usage.schema';
 
 type SqliteClient = ReturnType<typeof createSqliteClient>;
+type TransactionClient = Omit<SqliteClient, '$client'>;
 
 export class SqliteUsageRepository implements UsageRepositoryPort {
   constructor(
@@ -14,7 +15,7 @@ export class SqliteUsageRepository implements UsageRepositoryPort {
   ) {}
 
   save(record: Usage): void {
-    this.client.transaction((transaction) => {
+    this.client.transaction((transaction: TransactionClient) => {
       transaction
         .insert(usage)
         .values({
@@ -45,7 +46,12 @@ export class SqliteUsageRepository implements UsageRepositoryPort {
       .orderBy(asc(sql`rowid`))
       .all()
       .map(
-        (record) =>
+        (record: {
+          request_id: string;
+          request_timestamp: number;
+          applied_filters: string;
+          duration_ms: number;
+        }) =>
           new Usage(
             record.request_id,
             record.request_timestamp,

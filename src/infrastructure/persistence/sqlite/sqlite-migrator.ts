@@ -1,6 +1,6 @@
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { migrate } from 'drizzle-orm/node-sqlite/migrator';
+import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import type { createSqliteClient } from '@/infrastructure/persistence/sqlite/sqlite.client';
 import { hasMigrationFiles } from '@/infrastructure/persistence/sqlite/migration-files';
 

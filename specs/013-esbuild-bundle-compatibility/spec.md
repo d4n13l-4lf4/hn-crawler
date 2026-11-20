@@ -12,6 +12,7 @@ We are going to implement some technical debt improvements.
 We have implemented esbuild to generate a minified production bundle at dist/main.js.
 The goal is to avoid breaking changes with this new functionality.
 So, we need to refactor some code to avoid breaking changes with this new functionality.
+Also, we need to pin drizzle-orm and drizzle-kit to stable versions (v0.45.4 and v0.31.11) to avoid breaking changes of release candidates.
 The behavior will not change.
 
 The technical solution will be provided in the plan.
@@ -24,7 +25,7 @@ No acceptance tests will be implemented or automatically run for this feature."
 
 As a user of the Hacker News Crawler CLI, I want the installed `hn-crawler` command to behave exactly as before after the production bundle is generated with esbuild, so that my scripts and dashboards continue to work without any breaking changes.
 
-**Why this priority**: Avoiding breaking changes is the sole purpose of this refactor; no user-facing change is intended.
+**Why this priority**: Avoiding breaking changes is the sole purpose of this refactor; no user-facing change is intended. This includes keeping internal dependencies such as `drizzle-orm` and `drizzle-kit` pinned to stable releases (v0.45.4 and v0.31.11) so that infrastructure code aligns with the stable library API.
 
 **Independent Test**: Run the bundled production CLI (`dist/main.js`) and verify it produces identical command output, exit codes, and error handling as before for all existing crawl and usage subcommands.
 
@@ -49,6 +50,7 @@ As a user of the Hacker News Crawler CLI, I want the installed `hn-crawler` comm
 - **FR-003**: Command output fields, ordering, error handling, and exit codes MUST remain unchanged.
 - **FR-004**: Existing acceptance tests MUST continue to pass with zero modifications.
 - **FR-005**: No new user-facing options, commands, or behavioral changes are introduced.
+- **FR-006**: The `drizzle-orm` and `drizzle-kit` dependencies are pinned to stable releases (drizzle-orm v0.45.4, drizzle-kit v0.31.11) so that infrastructure code uses the stable library API without changing application behavior.
 
 ## Success Criteria _(mandatory)_
 
@@ -58,6 +60,7 @@ As a user of the Hacker News Crawler CLI, I want the installed `hn-crawler` comm
 - **SC-002**: Every command exits with the same status codes as before the bundle was introduced.
 - **SC-003**: All existing acceptance tests pass with zero modifications.
 - **SC-004**: No user-facing options, commands, or behavioral changes are introduced.
+- **SC-005**: `drizzle-orm` and `drizzle-kit` are pinned to stable releases (drizzle-orm v0.45.4, drizzle-kit v0.31.11) so that infrastructure code uses stable library APIs without changing application behavior.
 
 ## Assumptions
 
@@ -66,3 +69,4 @@ As a user of the Hacker News Crawler CLI, I want the installed `hn-crawler` comm
 - The existing acceptance suite remains the source of truth for correct behavior.
 - The technical solution (how to refactor code to avoid breaking changes) will be defined in the plan phase.
 - No new tests are written for this feature; existing tests validate the unchanged behavior.
+- `drizzle-orm` v0.45.4 and `drizzle-kit` v0.31.11 are pinned as stable releases so that infrastructure code uses stable library APIs without changing application behavior.

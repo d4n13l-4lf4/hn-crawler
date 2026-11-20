@@ -1,11 +1,11 @@
-import { DatabaseSync } from 'node:sqlite';
+import Database from 'better-sqlite3';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const { migrateMock } = vi.hoisted(() => ({ migrateMock: vi.fn() }));
-vi.mock('drizzle-orm/node-sqlite/migrator', () => ({
+vi.mock('drizzle-orm/better-sqlite3/migrator', () => ({
   migrate: migrateMock,
 }));
 
@@ -67,7 +67,7 @@ describe('migrateSqlite', () => {
     expect(hasMigrationFiles).toHaveBeenCalledWith(
       expect.stringContaining('drizzle/migrations')
     );
-    expect(client.$client).toBeInstanceOf(DatabaseSync);
+    expect(client.$client).toBeInstanceOf(Database);
   });
 
   it('should apply migrations repeatedly during repeated startup', () => {
