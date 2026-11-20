@@ -2,7 +2,7 @@
   "name": "@d4n13l-4lf4/hn-crawler",
   "version": "1.0.3",
   "description": "A CLI tool to scrape and analyze Hacker News entries",
-  "main": "dist/presentation/main.js",
+  "main": "dist/main.js",
   "publishConfig": {
     "access": "public"
   },
@@ -10,7 +10,7 @@
     "node": ">=26.0.0"
   },
   "bin": {
-    "hn-crawler": "dist/presentation/main.js"
+    "hn-crawler": "dist/main.js"
   },
   "directories": {
     "doc": "docs"
@@ -24,7 +24,9 @@
     "!dist/**/*.d.ts"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "clean": "rm -rf dist",
+    "build:js": "node esbuild.config.mts",
+    "build": "npm run clean && npm run typecheck && npm run build:js",
     "db:generate": "drizzle-kit generate",
     "db:check": "drizzle-kit check",
     "test:unit": "vitest run tests/unit",
@@ -50,7 +52,7 @@
   ],
   "author": "Daniel Aucatoma",
   "license": "MIT",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/d4n13l-4lf4/hn-crawler/issues"
   },
@@ -70,10 +72,10 @@
     "@typescript-eslint/parser": "8.73.0",
     "@vitest/coverage-v8": "5.1.0",
     "drizzle-kit": "1.0.0-rc.5",
+    "esbuild": "0.28.2",
     "eslint": "9.19.0",
     "husky": "9.1.7",
     "prettier": "3.5.3",
-    "tsc-alias": "1.9.10",
     "tsx": "4.23.15",
     "typescript": "5.7.3",
     "vitest": "5.1.0"
