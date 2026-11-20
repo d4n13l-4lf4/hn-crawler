@@ -1,30 +1,60 @@
-import { load } from 'cheerio';
+import { load, Cheerio, CheerioAPI } from 'cheerio';
 import { HNEntry } from '@/domain/entities/hn-entry.entity';
 
 const POINTS_MATCHER = /(\d+)\s+points?/i;
 const COMMENTS_MATCHER = /(\d+)\s+comments?/i;
 
-export async function* parseHnEntries(html: string): AsyncGenerator<HNEntry> {
-  const $ = load(html);
-  const storyRows = $('tr.athing.submission').toArray();
+export class HnCrawlerParser {
+  private readonly $: CheerioAPI;
 
-  for (let index = 0; index < storyRows.length; index += 1) {
-    const row = storyRows[index];
-    const story = $(row);
-    const followingRow = story.next('tr');
-    const title = story.find('span.titleline > a').first().text();
+  constructor(private readonly html: string) {
+    this.$ = load(html);
+  }
+
+  hasEntries(): boolean {
+    return this.$('tr.athing.submission').length > 0;
+  }
+
+  async *[Symbol.asyncIterator](): AsyncGenerator<HNEntry> {
+    const storyRows = this.$('tr.athing.submission').toArray();
+
+    if (storyRows.length === 0) {
+      return;
+    }
+
+    for (let index = 0; index < storyRows.length; index += 1) {
+      const row = storyRows[index];
+      const story = this.$(row);
+      const followingRow = story.next('tr');
+
+      yield new HNEntry(
+        this.getRank(index),
+        this.getTitle(story),
+        this.getPoints(followingRow),
+        this.getComments(followingRow)
+      );
+    }
+  }
+
+  private getRank(index: number): number {
+    return index + 1;
+  }
+
+  private getTitle(story: Cheerio<any>): string {
+    return story.find('span.titleline > a').first().text();
+  }
+
+  private getPoints(followingRow: Cheerio<any>): string {
     const scoreText = followingRow.find('.score').first().text();
+    return POINTS_MATCHER.exec(scoreText)?.[1] ?? '';
+  }
+
+  private getComments(followingRow: Cheerio<any>): string {
     const commentText = followingRow
       .find('a[href^="item?id="]')
-      .filter((_, link) => COMMENTS_MATCHER.test($(link).text()))
+      .filter((_, link: any) => COMMENTS_MATCHER.test(this.$(link).text()))
       .last()
       .text();
-
-    yield new HNEntry(
-      index + 1,
-      title,
-      POINTS_MATCHER.exec(scoreText)?.[1] ?? '',
-      COMMENTS_MATCHER.exec(commentText)?.[1] ?? ''
-    );
+    return COMMENTS_MATCHER.exec(commentText)?.[1] ?? '';
   }
 }

@@ -13,26 +13,16 @@ export class CrawlerUseCase implements CrawlerPort {
   ) {}
 
   async execute(request: CrawlRequest): Promise<HNEntry[]> {
-    const entries: HNEntry[] = [];
-    const source = this.entrySource.fetchEntries(request.url);
-
-    for await (const entry of source) {
-      entries.push(entry);
-      if (entries.length === 30) break;
-    }
+    const source = this.entrySource.fetchEntries(request.maxEntries);
 
     const pipeline = this.pipelineFactory.create({
       sortBy: request.sortBy,
       titleWords: request.titleWords,
     });
     const result: HNEntry[] = [];
-    for await (const entry of pipeline(toAsyncIterable(entries))) {
+    for await (const entry of pipeline(source)) {
       result.push(entry);
     }
     return result;
   }
-}
-
-async function* toAsyncIterable<T>(entries: T[]): AsyncGenerator<T> {
-  yield* entries;
 }

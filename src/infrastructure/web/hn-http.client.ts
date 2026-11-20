@@ -1,13 +1,37 @@
-export async function fetchPage(url: string): Promise<string> {
-  let response: Response;
-  try {
-    response = await fetch(url);
-  } catch (error) {
-    throw new Error(`Failed to fetch page from ${url}`, { cause: error });
+import { AxiosError } from 'axios';
+import { createAxiosHttpClient } from './axios';
+
+export class HnHttpClient {
+  private readonly http: ReturnType<typeof createAxiosHttpClient>;
+
+  constructor(httpClient: ReturnType<typeof createAxiosHttpClient>) {
+    this.http = httpClient;
   }
 
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  async fetchPage(pageNumber = 1): Promise<string> {
+    let response: { data: string };
+    try {
+      response = await this.http.get<string>('', { params: { p: pageNumber } });
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const axiosError = error as AxiosError;
+        if (axiosError.response) {
+          throw new Error(
+            `HTTP ${axiosError.response.status}: ${axiosError.response.statusText}`
+          );
+        }
+        throw new Error(`Failed to fetch page ${pageNumber}`, { cause: error });
+      }
+      throw new Error(`Failed to fetch page ${pageNumber}`, { cause: error });
+    }
+    return response.data;
   }
-  return response.text();
+}
+
+function isAxiosError(error: unknown): error is AxiosError {
+  return (
+    error instanceof Error &&
+    'isAxiosError' in error &&
+    (error as AxiosError).isAxiosError
+  );
 }

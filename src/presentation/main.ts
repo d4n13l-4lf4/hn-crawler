@@ -6,6 +6,8 @@ import { UsageQueryUseCase } from '@/application/usecases/usage-query.usecase';
 import { pipelineFactory } from '@/application/pipeline/factory/factory';
 import { config } from '@/config/config';
 import { HnWebAdapter } from '@/infrastructure/web/hn-web.adapter';
+import { HnHttpClient } from '@/infrastructure/web/hn-http.client';
+import { createAxiosHttpClient } from '@/infrastructure/web/axios';
 import { createSqliteClient } from '@/infrastructure/persistence/sqlite/sqlite.client';
 import { migrateSqlite } from '@/infrastructure/persistence/sqlite/sqlite-migrator';
 import { getSqlitePath } from '@/infrastructure/persistence/sqlite/sqlite-path';
@@ -25,7 +27,14 @@ async function main(): Promise<void> {
       config.usageRetentionLimit
     );
     const usageQuery = new UsageQueryUseCase(usageRepository);
-    const entrySource = new HnWebAdapter();
+    const axiosInstance = createAxiosHttpClient({
+      baseURL: config.newsCombinatorUrl,
+      timeout: config.httpTimeout,
+      maxRetries: config.httpMaxRetries,
+      retryDelay: config.httpRetryDelay,
+    });
+    const httpClient = new HnHttpClient(axiosInstance);
+    const entrySource = new HnWebAdapter(httpClient, config.maxPagesToFetch);
     const crawler = new CrawlerUseCase(entrySource, pipelineFactory);
     const trackedCrawler = new TrackedCrawlerUseCase(crawler, usageRepository);
 

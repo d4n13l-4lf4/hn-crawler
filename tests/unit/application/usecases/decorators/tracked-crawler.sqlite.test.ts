@@ -45,7 +45,7 @@ describe('TrackedCrawlerUseCase with SQLite', () => {
         SELECT RAISE(ABORT, 'write failed');
       END;`);
     const request = {
-      url: 'https://example.test',
+      maxEntries: 30,
       sortBy: 'comments',
     } as const;
 
@@ -72,7 +72,7 @@ describe('TrackedCrawlerUseCase with SQLite', () => {
       BEGIN
         SELECT RAISE(ABORT, 'write failed');
       END;`);
-    const request = { url: 'https://example.test', sortBy: 'points' } as const;
+    const request = { maxEntries: 30, sortBy: 'points' } as const;
 
     await expect(crawler.execute(request)).rejects.toBe(crawlFailure);
 

@@ -26,7 +26,7 @@ describe('TrackedCrawlerUseCase unit test', () => {
       should: 'return the crawler result and record selected operations',
       when: 'the crawler succeeds with explicit filter and ranking options',
       request: {
-        url: 'https://example.test',
+        maxEntries: 30,
         sortBy: 'comments',
         titleWords: { operator: 'gt', value: 5 },
       },
@@ -38,7 +38,7 @@ describe('TrackedCrawlerUseCase unit test', () => {
     {
       should: 'return the crawler result and record ranking only',
       when: 'the crawler succeeds with points ranking only',
-      request: { url: 'https://example.test', sortBy: 'points' },
+      request: { maxEntries: 30, sortBy: 'points' },
       result: [],
       expectedFilters: 'sort:number_of_points:desc',
       timestamps: [2000, 2000],
@@ -47,7 +47,7 @@ describe('TrackedCrawlerUseCase unit test', () => {
     {
       should: 'return the crawler result and record none',
       when: 'the crawler succeeds with no filter or ranking options',
-      request: { url: 'https://example.test' },
+      request: { maxEntries: 30 },
       result: entries,
       expectedFilters: 'none',
       timestamps: [3000, 3000],
@@ -103,7 +103,7 @@ describe('TrackedCrawlerUseCase unit test', () => {
     const execute = vi.fn().mockRejectedValue(failure);
     const save = vi.fn();
     const request = {
-      url: 'https://example.test',
+      maxEntries: 30,
       sortBy: 'comments',
     } as const;
     const useCase = new TrackedCrawlerUseCase(
@@ -157,7 +157,7 @@ describe('TrackedCrawlerUseCase unit test', () => {
       () => '018f0f4b-7b7c-7abc-8def-0123456789ab'
     );
     const request = {
-      url: 'https://example.test',
+      maxEntries: 30,
       sortBy: 'comments',
     } as const;
 
@@ -181,7 +181,7 @@ describe('TrackedCrawlerUseCase unit test', () => {
     );
 
     await expect(
-      useCase.execute({ url: 'https://example.test', sortBy: 'comments' })
+      useCase.execute({ maxEntries: 30, sortBy: 'comments' })
     ).resolves.toBe(result);
 
     expect(execute).toHaveBeenCalledOnce();

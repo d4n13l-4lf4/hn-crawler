@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { parseHnEntries } from '@/infrastructure/web/hn-crawler.parser';
+import { HnCrawlerParser } from '@/infrastructure/web/hn-crawler.parser';
 import { HNEntry } from '@/domain/entities/hn-entry.entity';
 
 const sampleHtml = readFileSync(
@@ -56,15 +56,17 @@ describe('Hacker News parser unit test', () => {
   it.each(testCases)(
     'should $should when $when',
     async ({ input, expected }) => {
+      const parser = new HnCrawlerParser(input);
       const result: HNEntry[] = [];
-      for await (const entry of parseHnEntries(input)) result.push(entry);
+      for await (const entry of parser) result.push(entry);
       expect(result.slice(0, expected.length)).toEqual(expected);
     }
   );
 
   it('should yield all sample entries in source order with one-based ranks', async () => {
+    const parser = new HnCrawlerParser(sampleHtml);
     const result: HNEntry[] = [];
-    for await (const entry of parseHnEntries(sampleHtml)) result.push(entry);
+    for await (const entry of parser) result.push(entry);
 
     expect(result).toHaveLength(30);
     expect(result.map((entry) => entry.rank.value)).toEqual(
@@ -73,8 +75,9 @@ describe('Hacker News parser unit test', () => {
   });
 
   it('should default missing score and discussion counts in the sample to zero', async () => {
+    const parser = new HnCrawlerParser(sampleHtml);
     const result: HNEntry[] = [];
-    for await (const entry of parseHnEntries(sampleHtml)) result.push(entry);
+    for await (const entry of parser) result.push(entry);
 
     expect(result[13]).toEqual(
       new HNEntry(
@@ -94,7 +97,29 @@ describe('Hacker News parser unit test', () => {
     );
   });
 
-  it('should return an async generator', () => {
-    expect(parseHnEntries(sampleHtml)).toHaveProperty('next');
+  it('should report hasEntries true when the page contains story rows', () => {
+    const parser = new HnCrawlerParser(sampleHtml);
+    expect(parser.hasEntries()).toBe(true);
+  });
+
+  it('should report hasEntries false when the page has no story rows', () => {
+    const parser = new HnCrawlerParser(
+      '<html><body><p>No stories</p></body></html>'
+    );
+    expect(parser.hasEntries()).toBe(false);
+  });
+
+  it('should be async iterable', () => {
+    const parser = new HnCrawlerParser(sampleHtml);
+    expect(typeof parser[Symbol.asyncIterator]).toBe('function');
+  });
+
+  it('should terminate the async iterator when no entries exist', async () => {
+    const parser = new HnCrawlerParser(
+      '<html><body><p>No stories</p></body></html>'
+    );
+    const result: HNEntry[] = [];
+    for await (const entry of parser) result.push(entry);
+    expect(result).toEqual([]);
   });
 });

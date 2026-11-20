@@ -5,7 +5,7 @@ Feature: Persist and inspect crawler usage history
 
   Scenario: Display no-option crawl usage as none across two CLI invocations
     Given a temporary usage database path is configured
-    When I run the crawl command with the configured URL in beta mode using the temporary usage database
+    When I run the crawl command using the temporary usage database
     And I run the usage command using the same temporary usage database
     Then the usage command exits with code 0
     And the usage table contains the persisted crawl record
@@ -14,7 +14,7 @@ Feature: Persist and inspect crawler usage history
 
   Scenario: Display filter and ranking usage labels for explicitly selected options
     Given a temporary usage database path is configured
-    When I run the crawl command with title filter "le:5" and ranking "points" using the configured URL in beta mode with the temporary usage database
+    When I run the crawl command with title filter "le:5" and ranking "points" using the temporary usage database
     And I run the usage command using the same temporary usage database
     Then the usage command exits with code 0
     And the applied filter is displayed as "sort:number_of_points:desc,filter:title_words:le:5"

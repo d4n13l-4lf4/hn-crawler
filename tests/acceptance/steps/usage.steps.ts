@@ -32,12 +32,9 @@ After(function (this: UsageWorld) {
 });
 
 When(
-  'I run the crawl command with the configured URL in beta mode using the temporary usage database',
+  'I run the crawl command using the temporary usage database',
   function (this: UsageWorld) {
-    this.result = runCli(
-      ['crawl', '--url', getAcceptanceUrl()],
-      testDbEnvironment(this)
-    );
+    this.result = runCli(['crawl'], testDbEnvironment(this));
     assert.equal(
       this.result.status,
       0,
@@ -47,13 +44,11 @@ When(
 );
 
 When(
-  'I run the crawl command with title filter {string} and ranking {string} using the configured URL in beta mode with the temporary usage database',
+  'I run the crawl command with title filter {string} and ranking {string} using the temporary usage database',
   function (this: UsageWorld, filter: string, ranking: string) {
     this.result = runCli(
       [
         'crawl',
-        '--url',
-        getAcceptanceUrl(),
         '--title-words',
         filter,
         ranking === 'comments' ? '--top-comments' : '--top-points',
@@ -168,22 +163,13 @@ function testDbEnvironment(world: UsageWorld): Record<string, string> {
   };
 }
 
-function getAcceptanceUrl(): string {
-  const url = process.env.HN_CRAWLER_ACCEPTANCE_URL?.trim();
-  assert.ok(
-    url,
-    'HN_CRAWLER_ACCEPTANCE_URL must be set to a deterministic page URL before running acceptance tests.'
-  );
-  return url;
-}
-
 function runCli(
   args: string[],
   extraEnv: Record<string, string>
 ): CommandResult {
   const result: SpawnSyncReturns<string> = spawnSync('hn-crawler', args, {
     encoding: 'utf8',
-    env: { ...process.env, HN_CRAWLER_BETA: 'true', ...extraEnv },
+    env: { ...process.env, ...extraEnv },
     shell: false,
   });
   return {
