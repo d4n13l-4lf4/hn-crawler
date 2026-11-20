@@ -12,7 +12,7 @@ Refactor two source locations that break when the CLI is bundled with esbuild in
 
 **Language/Version**: TypeScript strict mode; Node 26 LTS; ESM (`"type": "module"`)
 
-**Primary Dependencies**: esbuild (devDependency, `0.28.2`); axios, cheerio, commander, drizzle-orm, @libsql/client, env-paths (existing)
+**Primary Dependencies**: esbuild (devDependency, `0.28.2`); axios, cheerio, commander, @libsql/client, env-paths (existing)
 
 **Storage**: N/A — no storage or schema change
 
@@ -103,7 +103,7 @@ tests/
 
 **Review gate**: `npm run quality` green; `sqlite-migrator.ts` no longer uses `__dirname`; migration files resolved via `import.meta.url`; no acceptance tests run. Presented for review before Milestone 3.
 
-### Milestone 3: Cleanup + final quality gate
+### Milestone 3: Composition root + cleanup + final quality gate
 
 - Delete any now-obsolete code or imports that became unnecessary because of the refactor across `src/`.
 - Confirm no references to `__dirname` remain in `cli.ts` or `sqlite-migrator.ts`.
@@ -129,4 +129,4 @@ No `[NEEDS CLARIFICATION]` markers remain. All design decisions are resolved wit
 - `import.meta.url` is available because the project uses `"type": "module"` and `module: ESNext` / `moduleResolution: Bundler` in tsconfig.
 - `fileURLToPath` from `node:url` is used to convert `import.meta.url` to a filesystem path.
 - Acceptance tests are not modified (no functional change), per the spec.
-- No new unit tests are required beyond refactoring existing tests for the two changed files (the spec's "no new tests" assumption and FR-005/SC-003).
+- No new unit tests are required beyond refactoring existing tests for the changed files (the spec's "no new tests" assumption and FR-005/SC-003).

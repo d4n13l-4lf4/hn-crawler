@@ -69,18 +69,18 @@
 
 ### Within User Story 1
 
-- Tests (T002, T003) MUST be written and FAIL before implementation (T004, T005).
+- Tests (T002, T003) MUST be written and FAIL before implementation (T004–T005).
 - T004 and T005 are independent edits on different files and can be done in parallel once tests are written.
 - T006 (quality gate) depends on T002–T005 completion.
 - T007 (build verification) depends on T006.
-- T008 (cleanup) depends on T004–T007.
-- T009 (quickstart validation) depends on T006.
+- T008 (cleanup) depends on T004–T005 completion.
+- T009 (quickstart validation) depends on T006 completion.
 
 ### Parallel Opportunities
 
 - T002 and T003 ([P]): test refactors on different files with no cross-dependency.
 - T004 and T005 ([P]): implementation edits on different files (`cli.ts`, `sqlite-migrator.ts`) with no cross-dependency.
-- T007, T008, T009 ([P]): post-quality-gate validation tasks on different concerns.
+- T007, T008 ([P]): post-quality-gate validation tasks on different concerns.
 
 ### Parallel Example: User Story 1
 

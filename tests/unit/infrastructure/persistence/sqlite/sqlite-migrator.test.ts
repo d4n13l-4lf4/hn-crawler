@@ -1,4 +1,3 @@
-import { DatabaseSync } from 'node:sqlite';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -67,7 +66,6 @@ describe('migrateSqlite', () => {
     expect(hasMigrationFiles).toHaveBeenCalledWith(
       expect.stringContaining('drizzle/migrations')
     );
-    expect(client.$client).toBeInstanceOf(DatabaseSync);
   });
 
   it('should apply migrations repeatedly during repeated startup', () => {

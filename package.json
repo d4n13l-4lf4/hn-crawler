@@ -58,7 +58,6 @@
   },
   "homepage": "https://github.com/d4n13l-4lf4/hn-crawler#readme",
   "dependencies": {
-    "@libsql/client": "0.18.0",
     "axios": "1.21.1",
     "cheerio": "1.0.0",
     "commander": "12.1.0",
