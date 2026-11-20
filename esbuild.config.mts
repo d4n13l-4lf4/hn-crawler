@@ -18,7 +18,7 @@ await build({
   legalComments: 'eof',
   tsconfig: 'tsconfig.build.json',
   define: {
-    __APP__VERSION__: JSON.stringify(packageJson.version),
+    __APP_VERSION__: JSON.stringify(packageJson.version),
   },
   sourcemap: true,
   charset: 'utf8',
