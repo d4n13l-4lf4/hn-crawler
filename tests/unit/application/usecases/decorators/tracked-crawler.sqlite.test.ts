@@ -9,6 +9,13 @@ import { createSqliteClient } from '@/infrastructure/persistence/sqlite/sqlite.c
 import { migrateSqlite } from '@/infrastructure/persistence/sqlite/sqlite-migrator';
 import { SqliteUsageRepository } from '@/infrastructure/persistence/sqlite/repositories/usage.repository';
 
+vi.mock('@/infrastructure/persistence/sqlite/sqlite-migrator', () => ({
+  migrateSqlite: vi.fn(),
+}));
+vi.mock('@/infrastructure/persistence/sqlite/migration-files', () => ({
+  hasMigrationFiles: vi.fn().mockReturnValue(true),
+}));
+
 describe('TrackedCrawlerUseCase with SQLite', () => {
   let directory: string | undefined;
   let client: ReturnType<typeof createSqliteClient> | undefined;
@@ -25,6 +32,14 @@ describe('TrackedCrawlerUseCase with SQLite', () => {
   function createRepository(): SqliteUsageRepository {
     directory = mkdtempSync(join(tmpdir(), 'hn-crawler-tracked-'));
     client = createSqliteClient(join(directory, 'usage.sqlite'));
+    client.$client.exec(`
+      CREATE TABLE IF NOT EXISTS usage (
+        request_id text PRIMARY KEY,
+        request_timestamp integer NOT NULL,
+        applied_filters text NOT NULL,
+        duration_ms integer NOT NULL
+      )
+    `);
     migrateSqlite(client);
     return new SqliteUsageRepository(client, 100);
   }
