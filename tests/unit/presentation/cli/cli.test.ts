@@ -1,15 +1,16 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { Command } from 'commander';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { createCli } from '@/presentation/cli/cli';
 
 const packageJson = JSON.parse(
   readFileSync(join(process.cwd(), 'package.json'), 'utf8')
 ) as { version: string };
 
 describe('CLI builder unit test', () => {
-  it('should register each supplied subcommand', () => {
+  it('should register each supplied subcommand', async () => {
+    vi.stubGlobal('__APP_VERSION__', packageJson.version);
+    const { createCli } = await import('@/presentation/cli/cli');
     const command = new Command('sample').description('Sample subcommand');
     const cli = createCli([command]);
 
@@ -23,7 +24,9 @@ describe('CLI builder unit test', () => {
       when: 'building the root command',
       expectedVersion: packageJson.version,
     },
-  ])('should $should when $when', ({ expectedVersion }) => {
+  ])('should $should when $when', async ({ expectedVersion }) => {
+    vi.stubGlobal('__APP_VERSION__', expectedVersion);
+    const { createCli } = await import('@/presentation/cli/cli');
     const cli = createCli([]);
 
     expect(cli.options.some((option) => option.short === '-V')).toBe(true);

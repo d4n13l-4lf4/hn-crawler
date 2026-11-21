@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { CrawlerUseCase } from '@/application/usecases/crawler.usecase';
 import { TrackedCrawlerUseCase } from '@/application/usecases/decorators/tracked-crawler.usecase';
 import { UsageQueryUseCase } from '@/application/usecases/usage-query.usecase';
