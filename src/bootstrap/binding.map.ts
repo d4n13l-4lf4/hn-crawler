@@ -20,11 +20,10 @@ import {
 } from './tokens';
 import type { createConfig } from '@/config/config';
 import type { HnHttpClient } from '@/infrastructure/web/hn-http.client';
-import type { HnWebAdapter } from '@/infrastructure/web/hn-web.adapter';
-import type { CrawlerUseCase } from '@/application/usecases/crawler.usecase';
-import type { TrackedCrawlerUseCase } from '@/application/usecases/decorators/tracked-crawler.usecase';
-import type { UsageQueryUseCase } from '@/application/usecases/usage-query.usecase';
-import type { SqliteUsageRepository } from '@/infrastructure/persistence/sqlite/repositories/usage.repository';
+import type { EntrySourcePort } from '@/application/ports/out/entry-source.port';
+import type { UsageRepositoryPort } from '@/application/ports/out/usage-repository.port';
+import type { CrawlerPort } from '@/application/ports/in/crawler.port';
+import type { UsageQueryPort } from '@/application/ports/in/usage-query.port';
 import { pipelineFactory } from '@/application/pipeline/factory/factory';
 import { migrateSqlite } from '@/infrastructure/persistence/sqlite/sqlite-migrator';
 import { getSqlitePath } from '@/infrastructure/persistence/sqlite/sqlite-path';
@@ -32,14 +31,14 @@ import { createAxiosHttpClient } from '@/infrastructure/web/axios';
 import { createSqliteClient } from '@/infrastructure/persistence/sqlite/sqlite.client';
 
 export type BindingConfig = ReturnType<typeof createConfig>;
-export type BindingEntrySource = HnWebAdapter; // implements EntrySourcePort
+export type BindingEntrySource = EntrySourcePort;
 export type BindingHttpClient = HnHttpClient;
 export type BindingAxiosInstance = ReturnType<typeof createAxiosHttpClient>;
 export type BindingSqliteClient = ReturnType<typeof createSqliteClient>;
-export type BindingUsageRepository = SqliteUsageRepository; // implements UsageRepositoryPort
-export type BindingCrawlerUseCase = CrawlerUseCase; // implements CrawlerPort
-export type BindingTrackedCrawlerUseCase = TrackedCrawlerUseCase; // implements CrawlerPort
-export type BindingUsageQueryUseCase = UsageQueryUseCase; // implements UsageQueryPort
+export type BindingUsageRepository = UsageRepositoryPort;
+export type BindingCrawlerUseCase = CrawlerPort;
+export type BindingTrackedCrawlerUseCase = CrawlerPort;
+export type BindingUsageQueryUseCase = UsageQueryPort;
 export type BindingPipelineFactory = typeof pipelineFactory;
 export type BindingSqliteMigrator = typeof migrateSqlite;
 export type BindingSqlitePathResolver = typeof getSqlitePath;
