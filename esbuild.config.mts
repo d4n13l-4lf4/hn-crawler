@@ -6,7 +6,7 @@ const packageJson = JSON.parse(
 );
 
 await build({
-  entryPoints: ['src/presentation/main.ts'],
+  entryPoints: ['src/main.ts'],
   outfile: 'dist/main.js',
   platform: 'node',
   target: 'node26',
