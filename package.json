@@ -58,11 +58,13 @@
   },
   "homepage": "https://github.com/d4n13l-4lf4/hn-crawler#readme",
   "dependencies": {
+    "@inversifyjs/strongly-typed": "3.0.1",
     "axios": "1.21.1",
     "cheerio": "1.0.0",
     "commander": "12.1.0",
     "drizzle-orm": "1.0.0-rc.5",
-    "env-paths": "4.0.0"
+    "env-paths": "4.0.0",
+    "inversify": "8.3.0"
   },
   "devDependencies": {
     "@cucumber/cucumber": "10.8.0",
