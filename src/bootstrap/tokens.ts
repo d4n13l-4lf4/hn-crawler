@@ -16,3 +16,4 @@ export const UsageQueryUseCase: unique symbol = Symbol('UsageQueryUseCase');
 export const PipelineFactory: unique symbol = Symbol('PipelineFactory');
 export const SqliteMigrator: unique symbol = Symbol('SqliteMigrator');
 export const SqlitePathResolver: unique symbol = Symbol('SqlitePathResolver');
+export const DatabasePath: unique symbol = Symbol('DatabasePath');

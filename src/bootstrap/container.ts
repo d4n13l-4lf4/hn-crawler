@@ -24,6 +24,7 @@ import {
   PipelineFactory,
   SqliteMigrator,
   SqlitePathResolver,
+  DatabasePath,
 } from './tokens';
 import type {
   ContainerBindings,
@@ -35,15 +36,24 @@ import type {
   BindingUsageRepository,
   BindingCrawlerUseCase,
   BindingPipelineFactory,
+  BindingDatabasePath,
 } from './binding.map';
 
-export function createContainer(databasePath: string) {
+export function createContainer() {
   const container = new TypedContainer<ContainerBindings>();
 
   container.bind(Config).toConstantValue(config);
+  container.bind(DatabasePath).toDynamicValue((ctx) => {
+    const cfg = ctx.get<BindingConfig>(Config);
+    return getSqlitePath(cfg.usageDatabasePath);
+  });
   container
     .bind(SqliteClient)
-    .toConstantValue(createSqliteClient(databasePath));
+    .toDynamicValue((ctx) => {
+      const dbPath = ctx.get<BindingDatabasePath>(DatabasePath);
+      return createSqliteClient(dbPath);
+    })
+    .inSingletonScope();
   container.bind(SqliteMigrator).toConstantValue(migrateSqlite);
   container.bind(SqlitePathResolver).toConstantValue(getSqlitePath);
   container.bind(PipelineFactory).toConstantValue(pipelineFactory);

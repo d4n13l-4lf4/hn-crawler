@@ -17,6 +17,7 @@ import {
   PipelineFactory,
   SqliteMigrator,
   SqlitePathResolver,
+  DatabasePath,
 } from './tokens';
 import type { createConfig } from '@/config/config';
 import type { HnHttpClient } from '@/infrastructure/web/hn-http.client';
@@ -42,6 +43,7 @@ export type BindingUsageQueryUseCase = UsageQueryPort;
 export type BindingPipelineFactory = typeof pipelineFactory;
 export type BindingSqliteMigrator = typeof migrateSqlite;
 export type BindingSqlitePathResolver = typeof getSqlitePath;
+export type BindingDatabasePath = string;
 
 /**
  * ContainerBindings maps each container token symbol to its resolved container type.
@@ -62,6 +64,7 @@ export type ContainerBindings = {
   [PipelineFactory]: BindingPipelineFactory;
   [SqliteMigrator]: BindingSqliteMigrator;
   [SqlitePathResolver]: BindingSqlitePathResolver;
+  [DatabasePath]: BindingDatabasePath;
 };
 
 /**

@@ -1,6 +1,4 @@
 import { createContainer } from '@/bootstrap/container';
-import { config } from '@/config/config';
-import { getSqlitePath } from '@/infrastructure/persistence/sqlite/sqlite-path';
 import { createCli } from '@/presentation/cli/cli';
 import { createCrawlCommand } from '@/presentation/cli/crawl';
 import { createUsageCommand } from '@/presentation/cli/usage';
@@ -12,8 +10,7 @@ import {
 } from '@/bootstrap/tokens';
 
 async function main(): Promise<void> {
-  const databasePath = await getSqlitePath(config.usageDatabasePath);
-  const container = createContainer(databasePath);
+  const container = createContainer();
 
   const database = container.get(SqliteClient);
   const migrator = container.get(SqliteMigrator);
