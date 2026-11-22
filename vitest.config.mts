@@ -16,6 +16,8 @@ export default defineConfig({
       exclude: [
         'dist/',
         'node_modules/',
+        'src/bootstrap/',
+        'src/main.ts',
         'src/presentation/main.ts',
         'src/**/*.d.ts',
         'src/**/ports/**/*.ts',

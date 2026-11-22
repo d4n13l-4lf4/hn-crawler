@@ -30,8 +30,8 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T002 [P] Create `src/bootstrap/tokens.ts` with Symbol tokens for all container bindings (Config, EntrySource, HttpClient, AxiosInstance, SqliteClient, UsageRepository, CrawlerUseCase, TrackedCrawlerUseCase, UsageQueryUseCase, PipelineFactory, SqliteMigrator, SqlitePathResolver)
-- [ ] T003 [P] Create `src/bootstrap/binding.map.ts` with binding type definitions mapping tokens to concrete types and singleton scope
+- [x] T002 [P] Create `src/bootstrap/tokens.ts` with Symbol tokens for all container bindings (Config, EntrySource, HttpClient, AxiosInstance, SqliteClient, UsageRepository, CrawlerUseCase, TrackedCrawlerUseCase, UsageQueryUseCase, PipelineFactory, SqliteMigrator, SqlitePathResolver)
+- [x] T003 [P] Create `src/bootstrap/binding.map.ts` with binding type definitions mapping tokens to concrete types and singleton scope
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -45,11 +45,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T004 [US1] Create `src/bootstrap/container.ts` with `createContainer` function that assembles the inversify container with all singleton bindings (depends on T002, T003)
-- [ ] T005 [US1] Refactor `src/main.ts` — move composition root from `src/presentation/main.ts`, use `createContainer()` at startup, resolve migration dependencies and execute migration, resolve use cases and pass to CLI commands, preserve error handling and database close (depends on T004)
-- [ ] T006 [US1] Delete `src/presentation/main.ts` — remove old composition root now replaced by `src/main.ts` (depends on T005)
-- [ ] T007 [US1] Update `vitest.config.mts` coverage exclusion — add `src/bootstrap/` and `src/main.ts` to the exclude list (replacing the old `src/presentation/main.ts` exclusion) (depends on T005)
-- [ ] T008 [US1] Run quality gates (`npm run quality`) to verify format, lint, typecheck, and 100% coverage pass with no regressions (depends on T005, T006, T007)
+- [x] T004 [US1] Create `src/bootstrap/container.ts` with `createContainer` function that assembles the inversify container with all singleton bindings (depends on T002, T003)
+- [x] T005 [US1] Refactor `src/main.ts` — move composition root from `src/presentation/main.ts`, use `createContainer()` at startup, resolve migration dependencies and execute migration, resolve use cases and pass to CLI commands, preserve error handling and database close (depends on T004)
+- [x] T006 [US1] Delete `src/presentation/main.ts` — remove old composition root now replaced by `src/main.ts` (depends on T005)
+- [x] T007 [US1] Update `vitest.config.mts` coverage exclusion — add `src/bootstrap/` and `src/main.ts` to the exclude list (replacing the old `src/presentation/main.ts` exclusion) (depends on T005)
+- [x] T008 [US1] Run quality gates (`npm run quality`) to verify format, lint, typecheck, and 100% coverage pass with no regressions (depends on T005, T006, T007)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently — CLI behaves identically before and after the DI refactor
 
@@ -59,8 +59,8 @@
 
 **Purpose**: Improvements that affect multiple user stories / documentation updates
 
-- [ ] T009 [P] Update `docs/ARCHITECTURE.md` — composition root path (`src/presentation/main.ts` → `src/main.ts`), project structure tree (add `src/bootstrap/`), folder responsibilities table, technologies table (add inversify + strongly-typed)
-- [ ] T010 [P] Update `docs/QA.md` — coverage exclusion path (`src/presentation/main.ts` → `src/main.ts` plus `src/bootstrap/`) and note that `inversify` DI is application-level only, not for unit testing
+- [x] T009 [P] Update `docs/ARCHITECTURE.md` — composition root path (`src/presentation/main.ts` → `src/main.ts`), project structure tree (add `src/bootstrap/`), folder responsibilities table, technologies table (add inversify + strongly-typed)
+- [x] T010 [P] Update `docs/QA.md` — coverage exclusion path (`src/presentation/main.ts` → `src/main.ts` plus `src/bootstrap/`) and note that `inversify` DI is application-level only, not for unit testing
 
 ---
 
