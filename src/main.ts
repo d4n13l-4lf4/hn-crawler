@@ -10,16 +10,18 @@ import {
 } from '@/bootstrap/tokens';
 
 async function main(): Promise<void> {
-  const container = createContainer();
-
-  const database = container.get(SqliteClient);
-  const migrator = container.get(SqliteMigrator);
+  let database;
 
   try {
+    const container = createContainer();
+
+    database = await container.getAsync(SqliteClient);
+    const migrator = container.get(SqliteMigrator);
+
     migrator(database);
 
-    const trackedCrawler = container.get(TrackedCrawlerUseCaseToken);
-    const usageQuery = container.get(UsageQueryUseCaseToken);
+    const trackedCrawler = await container.getAsync(TrackedCrawlerUseCaseToken);
+    const usageQuery = await container.getAsync(UsageQueryUseCaseToken);
 
     const cli = createCli([
       createCrawlCommand(trackedCrawler),
@@ -35,7 +37,7 @@ async function main(): Promise<void> {
     process.stderr.write('\n');
     process.exitCode = 1;
   } finally {
-    database.$client.close();
+    database?.$client.close();
   }
 }
 
