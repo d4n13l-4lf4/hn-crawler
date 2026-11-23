@@ -24,7 +24,7 @@
 
 ## Coverage
 
-Vitest uses the V8 coverage provider and enforces 100% per-file and aggregate coverage for statements, branches, functions, and lines. Coverage excludes `src/presentation/main.ts`, declaration files, port files, and `*.type.ts` files.
+Vitest uses the V8 coverage provider and enforces 100% per-file and aggregate coverage for statements, branches, functions, and lines. Coverage excludes `src/main.ts`, `src/bootstrap/`, declaration files, port files, and `*.type.ts` files.
 
 ## Quality gates
 

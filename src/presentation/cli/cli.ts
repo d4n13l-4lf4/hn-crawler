@@ -1,7 +1,5 @@
 import { Command } from 'commander';
 
-declare const __APP_VERSION__: string;
-
 export function createCli(commands: Command[]): Command {
   const program = new Command();
   program

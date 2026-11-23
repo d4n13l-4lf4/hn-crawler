@@ -15,7 +15,7 @@ A standalone CLI that retrieves up to the first 30 Hacker News entries (rank, ti
 
 ### Dependency rule
 
-`presentation → application → domain`, and `infrastructure → application (ports) + domain`. The domain imports nothing. The application never imports from infrastructure or presentation. Only the composition root instantiates concrete adapters.
+`presentation → application → domain`, and `infrastructure → application (ports) + domain`. The domain imports nothing. The application never imports from infrastructure or presentation. Only the composition root (`src/main.ts`) instantiates concrete adapters.
 
 ## Domain rules
 
@@ -57,12 +57,16 @@ hn-crawler/
 │   │           ├── schema/usage.schema.ts
 │   │           ├── sqlite-migrator.ts
 │   │           └── sqlite.client.ts
-│   └── presentation/
-│       ├── cli/
-│       │   ├── cli.ts
-│       │   ├── crawl.ts
-│       │   └── usage.ts
-│       └── main.ts                 <-- composition root / DI
+│   ├── presentation/
+│   │   ├── cli/
+│   │   │   ├── cli.ts
+│   │   │   ├── crawl.ts
+│   │   │   └── usage.ts
+│   ├── bootstrap/
+│   │   ├── container.ts
+│   │   ├── tokens.ts
+│   │   └── binding.map.ts
+│   └── main.ts                 <-- composition root / DI
 ├── drizzle/
 │   └── migrations/
 ├── tests/
@@ -87,24 +91,25 @@ The web adapter uses `hn-http.client.ts`, `hn-crawler.parser.ts`, and `hn-web.ad
 
 ### Folder responsibilities
 
-| Folder                                  | Responsibility                                                                                                                                                                  |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/domain`                            | Pure core: entities, value objects, and policies such as title-word predicates. No external dependencies; unaware of streams, HTTP, databases or the CLI.                       |
-| `src/application`                       | Crawler and usage-query use cases coordinate ports, mapping, and pipeline behavior without depending on infrastructure or presentation.                                         |
-| `src/application/ports`                 | Interfaces that decouple the crawler use case from entry-source and pipeline implementations.                                                                                   |
-| `src/application/pipeline`              | Async stream building blocks: `pipeAsync`, lazy `filter`, bounded `topK`, configured title filters, and the pipeline factory.                                                   |
-| `src/application/pipeline/orchestrator` | Composes asynchronous iterable steps in order.                                                                                                                                  |
-| `src/application/pipeline/steps`        | Single-responsibility asynchronous steps configured with domain policies.                                                                                                       |
-| `src/application/pipeline/factory`      | Creates a pipeline for the requested ranking and optional title-word filter.                                                                                                    |
-| `src/infrastructure/web`                | Native HTTP fetching, lazy HTML-to-entry parsing with Cheerio, and the adapter implementing the entry-source port.                                                              |
-| `src/infrastructure/persistence`        | Usage repository, schema, database path, SQLite client, and migration setup. Drizzle ORM accesses the built-in Node SQLite driver.                                              |
-| `src/config`                            | Environment-backed runtime configuration, including database path override and usage retention limit.                                                                           |
-| `src/presentation`                      | Driving adapter: `cli/cli.ts`, `cli/crawl.ts`, and `cli/usage.ts` define commands; `main.ts` is the composition root that instantiates concrete adapters and injects use cases. |
-| `tests/resources`                       | Static HTML snapshot shared by unit tests, so parsing tests do not need the live site.                                                                                          |
-| `tests/unit`                            | Mirrors `src`; see `QA.md`.                                                                                                                                                     |
-| `tests/acceptance`                      | Gherkin `features` and `steps` exercising the CLI process; see `QA.md`.                                                                                                         |
-| `docs`                                  | Project documentation.                                                                                                                                                          |
-| `.github/workflows`, `.husky`           | CI/CD workflows and git hooks; see `CICD.md`.                                                                                                                                   |
+| Folder                                  | Responsibility                                                                                                                                                    |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/domain`                            | Pure core: entities, value objects, and policies such as title-word predicates. No external dependencies; unaware of streams, HTTP, databases or the CLI.         |
+| `src/application`                       | Crawler and usage-query use cases coordinate ports, mapping, and pipeline behavior without depending on infrastructure or presentation.                           |
+| `src/application/ports`                 | Interfaces that decouple the crawler use case from entry-source and pipeline implementations.                                                                     |
+| `src/application/pipeline`              | Async stream building blocks: `pipeAsync`, lazy `filter`, bounded `topK`, configured title filters, and the pipeline factory.                                     |
+| `src/application/pipeline/orchestrator` | Composes asynchronous iterable steps in order.                                                                                                                    |
+| `src/application/pipeline/steps`        | Single-responsibility asynchronous steps configured with domain policies.                                                                                         |
+| `src/application/pipeline/factory`      | Creates a pipeline for the requested ranking and optional title-word filter.                                                                                      |
+| `src/infrastructure/web`                | Native HTTP fetching, lazy HTML-to-entry parsing with Cheerio, and the adapter implementing the entry-source port.                                                |
+| `src/infrastructure/persistence`        | Usage repository, schema, database path, SQLite client, and migration setup. Drizzle ORM accesses the built-in Node SQLite driver.                                |
+| `src/config`                            | Environment-backed runtime configuration, including database path override and usage retention limit.                                                             |
+| `src/presentation`                      | Driving adapter: `cli/cli.ts`, `cli/crawl.ts`, and `cli/usage.ts` define commands.                                                                                |
+| `src/bootstrap`                         | Dependency injection wiring: `container.ts` assembles the inversify container, `tokens.ts` defines binding symbols, `binding.map.ts` documents the binding graph. |
+| `tests/resources`                       | Static HTML snapshot shared by unit tests, so parsing tests do not need the live site.                                                                            |
+| `tests/unit`                            | Mirrors `src`; see `QA.md`.                                                                                                                                       |
+| `tests/acceptance`                      | Gherkin `features` and `steps` exercising the CLI process; see `QA.md`.                                                                                           |
+| `docs`                                  | Project documentation.                                                                                                                                            |
+| `.github/workflows`, `.husky`           | CI/CD workflows and git hooks; see `CICD.md`.                                                                                                                     |
 
 ### Conventions
 
@@ -142,3 +147,4 @@ Testing and delivery tooling is described in `QA.md` and `CICD.md`.
 | `env-paths`                                      | Resolve the operating system's per-user data directory for the default SQLite database                            |
 | TypeScript path aliases + `tsc-alias`            | `@/*` source imports are rewritten to runtime paths after compilation                                             |
 | Vitest + coverage v8, Cucumber, ESLint, Prettier | Unit and acceptance testing, coverage, linting, and formatting; quality-gate details are in `QA.md`               |
+| inversify + @inversifyjs/strongly-typed          | Programmatic dependency injection container (application level only, no decorators)                               |
