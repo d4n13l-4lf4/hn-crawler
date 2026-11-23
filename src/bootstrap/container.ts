@@ -43,14 +43,14 @@ export function createContainer() {
   const container = new TypedContainer<ContainerBindings>();
 
   container.bind(Config).toConstantValue(config);
-  container.bind(DatabasePath).toDynamicValue((ctx) => {
+  container.bind(DatabasePath).toDynamicValue(async (ctx) => {
     const cfg = ctx.get<BindingConfig>(Config);
-    return getSqlitePath(cfg.usageDatabasePath);
+    return await getSqlitePath(cfg.usageDatabasePath);
   });
   container
     .bind(SqliteClient)
-    .toDynamicValue((ctx) => {
-      const dbPath = ctx.get<BindingDatabasePath>(DatabasePath);
+    .toDynamicValue(async (ctx) => {
+      const dbPath = await ctx.getAsync<BindingDatabasePath>(DatabasePath);
       return createSqliteClient(dbPath);
     })
     .inSingletonScope();
@@ -90,8 +90,8 @@ export function createContainer() {
 
   container
     .bind(UsageRepository)
-    .toDynamicValue((ctx) => {
-      const database = ctx.get<BindingSqliteClient>(SqliteClient);
+    .toDynamicValue(async (ctx) => {
+      const database = await ctx.getAsync<BindingSqliteClient>(SqliteClient);
       const cfg = ctx.get<BindingConfig>(Config);
       return new SqliteUsageRepository(database, cfg.usageRetentionLimit);
     })
@@ -108,17 +108,19 @@ export function createContainer() {
 
   container
     .bind(TrackedCrawlerUseCaseToken)
-    .toDynamicValue((ctx) => {
+    .toDynamicValue(async (ctx) => {
       const crawler = ctx.get<BindingCrawlerUseCase>(CrawlerUseCaseToken);
-      const usageRepository = ctx.get<BindingUsageRepository>(UsageRepository);
+      const usageRepository =
+        await ctx.getAsync<BindingUsageRepository>(UsageRepository);
       return new TrackedCrawlerUseCase(crawler, usageRepository);
     })
     .inSingletonScope();
 
   container
     .bind(UsageQueryUseCaseToken)
-    .toDynamicValue((ctx) => {
-      const usageRepository = ctx.get<BindingUsageRepository>(UsageRepository);
+    .toDynamicValue(async (ctx) => {
+      const usageRepository =
+        await ctx.getAsync<BindingUsageRepository>(UsageRepository);
       return new UsageQueryUseCase(usageRepository);
     })
     .inSingletonScope();
